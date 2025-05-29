@@ -1,68 +1,45 @@
 package conectiontingsboard;
 
-import java.io.FileWriter;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.time.Instant;
+
 public class ExportacaoDadosPWBI {
-    public static void exportToCSV(JsonObject data) throws Exception {
-        // Configurar o formato de números com ponto decimal
-        DecimalFormat decimalFormat = new DecimalFormat("#.##");
-        decimalFormat.setDecimalSeparatorAlwaysShown(false);
 
-        // Escrevendo o arquivo CSV
-        try (FileWriter writer = new FileWriter("C:\\Users\\Desn01\\Documents\\Powerbi/output.csv", false)) { // "false" sobrescreve o arquivo
-            // Cabeçalhos do arquivo
-            writer.append("Data/Hora,Metricas,Value\n");
+    private static final String POWER_BI_API_URL = "https://api.powerbi.com/beta/f06a7122-3027-4312-b120-38f60897fba4/datasets/de1e5aee-b655-4e65-8db7-d8674d2e0faa/rows?experience=power-bi&key=w5jrwVRtiix7WSdcuKVvly3WbLa2FlxmMJStI6BfT%2FTGQskytnGRu1JR9fLEyZODKueBxaJh5y9oe2q9VF3XDQ%3D%3D";
 
-            // Iterar pelos valores recebidos
-            for (String key : data.keySet()) {
-                for (JsonElement element : data.getAsJsonArray(key)) {
-                    JsonObject record = element.getAsJsonObject();
+    public static void sendFormattedToPowerBI(String metrica, double valor, Instant timestamp) throws Exception {
+        JsonObject payload = new JsonObject();
+        payload.addProperty("Metricas", metrica);
+        payload.addProperty("Valor", valor);
+        payload.addProperty("DataHora", timestamp.toString()); // formato ISO 8601
 
-                    // Converter timestamp para formato de data legível
-                    long timestamp = record.get("ts").getAsLong();
-                    String formattedDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                            .format(new Date(timestamp));
+        // Power BI espera um array de objetos JSON
+        String jsonArray = "[" + payload.toString() + "]";
 
-                    // Obter o valor e formatar, se necessário
-                    String value = record.get("value").getAsString();
-                    if (key.equalsIgnoreCase("Fator_Potencia")) {
-                        value = decimalFormat.format(Double.parseDouble(value));
-                    }
-
-                    // Escrever os dados no arquivo CSV
-                    writer.append(formattedDate)
-                            .append(",")
-                            .append(key)
-                            .append(",")
-                            .append(value)
-                            .append("\n");
-                }
-            }
-        }
-
-        // Mensagem de sucesso
-        System.out.println("Arquivo 'output.csv' atualizado com sucesso!");
+        sendJsonToPowerBI(jsonArray);
     }
 
-    public static void main(String[] args) throws Exception {
-        try {
-            // Obter o token e buscar os dados do ThingsBoard
-            String token = ThingsBoardAPI.getToken();
-            JsonObject data = ThingsBoardAPI.fetchData(token);
+    public static void sendJsonToPowerBI(String jsonData) throws Exception {
+        URL url = new URL(POWER_BI_API_URL);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setDoOutput(true);
 
-            // Exportar os dados para o CSV
-            exportToCSV(data);
-        } catch (Exception e) {
-            // Tratamento de erros
-            System.err.println("Erro ao exportar os dados: " + e.getMessage());
-            e.printStackTrace();
+        try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream())) {
+            writer.write(jsonData);
+            writer.flush();
+        }
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_ACCEPTED) {
+            System.out.println("Dados enviados para o Power BI com sucesso!");
+        } else {
+            throw new RuntimeException("Falha ao enviar dados para o Power BI: " + responseCode);
         }
     }
 }
-
