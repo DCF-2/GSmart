@@ -1,8 +1,10 @@
 import thingsboard.SimuladordeDispositivo;
 import conectiontingsboard.ExportacaoDadosPWBI;
-// import conectiontingsboard.ThingsBoardAPI;
+//import conectiontingsboard.ThingsBoardAPI;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 public class Main {
@@ -13,8 +15,10 @@ public class Main {
 
         // Thread para simular envio contínuo de dados
         Thread simuladorThread = new Thread(() -> {
+            int contador = 0; // Identificar cada ciclo
             while (true) {
                 try {
+                    contador++;
                     // Geração de dados aleatórios (igual ao simulador)
                     double Tensao = 200 + rand.nextInt(100) - 50;
                     double Corrente = 30 + rand.nextInt(20) - 10;
@@ -23,6 +27,7 @@ public class Main {
                     double Fator_Potencia = 0.3 + rand.nextDouble() * 0.7;
                     double temperature = 10 + rand.nextInt(80);
 
+                    // Dados em formato JSON para o ThingsBoard
                     String jsonData = "{"
                             + "\"Tensao\": " + Tensao + ","
                             + "\"Corrente\": " + Corrente + ","
@@ -34,18 +39,23 @@ public class Main {
 
                     // Enviar os dados simulados ao ThingsBoard
                     SimuladordeDispositivo.sendToThingsBoard(deviceToken, jsonData);
+                    //System.out.println("Dados enviados com sucesso para o ThingsBoard!");
 
-                    // Enviar os dados para o Power BI
+                    // Consolidar os dados para envio ao Power BI
+                    Map<String, Double> metrics = new HashMap<>();
+                    metrics.put("Tensao", Tensao);
+                    metrics.put("Corrente", Corrente);
+                    metrics.put("PotenciaAtiva", PotenciaAtiva);
+                    metrics.put("PotenciaReativa", PotenciaReativa);
+                    metrics.put("Fator_Potencia", Fator_Potencia);
+                    metrics.put("Temperatura", temperature);
+
+                    // Enviar todos os dados ao Power BI de uma vez
                     Instant now = Instant.now();
-
-                    ExportacaoDadosPWBI.sendFormattedToPowerBI("Tensao", Tensao, now);
-                    ExportacaoDadosPWBI.sendFormattedToPowerBI("Corrente", Corrente, now);
-                    ExportacaoDadosPWBI.sendFormattedToPowerBI("PotenciaAtiva", PotenciaAtiva, now);
-                    ExportacaoDadosPWBI.sendFormattedToPowerBI("PotenciaReativa", PotenciaReativa, now);
-                    ExportacaoDadosPWBI.sendFormattedToPowerBI("Fator_Potencia", Fator_Potencia, now);
-                    ExportacaoDadosPWBI.sendFormattedToPowerBI("Temperatura", temperature, now);
+                    ExportacaoDadosPWBI.sendAllMetricsToPowerBI(metrics, now);
 
                     // Aguardar 10 segundos antes do próximo envio
+                    System.out.println("Ciclo " + contador + " concluído. Aguardando 10 segundos...");
                     Thread.sleep(10000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -54,26 +64,29 @@ public class Main {
         });
 
         simuladorThread.start();
-
-        /*
-        // FUNCIONALIDADE ANTIGA: Exportar CSV a cada 60 segundos (inutilizada)
-        // import conectiontingsboard.ThingsBoardAPI;
-        // while (true) {
-        //     try {
-        //         Thread.sleep(60000); // 60 segundos
-        //
-        //         // Obter token e buscar dados do ThingsBoard
-        //         String token = ThingsBoardAPI.getToken();
-        //         JsonObject data = ThingsBoardAPI.fetchData(token);
-        //
-        //         // Exportar dados para o arquivo CSV
-        //         ExportacaoDadosPWBI.exportToCSV(data);
-        //
-        //     } catch (Exception e) {
-        //         System.err.println("Erro ao exportar dados: " + e.getMessage());
-        //         e.printStackTrace();
-        //     }
-        // }
-        */
     }
 }
+
+        /*
+         * FUNCIONALIDADE ANTIGA: Exportar CSV a cada 60 segundos (inutilizada)
+         * Este trecho foi desativado para evitar duplicação de envios ou funcionalidades desnecessárias.
+         *
+         * // while (true) {
+         * //     try {
+         * //         Thread.sleep(60000); // 60 segundos
+         * //
+         * //         // Obter token e buscar dados do ThingsBoard
+         * //         String token = ThingsBoardAPI.getToken();
+         * //         JsonObject data = ThingsBoardAPI.fetchData(token);
+         * //
+         * //         // Exportar dados para o arquivo CSV
+         * //         ExportacaoDadosPWBI.exportToCSV(data);
+         * //
+         * //     } catch (Exception e) {
+         * //         System.err.println("Erro ao exportar dados: " + e.getMessage());
+         * //         e.printStackTrace();
+         * //     }
+         * // }
+         */
+
+

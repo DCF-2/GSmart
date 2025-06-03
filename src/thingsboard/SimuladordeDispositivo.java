@@ -8,9 +8,11 @@ import java.io.OutputStream;
 public class SimuladordeDispositivo {
 
     static String IP_TB = "http://10.5.0.80:8080/api/v1/";
+    private static int contadorEnvios = 0; // Contador de envios
 
     // Função para enviar dados para o ThingsBoard
     public static void sendToThingsBoard(String deviceToken, String jsonData) throws IOException {
+        contadorEnvios++; // Incrementa a cada envio
         URL url = new URL(IP_TB + deviceToken + "/telemetry");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
@@ -26,9 +28,10 @@ public class SimuladordeDispositivo {
 
         int responseCode = conn.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
+            System.out.println("Envio " + contadorEnvios + ":");
             System.out.println("Dados enviados com sucesso para o ThingsBoard!");
         } else {
-            System.out.println("Falha ao enviar dados. Código de resposta: " + responseCode);
+            System.out.println("Envio " + contadorEnvios + ": Falha ao enviar dados. Código de resposta: " + responseCode);
         }
     }
 }
