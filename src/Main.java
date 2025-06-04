@@ -1,6 +1,6 @@
 import thingsboard.SimuladordeDispositivo;
 import conectiontingsboard.ExportacaoDadosPWBI;
-//import conectiontingsboard.ThingsBoardAPI;
+import functrendz.FuncTrendZ;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -41,6 +41,9 @@ public class Main {
                     SimuladordeDispositivo.sendToThingsBoard(deviceToken, jsonData);
                     //System.out.println("Dados enviados com sucesso para o ThingsBoard!");
 
+                    // Registrar o consumo no FuncTrendZ
+                    FuncTrendZ.registrarConsumo(PotenciaAtiva);
+
                     // Consolidar os dados para envio ao Power BI
                     Map<String, Double> metrics = new HashMap<>();
                     metrics.put("Tensao", Tensao);
@@ -54,8 +57,16 @@ public class Main {
                     Instant now = Instant.now();
                     ExportacaoDadosPWBI.sendAllMetricsToPowerBI(metrics, now);
 
+                    // Exibir dados acumulados a cada 10 ciclos
+                    if (contador % 10 == 0) {
+                        double consumoTotal = FuncTrendZ.getHistoricoConsumo().stream().mapToDouble(Double::doubleValue).sum();
+                        double custoTotal = FuncTrendZ.calcularCusto();
+                        System.out.printf("Ciclo %d concluído. Consumo acumulado: %.2f kWh, Custo total: R$ %.2f.%n",
+                                contador, consumoTotal, custoTotal);
+                    }
+
                     // Aguardar 10 segundos antes do próximo envio
-                    System.out.println("Ciclo " + contador + " concluído. Aguardando 10 segundos...");
+                    System.out.printf("Ciclo %d concluído. Aguardando 10 segundos...%n", contador);
                     Thread.sleep(10000);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -67,7 +78,7 @@ public class Main {
     }
 }
 
-        /*
+/*
          * FUNCIONALIDADE ANTIGA: Exportar CSV a cada 60 segundos (inutilizada)
          * Este trecho foi desativado para evitar duplicação de envios ou funcionalidades desnecessárias.
          *
