@@ -24,7 +24,7 @@ public class Main {
                     double Corrente = 30 + rand.nextInt(20) - 10;
                     double PotenciaAtiva = 100 + rand.nextInt(80) - 40;
                     double PotenciaReativa = 50 + rand.nextInt(60) - 30;
-                    double Fator_Potencia = 0.3 + rand.nextDouble() * 0.7;
+                    double Fator_Potencia = 0.3;// + rand.nextDouble() * 0.7;
                     double temperature = 10 + rand.nextInt(80);
 
                     // Dados em formato JSON para o ThingsBoard
@@ -39,7 +39,7 @@ public class Main {
 
                     // Enviar os dados simulados ao ThingsBoard
                     SimuladordeDispositivo.sendToThingsBoard(deviceToken, jsonData);
-                    //System.out.println("Dados enviados com sucesso para o ThingsBoard!");
+                    FuncTrendZ.verificarManutencao(Fator_Potencia, temperature);
 
                     // Registrar o consumo no FuncTrendZ
                     FuncTrendZ.registrarConsumo(PotenciaAtiva);
