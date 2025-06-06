@@ -27,6 +27,23 @@ public class Main {
                     double Fator_Potencia = 0.3;// + rand.nextDouble() * 0.7;
                     double temperature = 10 + rand.nextInt(80);
 
+                    // **FORÇAR FALHA DE TESTE**:
+                    // No ciclo 5, por exemplo, atribuímos valores extremos para simular falha.
+                    if (contador == 5) {
+                        PotenciaAtiva = 2000;    // valor muito alto
+                        Fator_Potencia = 0.1;    // fator de potência muito baixo
+                        temperature = 100.0;     // temperatura muito alta
+                        System.out.println(">>> Ciclo " + contador + ": simulando valores anômalos para teste de falha.");
+                    }
+
+
+                    //No futuro você precisara capturar esses valores de outra fonte (como um dispositivo real)
+                    //você poderá implementar métodos de captura e substituí-los no código.
+                    //double temperatura = capturarTemperatura();
+                    //double fatorPotencia = capturarFatorPotencia();
+                    //double potenciaAtiva = capturarPotenciaAtiva();
+
+
                     // Dados em formato JSON para o ThingsBoard
                     String jsonData = "{"
                             + "\"Tensao\": " + Tensao + ","
@@ -39,10 +56,9 @@ public class Main {
 
                     // Enviar os dados simulados ao ThingsBoard
                     SimuladordeDispositivo.sendToThingsBoard(deviceToken, jsonData);
-                    FuncTrendZ.verificarManutencao(Fator_Potencia, temperature);
 
-                    // Registrar o consumo no FuncTrendZ
-                    FuncTrendZ.registrarConsumo(PotenciaAtiva);
+
+
 
                     // Consolidar os dados para envio ao Power BI
                     Map<String, Double> metrics = new HashMap<>();
@@ -57,16 +73,32 @@ public class Main {
                     Instant now = Instant.now();
                     ExportacaoDadosPWBI.sendAllMetricsToPowerBI(metrics, now);
 
+                    //Verifica a necessidade de manutençao e gera alertas para Fator_Potencia e temperature
+                    FuncTrendZ.verificarManutencao(Fator_Potencia, temperature);
+
+                    // Registrar métricas
+                    FuncTrendZ.registrarMetricas(temperature, Fator_Potencia, PotenciaAtiva);
+
+                    // Prever falhas
+                    boolean falhaDetectada = FuncTrendZ.preverFalhas();
+                    if (falhaDetectada) {
+                        System.out.println("***ALERTA (no ciclo " + contador + "): Falha detectada no sistema! Investigar imediatamente.***\n");
+                    }
+
+
+                    // Registrar o consumo no FuncTrendZ
+                    FuncTrendZ.registrarConsumo(PotenciaAtiva);
+
                     // Exibir dados acumulados a cada 10 ciclos
                     if (contador % 10 == 0) {
                         double consumoTotal = FuncTrendZ.getHistoricoConsumo().stream().mapToDouble(Double::doubleValue).sum();
                         double custoTotal = FuncTrendZ.calcularCusto();
-                        System.out.printf("Ciclo %d concluído. Consumo acumulado: %.2f kWh, Custo total: R$ %.2f.%n",
+                        System.out.printf(">>Ciclo %d concluído. Consumo acumulado: %.2f kWh, Custo total: R$ %.2f.%n",
                                 contador, consumoTotal, custoTotal);
                     }
 
                     // Aguardar 10 segundos antes do próximo envio
-                    System.out.printf("Ciclo %d concluído. Aguardando 10 segundos...%n", contador);
+                    System.out.printf(">>Ciclo %d concluído. Aguardando 10 segundos...%n \n", contador);
                     Thread.sleep(10000);
                 } catch (Exception e) {
                     e.printStackTrace();

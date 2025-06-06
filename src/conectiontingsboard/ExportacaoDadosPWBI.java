@@ -46,9 +46,9 @@ public class ExportacaoDadosPWBI {
 
         int responseCode = connection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_ACCEPTED) {
-            System.out.println("Dados enviados para o Power BI com sucesso!");
+            System.out.println("Dados enviados para o Power BI com sucesso!\n");
         } else {
-            throw new RuntimeException("Falha ao enviar dados para o Power BI: " + responseCode);
+            throw new RuntimeException("Falha ao enviar dados para o Power BI: \n" + responseCode);
         }
     }
 }
