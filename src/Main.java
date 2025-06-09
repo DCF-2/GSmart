@@ -1,66 +1,85 @@
 import thingsboard.SimuladordeDispositivo;
 import conectiontingsboard.ExportacaoDadosPWBI;
-import functrendz.FuncTrendZ;
+import static functrendz.GerenciamentoRecurso.*;
+import static functrendz.ConsumoEnergia.*;
+import static functrendz.Manutencao.*;
+import static functrendz.PrevisaoFalhas.*;
+import static functrendz.AnaliseEficiencia.*;
+import static functrendz.GeradorDeInsights.*;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 
 public class Main {
-    public static void main(String[] args) {
-        // Configurações iniciais
-        String deviceToken = "Bj8Fb7s9Oxj8n2GblelN"; // Token do dispositivo no ThingsBoard
-        Random rand = new Random();
 
-        // Thread para simular envio contínuo de dados
+    public static void main(String[] args) {
+        // --- 1. CONFIGURAÇÕES INICIAIS ---
+        String deviceToken = "Bj8Fb7s9Oxj8n2GblelN";
+        Random rand = new Random();
+        final double TEMPO_CICLO_EM_SEGUNDOS = 10.0;
+
+        System.out.println("🚀 INICIANDO GETSMART - SIMULADOR INDUSTRIAL INTEGRADO v4.0 🚀");
+        System.out.println("[SETUP] Configurando serviços e recursos iniciais...");
+        injetarMassa(500, false);
+        resetarHistorico();
+        resetarAnalise();
+        System.out.println("-----------------------------------------------------------------");
+
+        // --- 2. THREAD DE SIMULAÇÃO CONTÍNUA ---
         Thread simuladorThread = new Thread(() -> {
-            int contador = 0; // Identificar cada ciclo
+            int contador = 0;
             while (true) {
                 try {
                     contador++;
-                    // Geração de dados aleatórios (igual ao simulador)
+                    System.out.printf("\n--- Iniciando Ciclo de Simulação Nº %d ---\n", contador);
+
+                    // a. Geração de dados do processo
                     double Tensao = 200 + rand.nextInt(100) - 50;
                     double Corrente = 30 + rand.nextInt(20) - 10;
                     double PotenciaAtiva = 100 + rand.nextInt(80) - 40;
                     double PotenciaReativa = 50 + rand.nextInt(60) - 30;
-                    double Fator_Potencia = 0.3;// + rand.nextDouble() * 0.7;
-                    double temperature = 10 + rand.nextInt(80);
+                    double Fator_Potencia = 0.85 + rand.nextDouble() * 0.1;
+                    double temperature = 65 + rand.nextInt(20);
+                    double consumoMassa = 20 + rand.nextDouble() * 15;
+                    double massaReprocessadaCiclo = consumoMassa * (rand.nextDouble() * 0.05);
 
-                    // **FORÇAR FALHA DE TESTE**:
-                    // No ciclo 5, por exemplo, atribuímos valores extremos para simular falha.
-                    if (contador == 5) {
-                        PotenciaAtiva = 2000;    // valor muito alto
-                        Fator_Potencia = 0.1;    // fator de potência muito baixo
-                        temperature = 100.0;     // temperatura muito alta
-                        System.out.println(">>> Ciclo " + contador + ": simulando valores anômalos para teste de falha.");
-                    }
+                    // b. Módulos de Execução
+                    registrarConsumoRecurso(consumoMassa);
+                    registrarConsumo(PotenciaAtiva);
+                    double tempoCicloEmHoras = TEMPO_CICLO_EM_SEGUNDOS / 3600.0;
+                    double energiaConsumidaCiclo = (PotenciaAtiva / 1000) * tempoCicloEmHoras;
+                    registrarCiclo(consumoMassa, massaReprocessadaCiclo, energiaConsumidaCiclo);
+
+                    // c. Módulos de Análise
+                    StatusManutencao statusManutencao = verificarManutencao(Fator_Potencia, temperature);
+                    registrarMetricas(temperature, Fator_Potencia, PotenciaAtiva);
+                    boolean falhaDetectada = preverFalhas();
+
+                    // Captura das novas métricas de eficiência para o alarme
+                    double eficienciaMaterial = calcularEficienciaMaterial();
+
+                    // vvV ADICIONE OU VERIFIQUE ESTA LINHA vvv
+                    eficienciaMaterial = 92.5; // FORÇAR VALOR BAIXO PARA TESTE
+                    // ^^^ ADICIONE OU VERIFIQUE ESTA LINHA ^^^
+
+                    double eficienciaEnergetica = calcularEficienciaEnergetica();
 
 
-                    //No futuro você precisara capturar esses valores de outra fonte (como um dispositivo real)
-                    //você poderá implementar métodos de captura e substituí-los no código.
-                    //double temperatura = capturarTemperatura();
-                    //double fatorPotencia = capturarFatorPotencia();
-                    //double potenciaAtiva = capturarPotenciaAtiva();
+                    // d. Geração de Insights
+                    System.out.println("\n[ANÁLISE E DIAGNÓSTICO DO CICLO]");
+                    gerarInsightsDoCiclo(eficienciaMaterial, Fator_Potencia, temperature, statusManutencao, falhaDetectada);
 
-
-                    // Dados em formato JSON para o ThingsBoard
-                    String jsonData = "{"
-                            + "\"Tensao\": " + Tensao + ","
-                            + "\"Corrente\": " + Corrente + ","
-                            + "\"PotenciaAtiva\": " + PotenciaAtiva + ","
-                            + "\"PotenciaReativa\": " + PotenciaReativa + ","
-                            + "\"Fator_Potencia\": " + Fator_Potencia + ","
-                            + "\"temperature\": " + temperature
-                            + "}";
-
-                    // Enviar os dados simulados ao ThingsBoard
+                    // e. Envio de Dados para Plataformas Externas
+                    // A linha abaixo já inclui "eficienciaMaterial" para acionar seu alarme
+                    String jsonData = String.format(Locale.US,
+                            "{\"Tensao\":%.2f, \"Corrente\":%.2f, \"PotenciaAtiva\":%.2f, \"PotenciaReativa\":%.2f, \"Fator_Potencia\":%.2f, \"temperature\":%.2f, \"consumoMassa\":%.2f, \"massaReprocessada\":%.2f, \"eficienciaMaterial\":%.2f, \"eficienciaEnergetica\":%.2f, \"previsaoFalha\":%b}",
+                            Tensao, Corrente, PotenciaAtiva, PotenciaReativa, Fator_Potencia, temperature, consumoMassa, massaReprocessadaCiclo, eficienciaMaterial, eficienciaEnergetica, falhaDetectada
+                    );
                     SimuladordeDispositivo.sendToThingsBoard(deviceToken, jsonData);
 
-
-
-
-                    // Consolidar os dados para envio ao Power BI
                     Map<String, Double> metrics = new HashMap<>();
                     metrics.put("Tensao", Tensao);
                     metrics.put("Corrente", Corrente);
@@ -68,39 +87,31 @@ public class Main {
                     metrics.put("PotenciaReativa", PotenciaReativa);
                     metrics.put("Fator_Potencia", Fator_Potencia);
                     metrics.put("Temperatura", temperature);
+                    metrics.put("ConsumoMassa", consumoMassa);
+                    metrics.put("MassaReprocessada", massaReprocessadaCiclo);
+                    metrics.put("EficienciaMaterial", eficienciaMaterial);
+                    metrics.put("EficienciaEnergetica", eficienciaEnergetica);
+                    metrics.put("PrevisaoFalha", falhaDetectada ? 1.0 : 0.0);
+                    ExportacaoDadosPWBI.sendAllMetricsToPowerBI(metrics, Instant.now());
 
-                    // Enviar todos os dados ao Power BI de uma vez
-                    Instant now = Instant.now();
-                    ExportacaoDadosPWBI.sendAllMetricsToPowerBI(metrics, now);
-
-                    //Verifica a necessidade de manutençao e gera alertas para Fator_Potencia e temperature
-                    FuncTrendZ.verificarManutencao(Fator_Potencia, temperature);
-
-                    // Registrar métricas
-                    FuncTrendZ.registrarMetricas(temperature, Fator_Potencia, PotenciaAtiva);
-
-                    // Prever falhas
-                    boolean falhaDetectada = FuncTrendZ.preverFalhas();
-                    if (falhaDetectada) {
-                        System.out.println("***ALERTA (no ciclo " + contador + "): Falha detectada no sistema! Investigar imediatamente.***\n");
-                    }
-
-
-                    // Registrar o consumo no FuncTrendZ
-                    FuncTrendZ.registrarConsumo(PotenciaAtiva);
-
-                    // Exibir dados acumulados a cada 10 ciclos
+                    // f. Relatório Periódico
                     if (contador % 10 == 0) {
-                        double consumoTotal = FuncTrendZ.getHistoricoConsumo().stream().mapToDouble(Double::doubleValue).sum();
-                        double custoTotal = FuncTrendZ.calcularCusto();
-                        System.out.printf(">>Ciclo %d concluído. Consumo acumulado: %.2f kWh, Custo total: R$ %.2f.%n",
-                                contador, consumoTotal, custoTotal);
+                        System.out.println("\n--- RELATÓRIO PERIÓDICO (FIM DO CICLO " + contador + ") ---");
+                        double consumoTotalEnergia = getHistoricoConsumo().stream().mapToDouble(Double::doubleValue).sum();
+                        double custoTotal = calcularCusto();
+                        System.out.printf(Locale.US, "[ENERGIA] Consumo para custo: %.2f kWh | Custo total: R$ %.2f%n", consumoTotalEnergia, custoTotal);
+                        System.out.print("[RECURSO] ");
+                        exibirStatusRecurso();
+                        exibirRelatorioEficiencia();
+                        System.out.println("----------------------------------------------------");
                     }
 
-                    // Aguardar 10 segundos antes do próximo envio
-                    System.out.printf(">>Ciclo %d concluído. Aguardando 10 segundos...%n \n", contador);
-                    Thread.sleep(10000);
+                    // g. Aguardar próximo ciclo
+                    System.out.printf("\n>> Ciclo %d concluído. Aguardando %.0f segundos...%n", contador, TEMPO_CICLO_EM_SEGUNDOS);
+                    Thread.sleep((long) (TEMPO_CICLO_EM_SEGUNDOS * 1000));
+
                 } catch (Exception e) {
+                    System.err.println("Ocorreu um erro na thread do simulador: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
