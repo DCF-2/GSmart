@@ -1,135 +1,111 @@
-import thingsboard.SimuladordeDispositivo;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import conectiontingsboard.ExportacaoDadosPWBI;
-import functrendz.FuncTrendZ;
+import conectiontingsboard.ThingsBoardAPI;
+import functrendz.CalculoDeCusto;
+import functrendz.GeradorDeInsights;
+import functrendz.Manutencao;
+import functrendz.PrevisaoFalhas;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 public class Main {
-    public static void main(String[] args) {
-        // Configurações iniciais
-        String deviceToken = "Bj8Fb7s9Oxj8n2GblelN"; // Token do dispositivo no ThingsBoard
-        Random rand = new Random();
 
-        // Thread para simular envio contínuo de dados
-        Thread simuladorThread = new Thread(() -> {
-            int contador = 0; // Identificar cada ciclo
-            while (true) {
-                try {
-                    contador++;
-                    // Geração de dados aleatórios (igual ao simulador)
-                    double Tensao = 200 + rand.nextInt(100) - 50;
-                    double Corrente = 30 + rand.nextInt(20) - 10;
-                    double PotenciaAtiva = 100 + rand.nextInt(80) - 40;
-                    double PotenciaReativa = 50 + rand.nextInt(60) - 30;
-                    double Fator_Potencia = 0.3;// + rand.nextDouble() * 0.7;
-                    double temperature = 10 + rand.nextInt(80);
+    public static void main(String[] args) throws InterruptedException {
+        final long INTERVALO_EXECUCAO_SEGUNDOS = 5;
 
-                    // **FORÇAR FALHA DE TESTE**:
-                    // No ciclo 5, por exemplo, atribuímos valores extremos para simular falha.
-                    if (contador == 5) {
-                        PotenciaAtiva = 2000;    // valor muito alto
-                        Fator_Potencia = 0.1;    // fator de potência muito baixo
-                        temperature = 100.0;     // temperatura muito alta
-                        System.out.println(">>> Ciclo " + contador + ": simulando valores anômalos para teste de falha.");
-                    }
+        System.out.println("🚀 INICIANDO GETSMART - PROCESSADOR DE DADOS DE ENERGIA (v6) 🚀");
+        System.out.println("-----------------------------------------------------------------");
 
+        while (true) {
+            try {
+                System.out.printf("\n--- Iniciando novo ciclo de processamento em %s ---\n", Instant.now());
 
-                    //No futuro você precisara capturar esses valores de outra fonte (como um dispositivo real)
-                    //você poderá implementar métodos de captura e substituí-los no código.
-                    //double temperatura = capturarTemperatura();
-                    //double fatorPotencia = capturarFatorPotencia();
-                    //double potenciaAtiva = capturarPotenciaAtiva();
+                // 1. EXTRAÇÃO
+                System.out.println("[ETAPA 1/3] Buscando dados do ThingsBoard...");
+                String token = ThingsBoardAPI.getToken();
+                JsonObject telemetria = ThingsBoardAPI.fetchData(token);
+                System.out.println("Dados recebidos com sucesso!");
 
+                // Extraindo TODAS as 20 métricas do JSON de forma segura
+                double consDiaP = getTelemetryAsDouble(telemetria, "ConsDiaP", 0.0);
+                double consHoraP = getTelemetryAsDouble(telemetria, "ConsHoraP", 0.0);
+                double eakwh = getTelemetryAsDouble(telemetria, "EAkWh", 0.0);
+                long envio = getTelemetryAsLong(telemetria, "Envio", 0L);
+                double erro = getTelemetryAsDouble(telemetria, "Erro", 0.0);
+                String hdDev = getTelemetryAsString(telemetria, "HdDev", Instant.now().toString());
+                double ia_n = getTelemetryAsDouble(telemetria, "Ia_n", 0.0);
+                double ib_n = getTelemetryAsDouble(telemetria, "Ib_n", 0.0);
+                double ic_n = getTelemetryAsDouble(telemetria, "Ic_n", 0.0);
+                String nserie = getTelemetryAsString(telemetria, "NSerie", "N/A");
+                double temperature = getTelemetryAsDouble(telemetria, "temperature", 0.0);
+                double va_n = getTelemetryAsDouble(telemetria, "Va_n", 0.0);
+                double vb_n = getTelemetryAsDouble(telemetria, "Vb_n", 0.0);
+                double vc_n = getTelemetryAsDouble(telemetria, "Vc_n", 0.0);
+                double vfreq = getTelemetryAsDouble(telemetria, "VFreq", 0.0);
+                long wifi_rssi = getTelemetryAsLong(telemetria, "WiFi_RSSI", -90L);
+                double ptot = getTelemetryAsDouble(telemetria, "Ptot", 0.0);
+                double fatorPotencia = getTelemetryAsDouble(telemetria, "Fator_Potencia", 1.0);
+                double va_b = getTelemetryAsDouble(telemetria, "Va_b", 0.0);
+                double vb_c = getTelemetryAsDouble(telemetria, "Vb_c", 0.0);
+                double vc_a = getTelemetryAsDouble(telemetria, "Vc_a", 0.0);
 
-                    // Dados em formato JSON para o ThingsBoard
-                    String jsonData = "{"
-                            + "\"Tensao\": " + Tensao + ","
-                            + "\"Corrente\": " + Corrente + ","
-                            + "\"PotenciaAtiva\": " + PotenciaAtiva + ","
-                            + "\"PotenciaReativa\": " + PotenciaReativa + ","
-                            + "\"Fator_Potencia\": " + Fator_Potencia + ","
-                            + "\"temperature\": " + temperature
-                            + "}";
+                // 2. TRANSFORMAÇÃO
+                System.out.println("[ETAPA 2/3] Processando dados e gerando inteligência...");
+                double custoPeriodo = CalculoDeCusto.calcularCustoDoPeriodo(eakwh);
+                Manutencao.StatusManutencao statusManutencao = Manutencao.verificarManutencao(fatorPotencia, temperature);
+                PrevisaoFalhas.registrarMetricas(temperature, fatorPotencia, ptot);
+                boolean falhaPrevista = PrevisaoFalhas.preverFalhas();
 
-                    // Enviar os dados simulados ao ThingsBoard
-                    SimuladordeDispositivo.sendToThingsBoard(deviceToken, jsonData);
+                // 3. CARGA
+                System.out.println("[ETAPA 3/3] Enviando dados para o Power BI...");
+                JsonObject pbiPayload = new JsonObject();
+                pbiPayload.addProperty("timestamp", Instant.now().toString());
+                pbiPayload.addProperty("ConsDiaP", consDiaP);
+                pbiPayload.addProperty("ConsHoraP", consHoraP);
+                pbiPayload.addProperty("EAkWh", eakwh);
+                pbiPayload.addProperty("Envio", envio);
+                pbiPayload.addProperty("Erro", erro);
+                pbiPayload.addProperty("HdDev", hdDev);
+                pbiPayload.addProperty("Ia_n", ia_n);
+                pbiPayload.addProperty("Ib_n", ib_n);
+                pbiPayload.addProperty("Ic_n", ic_n);
+                pbiPayload.addProperty("NSerie", nserie);
+                pbiPayload.addProperty("temperature", temperature);
+                pbiPayload.addProperty("Va_n", va_n);
+                pbiPayload.addProperty("Vb_n", vb_n);
+                pbiPayload.addProperty("Vc_n", vc_n);
+                pbiPayload.addProperty("VFreq", vfreq);
+                pbiPayload.addProperty("WiFi_RSSI", wifi_rssi);
+                pbiPayload.addProperty("Ptot", ptot);
+                pbiPayload.addProperty("Fator_Potencia", fatorPotencia);
+                pbiPayload.addProperty("CustoPeriodo", custoPeriodo);
+                pbiPayload.addProperty("PrevisaoFalha", falhaPrevista ? 1 : 0);
+                pbiPayload.addProperty("Va_b", va_b);
+                pbiPayload.addProperty("Vb_c", vb_c);
+                pbiPayload.addProperty("Vc_a", vc_a);
 
+                ExportacaoDadosPWBI.sendDataToPowerBI(pbiPayload);
 
-
-
-                    // Consolidar os dados para envio ao Power BI
-                    Map<String, Double> metrics = new HashMap<>();
-                    metrics.put("Tensao", Tensao);
-                    metrics.put("Corrente", Corrente);
-                    metrics.put("PotenciaAtiva", PotenciaAtiva);
-                    metrics.put("PotenciaReativa", PotenciaReativa);
-                    metrics.put("Fator_Potencia", Fator_Potencia);
-                    metrics.put("Temperatura", temperature);
-
-                    // Enviar todos os dados ao Power BI de uma vez
-                    Instant now = Instant.now();
-                    ExportacaoDadosPWBI.sendAllMetricsToPowerBI(metrics, now);
-
-                    //Verifica a necessidade de manutençao e gera alertas para Fator_Potencia e temperature
-                    FuncTrendZ.verificarManutencao(Fator_Potencia, temperature);
-
-                    // Registrar métricas
-                    FuncTrendZ.registrarMetricas(temperature, Fator_Potencia, PotenciaAtiva);
-
-                    // Prever falhas
-                    boolean falhaDetectada = FuncTrendZ.preverFalhas();
-                    if (falhaDetectada) {
-                        System.out.println("***ALERTA (no ciclo " + contador + "): Falha detectada no sistema! Investigar imediatamente.***\n");
-                    }
-
-
-                    // Registrar o consumo no FuncTrendZ
-                    FuncTrendZ.registrarConsumo(PotenciaAtiva);
-
-                    // Exibir dados acumulados a cada 10 ciclos
-                    if (contador % 10 == 0) {
-                        double consumoTotal = FuncTrendZ.getHistoricoConsumo().stream().mapToDouble(Double::doubleValue).sum();
-                        double custoTotal = FuncTrendZ.calcularCusto();
-                        System.out.printf(">>Ciclo %d concluído. Consumo acumulado: %.2f kWh, Custo total: R$ %.2f.%n",
-                                contador, consumoTotal, custoTotal);
-                    }
-
-                    // Aguardar 10 segundos antes do próximo envio
-                    System.out.printf(">>Ciclo %d concluído. Aguardando 10 segundos...%n \n", contador);
-                    Thread.sleep(10000);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                System.err.println("Ocorreu um erro no ciclo principal: " + e.getMessage());
+                e.printStackTrace();
             }
-        });
 
-        simuladorThread.start();
+            System.out.printf("--- Ciclo concluído. Aguardando %d segundos para o próximo... ---\n", INTERVALO_EXECUCAO_SEGUNDOS);
+            Thread.sleep(INTERVALO_EXECUCAO_SEGUNDOS * 1000);
+        }
+    }
+
+    // --- FUNÇÕES AUXILIARES PARA LER O JSON DE FORMA SEGURA ---
+    private static String getTelemetryAsString(JsonObject telemetria, String key, String defaultValue) {
+        try { if (telemetria.has(key)) { JsonElement valueElement = telemetria.getAsJsonArray(key).get(0).getAsJsonObject().get("value"); return valueElement.isJsonNull() ? defaultValue : valueElement.getAsString(); } } catch (Exception e) { System.out.println("[AVISO] Chave de texto '" + key + "' não encontrada ou com formato inesperado."); } return defaultValue;
+    }
+    private static double getTelemetryAsDouble(JsonObject telemetria, String key, double defaultValue) {
+        try { if (telemetria.has(key)) { JsonElement valueElement = telemetria.getAsJsonArray(key).get(0).getAsJsonObject().get("value"); return valueElement.isJsonNull() ? defaultValue : valueElement.getAsDouble(); } } catch (Exception e) { System.out.println("[AVISO] Chave numérica '" + key + "' não encontrada ou com formato inesperado."); } return defaultValue;
+    }
+    private static long getTelemetryAsLong(JsonObject telemetria, String key, long defaultValue) {
+        try { if (telemetria.has(key)) { JsonElement valueElement = telemetria.getAsJsonArray(key).get(0).getAsJsonObject().get("value"); return valueElement.isJsonNull() ? defaultValue : valueElement.getAsLong(); } } catch (Exception e) { System.out.println("[AVISO] Chave numérica longa '" + key + "' não encontrada ou com formato inesperado."); } return defaultValue;
     }
 }
-
-/*
-         * FUNCIONALIDADE ANTIGA: Exportar CSV a cada 60 segundos (inutilizada)
-         * Este trecho foi desativado para evitar duplicação de envios ou funcionalidades desnecessárias.
-         *
-         * // while (true) {
-         * //     try {
-         * //         Thread.sleep(60000); // 60 segundos
-         * //
-         * //         // Obter token e buscar dados do ThingsBoard
-         * //         String token = ThingsBoardAPI.getToken();
-         * //         JsonObject data = ThingsBoardAPI.fetchData(token);
-         * //
-         * //         // Exportar dados para o arquivo CSV
-         * //         ExportacaoDadosPWBI.exportToCSV(data);
-         * //
-         * //     } catch (Exception e) {
-         * //         System.err.println("Erro ao exportar dados: " + e.getMessage());
-         * //         e.printStackTrace();
-         * //     }
-         * // }
-         */
-
-

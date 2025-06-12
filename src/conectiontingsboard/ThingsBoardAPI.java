@@ -10,8 +10,8 @@ import java.util.Scanner;
 
 public class ThingsBoardAPI {
 
-    private static final String AUTH_URL = "http://10.5.0.80:8080/api/auth/login";
-    private static final String DATA_URL = "http://10.5.0.80:8080/api/plugins/telemetry/DEVICE/ede13780-34cf-11f0-a14a-d74becf51ffe/values/timeseries?keys=Tensao,Corrente,PotenciaAtiva,PotenciaReativa,Fator_Potencia,temperature";
+    private static final String AUTH_URL = "http://10.8.0.5:8080/api/auth/login";
+    private static final String DATA_URL = "http://10.8.0.5:8080/api/plugins/telemetry/DEVICE/06e109e0-e8ff-11ee-bb8b-2563c61db9b0/values/timeseries?keys=ConsDiaP,ConsHoraP,EAkWh,Envio,Erro,HdDev,Ia_n,Ib_n,Ic_n,NSerie,temperature,Va_n,Vb_n,Vc_n,VFreq,WiFi_RSSI,Ptot,Fator_Potencia,Va_b,Vb_c,Vc_a";
     private static final String USERNAME = "tenant@thingsboard.org";
     private static final String PASSWORD = "tenant";
 
