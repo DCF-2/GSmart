@@ -76,3 +76,5 @@ public class PrevisaoFalhas {
         return Math.sqrt(somaQuadrados / valores.size());
     }
 }
+
+

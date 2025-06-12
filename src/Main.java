@@ -109,3 +109,5 @@ public class Main {
         try { if (telemetria.has(key)) { JsonElement valueElement = telemetria.getAsJsonArray(key).get(0).getAsJsonObject().get("value"); return valueElement.isJsonNull() ? defaultValue : valueElement.getAsLong(); } } catch (Exception e) { System.out.println("[AVISO] Chave numérica longa '" + key + "' não encontrada ou com formato inesperado."); } return defaultValue;
     }
 }
+
+
