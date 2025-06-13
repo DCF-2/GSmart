@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 public class ExportacaoDadosPWBI {
 
-    private static final String POWER_BI_API_URL = "https://api.powerbi.com/beta/f06a7122-3027-4312-b120-38f60897fba4/datasets/f66d6aac-aa43-43ed-95e7-b0ddd73aa55b/rows?experience=power-bi&key=%2FGiFg%2FatH4ofhOC4mhiHAvtkRDXKbzVrQ0hF55HguIl0izrL2sOT7mLLd7F55BJr1I%2FFEmGL3549XtSg4o%2FfpA%3D%3D";
+    private static final String POWER_BI_API_URL = "https://api.powerbi.com/beta/f06a7122-3027-4312-b120-38f60897fba4/datasets/b8512173-e419-4a24-9559-2f9f52935190/rows?experience=power-bi&key=%2F7U6mAvLW4ddN8tfVZJfT30CTl6LGrU4wmW%2FdotkmHnoj5eaVfUZh9fzlWFCgFnsSWI55MecpelCBmyb9reDpw%3D%3D";
 
     /**
      * Envia um objeto JSON para a API do Power BI.
@@ -24,7 +24,8 @@ public class ExportacaoDadosPWBI {
         payloadArray.add(dataObject);
 
         String jsonToSend = payloadArray.toString();
-
+        System.out.println("\n[DEBUG POWER BI] Tentando enviar o seguinte JSON:");
+        System.out.println(jsonToSend);
         sendJsonToPowerBI(jsonToSend);
     }
 
