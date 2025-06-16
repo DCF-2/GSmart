@@ -23,7 +23,7 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         final long INTERVALO_EXECUCAO_SEGUNDOS = 5;
 
-        System.out.println("🚀 INICIANDO GETSMART - PROCESSADOR DE DADOS DE ENERGIA (v6) 🚀");
+        System.out.println("🚀 INICIANDO GSMART - PROCESSADOR DE DADOS DE ENERGIA (v6) 🚀");
         System.out.println("-----------------------------------------------------------------");
         System.out.println("O ciclo de acúmulo de consumo por hora iniciou em: " + horaDeInicioDoCiclo.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
