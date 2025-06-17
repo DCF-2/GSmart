@@ -1,11 +1,21 @@
 // Localização: src/main/java/com/gsmart/Main.java
 package com.gsmart;
+import javax.swing.SwingUtilities;
 
+public class Main {
+    public static void main(String[] args) {
+        // Garante que a interface gráfica seja criada e atualizada na thread correta (Event Dispatch Thread)
+        SwingUtilities.invokeLater(() -> {
+            GSmartGui gui = new GSmartGui();
+            gui.setVisible(true);
+        });
+    }
+}
+/*
 import com.gsmart.sources.DatabaseSource;
 import com.gsmart.sources.IDataSource;
 import com.gsmart.sources.ThingsBoardSource;
 import java.util.Scanner;
-
 public class Main {
     public static void main(String[] args) {
         // --- INSTRUÇÕES DE CONFIGURAÇÃO ---
@@ -56,4 +66,4 @@ public class Main {
             Thread.currentThread().interrupt();
         }
     }
-}
+}*/
