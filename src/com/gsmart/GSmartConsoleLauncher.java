@@ -1,41 +1,25 @@
-// Localização: src/main/java/com/gsmart/Main.java
+// Localização: src/main/java/com/gsmart/GSmartConsoleLauncher.java
 package com.gsmart;
-import javax.swing.SwingUtilities;
 
-public class Main {
-    public static void main(String[] args) {
-        // Garante que a interface gráfica seja criada e atualizada na thread correta (Event Dispatch Thread)
-        SwingUtilities.invokeLater(() -> {
-            GSmartGui gui = new GSmartGui();
-            gui.setVisible(true);
-        });
-    }
-}
-/*
 import com.gsmart.sources.DatabaseSource;
 import com.gsmart.sources.IDataSource;
 import com.gsmart.sources.ThingsBoardSource;
 import java.util.Scanner;
-public class Main {
-    public static void main(String[] args) {
-        // --- INSTRUÇÕES DE CONFIGURAÇÃO ---
-        // Preencha as variáveis abaixo com suas informações reais.
 
-        // Detalhes da fonte de dados: ThingsBoard Produção
+public class GSmartConsoleLauncher {
+
+    public static void main(String[] args) {
+        // --- Configurações ---
         String thingsboardProdUrl = "http://10.8.0.5:8080";
         String thingsboardProdDeviceId = "06e109e0-e8ff-11ee-bb8b-2563c61db9b0";
-
-        // Detalhes da fonte de dados: Banco de Dados Espelho
-        String dbUrl = "jdbc:postgresql://SEU_SERVIDOR:5432/SEU_BANCO";
+        String dbUrl = "jdbc:postgresql://SEU_SERVIDOR/SEU_BANCO";
         String dbUser = "SEU_USUARIO";
         String dbPassword = "SUA_SENHA";
         String dbQuery = "SELECT * FROM sua_tabela ORDER BY timestamp DESC LIMIT 1";
+        String pbiUrlProducao = "SUA_URL_DE_PUSH_DO_POWER_BI_AQUI";
 
-        // Detalhes do destino: Power BI Produção
-        String pbiUrlProducao ="https://api.powerbi.com/beta/f06a7122-3027-4312-b120-38f60897fba4/datasets/b8512173-e419-4a24-9559-2f9f52935190/rows?experience=power-bi&key=%2F7U6mAvLW4ddN8tfVZJfT30CTl6LGrU4wmW%2FdotkmHnoj5eaVfUZh9fzlWFCgFnsSWI55MecpelCBmyb9reDpw%3D%3D";
-
-        // --- Menu interativo ---
-        System.out.println("BEM-VINDO AO GSmart | Escolha a fonte de dados:");
+        // --- Menu Interativo ---
+        System.out.println("GSmart [MODO CONSOLE] | Escolha a fonte de dados:");
         System.out.println("1. ThingsBoard - Produção");
         System.out.println("2. Banco de Dados Espelho");
 
@@ -66,4 +50,4 @@ public class Main {
             Thread.currentThread().interrupt();
         }
     }
-}*/
+}
