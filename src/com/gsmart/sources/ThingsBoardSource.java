@@ -1,12 +1,15 @@
 // Localização: src/main/java/com/gsmart/sources/ThingsBoardSource.java
 package com.gsmart.sources;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class ThingsBoardSource implements IDataSource {
@@ -14,11 +17,12 @@ public class ThingsBoardSource implements IDataSource {
     private static final String PASSWORD = "tenant";
     private final String apiUrl;
     private final String deviceId;
-    private static final String TELEMETRY_KEYS = "ConsDiaP,ConsHora,ConsHoraP,EAkWh,Envio,Erro,Ia_n,Ib_n,Ic_n,NSerie,temperature,Va_n,Vb_n,Vc_n,VFreq,WiFi.RSSI,Ptot,Fator_Potencia,Va_b,Vb_c,Vc_a";
+    private final List<String> selectedKeys;
 
-    public ThingsBoardSource(String apiUrl, String deviceId) {
+    public ThingsBoardSource(String apiUrl, String deviceId, List<String> selectedKeys) {
         this.apiUrl = apiUrl;
         this.deviceId = deviceId;
+        this.selectedKeys = selectedKeys;
     }
 
     @Override
@@ -43,7 +47,18 @@ public class ThingsBoardSource implements IDataSource {
     }
 
     private JsonObject fetchTelemetryData(String token) throws Exception {
-        String dataUrl = String.format("%s/api/plugins/telemetry/DEVICE/%s/values/timeseries?keys=%s", this.apiUrl, this.deviceId, TELEMETRY_KEYS);
+        // --- AQUI ESTÁ A LÓGICA CORRIGIDA ---
+        // Se a lista de chaves selecionadas pelo usuário for nula ou vazia,
+        // simplesmente retorna um objeto JSON vazio, sem fazer a chamada à API.
+        if (this.selectedKeys == null || this.selectedKeys.isEmpty()) {
+            System.out.println("Nenhuma métrica selecionada para busca no ThingsBoard. Retornando dados vazios.");
+            return new JsonObject();
+        }
+
+        // Se houver chaves, monta a URL apenas com elas.
+        String keysToFetch = String.join(",", this.selectedKeys);
+
+        String dataUrl = String.format("%s/api/plugins/telemetry/DEVICE/%s/values/timeseries?keys=%s", this.apiUrl, this.deviceId, keysToFetch);
         URL url = new URL(dataUrl);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
@@ -53,8 +68,23 @@ public class ThingsBoardSource implements IDataSource {
         }
     }
 
+    public List<String> getAvailableKeys() throws Exception {
+        String token = this.getToken();
+        String keysUrl = String.format("%s/api/plugins/telemetry/DEVICE/%s/keys/timeseries", this.apiUrl, this.deviceId);
+        URL url = new URL(keysUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("X-Authorization", "Bearer " + token);
+        List<String> availableKeys = new ArrayList<>();
+        try (InputStream is = conn.getInputStream(); Scanner scanner = new Scanner(is)) {
+            JsonArray jsonArray = JsonParser.parseString(scanner.useDelimiter("\\A").next()).getAsJsonArray();
+            jsonArray.forEach(jsonElement -> availableKeys.add(jsonElement.getAsString()));
+        }
+        return availableKeys;
+    }
+
     @Override
     public String getSourceName() {
-        return "ThingsBoard (Device: " + this.deviceId + ")";
+        return "Thingsboard API";
     }
 }
