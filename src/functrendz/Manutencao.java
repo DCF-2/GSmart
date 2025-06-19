@@ -1,5 +1,7 @@
+// Localização: src/main/java/functrendz/Manutencao.java
 package functrendz;
 
+import com.gsmart.GSmartListener;
 import java.util.Locale;
 
 public class Manutencao {
@@ -14,31 +16,22 @@ public class Manutencao {
         ALERTA_TEMPERATURA
     }
 
-    public static StatusManutencao verificarManutencao(double fatorPotencia, double temperatura) {
+    public static StatusManutencao verificarManutencao(GSmartListener listener, double fatorPotencia, double temperatura) {
         StatusManutencao status = StatusManutencao.OK;
 
-        // Lógica para Fator de Potência
-        if (fatorPotencia < LIMITE_FATOR_POTENCIA) {
+        if (fatorPotencia < LIMITE_FATOR_POTENCIA && fatorPotencia != 0.0) {
             ciclosBaixoFator++;
         } else {
             ciclosBaixoFator = 0;
         }
 
         if (ciclosBaixoFator >= 3) {
-            // --- MUDANÇA AQUI: Alerta detalhado ---
-            System.out.println("\n--- ALERTA DE MANUTENÇÃO PREVENTIVA ---");
-            System.out.printf(Locale.US, """
-                Causa: Baixo Fator de Potência persistente.
-                  - Ciclos com Anomalia: %d de 3
-                  - Limite Aceitável: > %.2f
-                  - Última Leitura: %.2f
-                  - Ação: Agendar verificação da rede elétrica/banco de capacitores.
-                ------------------------------------------%n""",
-                    ciclosBaixoFator, LIMITE_FATOR_POTENCIA, fatorPotencia);
+            String alerta = String.format(Locale.US, "Causa: Baixo Fator de Potência persistente por %d ciclos.\n- Última Leitura: %.2f (Limite: > %.2f)\n\nAção Recomendada:\nAgendar verificação da rede elétrica ou banco de capacitores.",
+                    ciclosBaixoFator, fatorPotencia, LIMITE_FATOR_POTENCIA);
+            listener.onAlert("Alerta de Manutenção Preventiva", alerta);
             status = StatusManutencao.ALERTA_FATOR_POTENCIA;
         }
 
-        // Lógica para Temperatura
         if (temperatura > LIMITE_TEMPERATURA) {
             ciclosAltaTemperatura++;
         } else {
@@ -46,21 +39,12 @@ public class Manutencao {
         }
 
         if (ciclosAltaTemperatura >= 5) {
-            // --- MUDANÇA AQUI: Alerta detalhado ---
-            System.out.println("\n--- ALERTA DE MANUTENÇÃO CRÍTICA ---");
-            System.out.printf(Locale.US, """
-                Causa: Superaquecimento persistente.
-                  - Ciclos com Anomalia: %d de 5
-                  - Limite Aceitável: < %.1f°C
-                  - Última Leitura: %.1f°C
-                  - Ação: Agendar manutenção IMEDIATA do sistema de refrigeração.
-                ------------------------------------------%n""",
-                    ciclosAltaTemperatura, LIMITE_TEMPERATURA, temperatura);
+            String alerta = String.format(Locale.US, "Causa: Superaquecimento persistente por %d ciclos.\n- Última Leitura: %.1f°C (Limite: < %.1f°C)\n\nAção Recomendada:\nAgendar manutenção IMEDIATA do sistema de refrigeração.",
+                    ciclosAltaTemperatura, temperatura, LIMITE_TEMPERATURA);
+            listener.onAlert("Alerta de Manutenção Crítica", alerta);
             status = StatusManutencao.ALERTA_TEMPERATURA;
         }
 
         return status;
     }
 }
-
-

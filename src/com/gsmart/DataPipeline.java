@@ -5,10 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.gsmart.sources.IDataSource;
 import conectiontingsboard.ExportacaoDadosPWBI;
-// Os imports da sua lógica de negócio podem ser mantidos para uso futuro
-// import functrendz.CalculoDeCusto;
-// import functrendz.Manutencao;
-// import functrendz.PrevisaoFalhas;
+import functrendz.GeradorDeInsights;
+import functrendz.Manutencao;
+import functrendz.PrevisaoFalhas;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,16 +17,17 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 public class DataPipeline {
     private static final Logger logger = LoggerFactory.getLogger(DataPipeline.class);
     private final IDataSource dataSource;
     private final String powerBiPushUrl;
     private final String chaveDeAcumulo;
-    private final List<String> colunasSelecionadas; // Guarda a lista de colunas a processar
+    private final List<MetricConfig> metricConfigs;
+    private final LogicConfig logicConfig;
+    private final GSmartListener listener;
 
-    // --- Variáveis de estado para reconexão e acúmulo ---
     private boolean isConexaoOk = true;
     private int falhasConsecutivas = 0;
     private final long delayBaseSegundos = 5;
@@ -36,11 +36,13 @@ public class DataPipeline {
     private double consumoAcumuladoNaHora = 0.0;
     private ZonedDateTime horaDeInicioDoCiclo;
 
-    public DataPipeline(IDataSource dataSource, String powerBiPushUrl, String chaveDeAcumulo, List<String> colunasSelecionadas) {
+    public DataPipeline(IDataSource dataSource, String powerBiPushUrl, String chaveDeAcumulo, List<MetricConfig> metricConfigs, LogicConfig logicConfig, GSmartListener listener) {
         this.dataSource = dataSource;
         this.powerBiPushUrl = powerBiPushUrl;
         this.chaveDeAcumulo = chaveDeAcumulo;
-        this.colunasSelecionadas = colunasSelecionadas;
+        this.metricConfigs = metricConfigs;
+        this.logicConfig = logicConfig;
+        this.listener = listener;
         this.horaDeInicioDoCiclo = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")).truncatedTo(ChronoUnit.HOURS);
     }
 
@@ -58,7 +60,6 @@ public class DataPipeline {
                 ZonedDateTime horaAtualBrasil = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
                 logger.info("--- Iniciando novo ciclo de processamento em {} ---", horaAtualBrasil.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
-                // ETAPA 1: EXTRAÇÃO GENÉRICA
                 logger.info("[ETAPA 1/3] Buscando dados da fonte...");
                 JsonObject telemetria = dataSource.fetchData();
                 logger.info("Dados recebidos com sucesso!");
@@ -66,34 +67,38 @@ public class DataPipeline {
                 JsonObject pbiPayload = new JsonObject();
                 double valorParaAcumular = 0.0;
 
-                // LÓGICA CORRIGIDA E RIGOROSA: Itera sobre a lista de colunas que o USUÁRIO selecionou.
-                for (String chave : this.colunasSelecionadas) {
-                    // Verifica se a telemetria recebida realmente contém a chave que o usuário pediu
-                    if (telemetria.has(chave)) {
+                Optional<Double> optTemperatura = Optional.empty();
+                Optional<Double> optFatorPotencia = Optional.empty();
+                Optional<Double> optPotenciaAtiva = Optional.empty();
+
+                for (MetricConfig config : this.metricConfigs) {
+                    String originalName = config.getOriginalName();
+                    String alias = config.getAlias();
+                    if (telemetria.has(originalName)) {
                         try {
-                            // Extrai o valor final da estrutura do JSON do ThingsBoard
-                            JsonElement valorFinal = telemetria.get(chave).getAsJsonArray().get(0).getAsJsonObject().get("value");
-
-                            // Adiciona a chave e o valor ao payload do Power BI
+                            JsonElement valorFinal = telemetria.get(originalName).getAsJsonArray().get(0).getAsJsonObject().get("value");
                             if (valorFinal.isJsonPrimitive() && valorFinal.getAsJsonPrimitive().isNumber()) {
-                                pbiPayload.addProperty(chave, valorFinal.getAsNumber());
-                            } else {
-                                pbiPayload.addProperty(chave, valorFinal.getAsString());
-                            }
+                                double valorNumerico = valorFinal.getAsDouble();
+                                pbiPayload.addProperty(alias, valorNumerico);
 
-                            // Se esta for a chave especial de acúmulo, guarda seu valor
-                            if (chave.equals(this.chaveDeAcumulo) && valorFinal.isJsonPrimitive() && valorFinal.getAsJsonPrimitive().isNumber()) {
-                                valorParaAcumular = valorFinal.getAsDouble();
+                                if (originalName.equals(logicConfig.temperaturaKey())) optTemperatura = Optional.of(valorNumerico);
+                                if (originalName.equals(logicConfig.fatorPotenciaKey())) optFatorPotencia = Optional.of(valorNumerico);
+                                if (originalName.equals(logicConfig.potenciaAtivaKey())) optPotenciaAtiva = Optional.of(valorNumerico);
+
+                                if (originalName.equals(this.chaveDeAcumulo)) {
+                                    valorParaAcumular = valorNumerico;
+                                }
+                            } else {
+                                pbiPayload.addProperty(alias, valorFinal.getAsString());
                             }
-                        } catch (Exception parseException) {
-                            logger.warn("Não foi possível processar a chave '{}'. Formato inesperado. Pulando.", chave);
+                        } catch (Exception e) {
+                            logger.warn("Não foi possível processar a chave '{}'. Formato inesperado. Pulando.", originalName, e);
                         }
                     } else {
-                        logger.warn("A chave selecionada '{}' não foi encontrada na resposta da fonte de dados. Pulando.", chave);
+                        logger.warn("A chave selecionada '{}' não foi encontrada na resposta da fonte de dados. Pulando.", originalName);
                     }
                 }
 
-                // Lógica de acúmulo horário
                 double totalHoraFechada = 0.0;
                 if (horaAtualBrasil.isAfter(horaDeInicioDoCiclo.plusHours(1))) {
                     logger.info("!!! HORA CONCLUÍDA !!! Total acumulado (de '{}'): {}", this.chaveDeAcumulo, consumoAcumuladoNaHora);
@@ -103,11 +108,16 @@ public class DataPipeline {
                 }
                 consumoAcumuladoNaHora += valorParaAcumular;
 
-                // ETAPA 2: Lógica de negócio desativada temporariamente
-                logger.info("[ETAPA 2/3] Lógica de negócio (Insights, Falhas, Custo) em espera.");
+                logger.info("[ETAPA 2/3] Executando lógica de negócio (Insights, Falhas, Custo)...");
+                double temperaturaAtual = optTemperatura.orElse(0.0);
+                double fatorPotenciaAtual = optFatorPotencia.orElse(0.0);
+                double potenciaAtivaAtual = optPotenciaAtiva.orElse(0.0);
 
-                // ETAPA 3: CARGA
-                // Adiciona campos calculados e de metadados ao payload
+                Manutencao.StatusManutencao statusManutencao = Manutencao.verificarManutencao(listener, fatorPotenciaAtual, temperaturaAtual);
+                PrevisaoFalhas.registrarMetricas(temperaturaAtual, fatorPotenciaAtual, potenciaAtivaAtual);
+                boolean falhaPrevista = PrevisaoFalhas.preverFalhas(listener);
+                GeradorDeInsights.gerarInsightsDoCiclo(listener, 95.0, fatorPotenciaAtual, temperaturaAtual, statusManutencao, falhaPrevista);
+
                 pbiPayload.addProperty("timestamp", Instant.now().minus(3, ChronoUnit.HOURS).toString());
                 pbiPayload.addProperty("HdDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("HH:mm:ss - dd/MM/yyyy")));
                 pbiPayload.addProperty("OrigemDados", dataSource.getSourceName());
@@ -117,7 +127,6 @@ public class DataPipeline {
                 logger.info("[ETAPA 3/3] Enviando {} campos para o Power BI...", pbiPayload.size());
                 ExportacaoDadosPWBI.sendDataToPowerBI(pbiPayload, this.powerBiPushUrl);
 
-                // Se chegamos até aqui, o ciclo foi um sucesso. Resetamos os contadores de falha.
                 falhasConsecutivas = 0;
                 delayAtualSegundos = delayBaseSegundos;
 

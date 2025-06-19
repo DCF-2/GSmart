@@ -1,90 +1,134 @@
 // Localização: src/main/java/com/gsmart/sources/ThingsBoardSource.java
 package com.gsmart.sources;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+//import java.util.Objects;
 
 public class ThingsBoardSource implements IDataSource {
-    private static final String USERNAME = "tenant@thingsboard.org";
-    private static final String PASSWORD = "tenant";
-    private final String apiUrl;
+    private static final Logger logger = LoggerFactory.getLogger(ThingsBoardSource.class);
+
+    private final String thingsboardUrl;
     private final String deviceId;
-    private final List<String> selectedKeys;
+    private final List<String> keysToFetch;
+    private final OkHttpClient client;
+    private String authToken;
 
-    public ThingsBoardSource(String apiUrl, String deviceId, List<String> selectedKeys) {
-        this.apiUrl = apiUrl;
+    public ThingsBoardSource(String thingsboardUrl, String deviceId, List<String> keysToFetch) {
+        this.thingsboardUrl = thingsboardUrl.endsWith("/") ? thingsboardUrl.substring(0, thingsboardUrl.length() - 1) : thingsboardUrl;
         this.deviceId = deviceId;
-        this.selectedKeys = selectedKeys;
-    }
-
-    @Override
-    public JsonObject fetchData() throws Exception {
-        String token = this.getToken();
-        return this.fetchTelemetryData(token);
-    }
-
-    private String getToken() throws Exception {
-        URL url = new URL(this.apiUrl + "/api/auth/login");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
-        String payload = String.format("{\"username\":\"%s\", \"password\":\"%s\"}", USERNAME, PASSWORD);
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(payload.getBytes("UTF-8"));
-        }
-        try (InputStream is = conn.getInputStream(); Scanner scanner = new Scanner(is)) {
-            return JsonParser.parseString(scanner.useDelimiter("\\A").next()).getAsJsonObject().get("token").getAsString();
-        }
-    }
-
-    private JsonObject fetchTelemetryData(String token) throws Exception {
-        // --- AQUI ESTÁ A LÓGICA CORRIGIDA ---
-        // Se a lista de chaves selecionadas pelo usuário for nula ou vazia,
-        // simplesmente retorna um objeto JSON vazio, sem fazer a chamada à API.
-        if (this.selectedKeys == null || this.selectedKeys.isEmpty()) {
-            System.out.println("Nenhuma métrica selecionada para busca no ThingsBoard. Retornando dados vazios.");
-            return new JsonObject();
-        }
-
-        // Se houver chaves, monta a URL apenas com elas.
-        String keysToFetch = String.join(",", this.selectedKeys);
-
-        String dataUrl = String.format("%s/api/plugins/telemetry/DEVICE/%s/values/timeseries?keys=%s", this.apiUrl, this.deviceId, keysToFetch);
-        URL url = new URL(dataUrl);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("X-Authorization", "Bearer " + token);
-        try (InputStream is = conn.getInputStream(); Scanner scanner = new Scanner(is)) {
-            return JsonParser.parseString(scanner.useDelimiter("\\A").next()).getAsJsonObject();
-        }
-    }
-
-    public List<String> getAvailableKeys() throws Exception {
-        String token = this.getToken();
-        String keysUrl = String.format("%s/api/plugins/telemetry/DEVICE/%s/keys/timeseries", this.apiUrl, this.deviceId);
-        URL url = new URL(keysUrl);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("X-Authorization", "Bearer " + token);
-        List<String> availableKeys = new ArrayList<>();
-        try (InputStream is = conn.getInputStream(); Scanner scanner = new Scanner(is)) {
-            JsonArray jsonArray = JsonParser.parseString(scanner.useDelimiter("\\A").next()).getAsJsonArray();
-            jsonArray.forEach(jsonElement -> availableKeys.add(jsonElement.getAsString()));
-        }
-        return availableKeys;
+        this.keysToFetch = keysToFetch;
+        this.client = new OkHttpClient();
     }
 
     @Override
     public String getSourceName() {
-        return "Thingsboard API";
+        if (this.deviceId != null && !this.deviceId.isEmpty()) {
+            return "ThingsBoard (Device: " + this.deviceId + ")";
+        }
+        return "ThingsBoard";
+    }
+
+    private void ensureAuthenticated() throws IOException {
+        if (this.authToken != null) { return; }
+        logger.info("Autenticando no ThingsBoard em {}...", this.thingsboardUrl);
+        String authUrl = this.thingsboardUrl + "/api/auth/login";
+        String credentials = "{\"username\":\"tenant@thingsboard.org\", \"password\":\"tenant\"}";
+        RequestBody body = RequestBody.create(credentials, MediaType.get("application/json; charset=utf-8"));
+        Request request = new Request.Builder().url(authUrl).post(body).build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful() || response.body() == null) {
+                throw new IOException("Falha na autenticação: " + response.code() + " " + response.message());
+            }
+            String jsonResponse = response.body().string();
+            this.authToken = JsonParser.parseString(jsonResponse).getAsJsonObject().get("token").getAsString();
+            logger.info("Autenticação bem-sucedida!");
+        }
+    }
+
+    // --- NOVOS MÉTODOS E MUDANÇAS ---
+
+    public List<DeviceProfile> getDeviceProfiles() throws IOException {
+        ensureAuthenticated();
+        // Endpoint para buscar informações dos perfis de dispositivo (funciona em v2.5+)
+        String profilesUrl = this.thingsboardUrl + "/api/deviceProfileInfos?pageSize=100&page=0";
+        logger.info("Buscando perfis de dispositivo...");
+        Request request = new Request.Builder().url(profilesUrl).addHeader("X-Authorization", "Bearer " + this.authToken).build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful() || response.body() == null) {
+                throw new IOException("Falha ao buscar perfis de dispositivo: " + response.code() + " " + response.message());
+            }
+            String jsonResponse = response.body().string();
+            List<DeviceProfile> profiles = new ArrayList<>();
+            JsonObject pageData = JsonParser.parseString(jsonResponse).getAsJsonObject();
+            pageData.getAsJsonArray("data").forEach(element -> {
+                JsonObject profileObject = element.getAsJsonObject();
+                String name = profileObject.get("name").getAsString();
+                String id = profileObject.get("id").getAsJsonObject().get("id").getAsString();
+                profiles.add(new DeviceProfile(name, id));
+            });
+            logger.info("Encontrados {} perfis de dispositivo.", profiles.size());
+            return profiles;
+        }
+    }
+
+    public List<Device> getDevicesByProfileId(String deviceProfileId) throws IOException {
+        ensureAuthenticated();
+        // Este é o endpoint correto e robusto para buscar dispositivos por ID de perfil
+        String devicesUrl = String.format("%s/api/tenant/devices?deviceProfileId=%s&pageSize=1024&page=0", this.thingsboardUrl, deviceProfileId);
+        logger.info("Buscando dispositivos para o perfil ID: {}", deviceProfileId);
+        Request request = new Request.Builder().url(devicesUrl).addHeader("X-Authorization", "Bearer " + this.authToken).build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful() || response.body() == null) {
+                throw new IOException("Falha ao buscar dispositivos por ID de perfil: " + response.code() + " " + response.message());
+            }
+            String jsonResponse = response.body().string();
+            List<Device> devices = new ArrayList<>();
+            JsonObject pageData = JsonParser.parseString(jsonResponse).getAsJsonObject();
+            pageData.getAsJsonArray("data").forEach(element -> {
+                JsonObject deviceObject = element.getAsJsonObject();
+                String name = deviceObject.get("name").getAsString();
+                String id = deviceObject.get("id").getAsJsonObject().get("id").getAsString();
+                devices.add(new Device(name, id));
+            });
+            logger.info("Encontrados {} dispositivos.", devices.size());
+            return devices;
+        }
+    }
+
+    // Métodos antigos (fetchData, getAvailableKeys) permanecem os mesmos
+    @Override
+    public JsonObject fetchData() throws IOException {
+        ensureAuthenticated();
+        String keys = String.join(",", this.keysToFetch);
+        String dataUrl = String.format("%s/api/plugins/telemetry/DEVICE/%s/values/timeseries?keys=%s", this.thingsboardUrl, this.deviceId, keys);
+        Request request = new Request.Builder().url(dataUrl).addHeader("X-Authorization", "Bearer " + this.authToken).build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful() || response.body() == null) {
+                throw new IOException("Falha ao buscar dados do ThingsBoard: " + response.code() + " " + response.message());
+            }
+            return JsonParser.parseString(response.body().string()).getAsJsonObject();
+        }
+    }
+
+    public List<String> getAvailableKeys() throws IOException {
+        ensureAuthenticated();
+        String keysUrl = String.format("%s/api/plugins/telemetry/DEVICE/%s/keys/timeseries", this.thingsboardUrl, this.deviceId);
+        Request request = new Request.Builder().url(keysUrl).addHeader("X-Authorization", "Bearer " + this.authToken).build();
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful() || response.body() == null) {
+                throw new IOException("Falha ao buscar lista de chaves: " + response.code() + " " + response.message());
+            }
+            List<String> keys = new ArrayList<>();
+            JsonParser.parseString(response.body().string()).getAsJsonArray().forEach(element -> keys.add(element.getAsString()));
+            return keys;
+        }
     }
 }
