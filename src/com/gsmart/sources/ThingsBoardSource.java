@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-//import java.util.Objects;
+import java.util.Objects;
 
 public class ThingsBoardSource implements IDataSource {
     private static final Logger logger = LoggerFactory.getLogger(ThingsBoardSource.class);
@@ -22,10 +22,25 @@ public class ThingsBoardSource implements IDataSource {
     private String authToken;
 
     public ThingsBoardSource(String thingsboardUrl, String deviceId, List<String> keysToFetch) {
-        this.thingsboardUrl = thingsboardUrl.endsWith("/") ? thingsboardUrl.substring(0, thingsboardUrl.length() - 1) : thingsboardUrl;
+        this.thingsboardUrl = thingsboardUrl != null && thingsboardUrl.endsWith("/") ? thingsboardUrl.substring(0, thingsboardUrl.length() - 1) : thingsboardUrl;
         this.deviceId = deviceId;
         this.keysToFetch = keysToFetch;
         this.client = new OkHttpClient();
+    }
+
+    // --- NOVO METODO ---
+    /**
+     * Tenta autenticar no servidor para validar a URL e as credenciais.
+     * @return true se a autenticação for bem-sucedida, false caso contrário.
+     */
+    public boolean testConnection() {
+        try {
+            ensureAuthenticated();
+            return true;
+        } catch (IOException e) {
+            logger.error("Falha no teste de conexão com o ThingsBoard: {}", e.getMessage());
+            return false;
+        }
     }
 
     @Override
@@ -52,8 +67,6 @@ public class ThingsBoardSource implements IDataSource {
             logger.info("Autenticação bem-sucedida!");
         }
     }
-
-    // --- NOVOS MÉTODOS E MUDANÇAS ---
 
     public List<DeviceProfile> getDeviceProfiles() throws IOException {
         ensureAuthenticated();

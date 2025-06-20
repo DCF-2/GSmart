@@ -8,6 +8,8 @@ import conectiontingsboard.ExportacaoDadosPWBI;
 import functrendz.GeradorDeInsights;
 import functrendz.Manutencao;
 import functrendz.PrevisaoFalhas;
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,25 +79,45 @@ public class DataPipeline {
                     if (telemetria.has(originalName)) {
                         try {
                             JsonElement valorFinal = telemetria.get(originalName).getAsJsonArray().get(0).getAsJsonObject().get("value");
+
                             if (valorFinal.isJsonPrimitive() && valorFinal.getAsJsonPrimitive().isNumber()) {
                                 double valorNumerico = valorFinal.getAsDouble();
-                                pbiPayload.addProperty(alias, valorNumerico);
 
+                                String expressao = config.getExpression();
+                                double valorParaEnviar = valorNumerico;
+
+                                if (expressao != null && !expressao.trim().isEmpty()) {
+                                    try {
+                                        Expression e = new ExpressionBuilder(expressao)
+                                                .variable("valor")
+                                                .build()
+                                                .setVariable("valor", valorNumerico);
+                                        valorParaEnviar = e.evaluate();
+                                        logger.debug("Expressão '{}' calculada para '{}'. Original: {}, Calculado: {}", expressao, originalName, valorNumerico, valorParaEnviar);
+                                    } catch (Exception e) {
+                                        logger.warn("Falha ao avaliar a expressão '{}' para a métrica '{}'. Enviando valor original. Erro: {}", expressao, originalName, e.getMessage());
+                                    }
+                                }
+
+                                pbiPayload.addProperty(alias, valorParaEnviar);
+
+                                // O mapeamento para a lógica de negócio continua usando o valor original, não transformado
                                 if (originalName.equals(logicConfig.temperaturaKey())) optTemperatura = Optional.of(valorNumerico);
                                 if (originalName.equals(logicConfig.fatorPotenciaKey())) optFatorPotencia = Optional.of(valorNumerico);
                                 if (originalName.equals(logicConfig.potenciaAtivaKey())) optPotenciaAtiva = Optional.of(valorNumerico);
 
+                                // --- MUDANÇA PRINCIPAL AQUI ---
+                                // A lógica de acúmulo agora usa o VALOR PARA ENVIAR (calculado), e não mais o valor numérico original.
                                 if (originalName.equals(this.chaveDeAcumulo)) {
-                                    valorParaAcumular = valorNumerico;
+                                    valorParaAcumular = valorParaEnviar;
                                 }
+
                             } else {
                                 pbiPayload.addProperty(alias, valorFinal.getAsString());
                             }
                         } catch (Exception e) {
-                            logger.warn("Não foi possível processar a chave '{}'. Formato inesperado. Pulando.", originalName, e);
+                            logger.warn("Não foi possível processar a chave '{}'. Pulando.", originalName, e);
                         }
-                    } else {
-                        logger.warn("A chave selecionada '{}' não foi encontrada na resposta da fonte de dados. Pulando.", originalName);
                     }
                 }
 
@@ -108,7 +130,7 @@ public class DataPipeline {
                 }
                 consumoAcumuladoNaHora += valorParaAcumular;
 
-                logger.info("[ETAPA 2/3] Executando lógica de negócio (Insights, Falhas, Custo)...");
+                logger.info("[ETAPA 2/3] Executando lógica de negócio...");
                 double temperaturaAtual = optTemperatura.orElse(0.0);
                 double fatorPotenciaAtual = optFatorPotencia.orElse(0.0);
                 double potenciaAtivaAtual = optPotenciaAtiva.orElse(0.0);

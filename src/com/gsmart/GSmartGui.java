@@ -10,54 +10,58 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class GSmartGui extends JFrame {
 
     private static final Logger logger = LoggerFactory.getLogger(GSmartGui.class);
 
-    // --- Componentes da Interface ---
     private final JComboBox<String> sourceSelector;
     private final JButton startButton;
+    private final JButton stopAllButton;
+    private final JButton monitoringButton;
     private final JButton loadKeysButton;
     private final JTextField pbiUrlField;
-
-    // --- Componentes de Configuração de Fonte ---
     private final JPanel thingsboardConfigPanel;
+    private final JTextField thingsboardUrlField;
+    private final JButton tbConnectButton;
+    private final JLabel tbStatusLabel;
     private final JComboBox<DeviceProfile> deviceProfileSelector;
-    private final JButton refreshProfilesButton;
     private final JComboBox<Device> deviceSelector;
-
     private final JPanel databaseConfigPanel;
     private final JTextField dbUrlField;
     private final JTextField dbUserField;
     private final JPasswordField dbPasswordField;
-    private final JTextField dbTableNameField;
-
+    private final JButton dbConnectButton;
+    private final JLabel dbStatusLabel;
+    private final JComboBox<String> dbTableSelector;
     private final JTable metricsTable;
     private final MetricTableModel tableModel;
     private final JPanel sourceConfigCardPanel;
-
     private final LogViewerWindow globalLogViewer;
+    private final PipelineManager pipelineManager;
+    private TaskManagerWindow taskManagerWindow;
 
-    // --- Variáveis de Configuração ---
     private String chaveDeAcumuloSelecionada;
     private LogicConfig logicConfig;
 
-    public GSmartGui(LogViewerWindow logViewer) {
+    public GSmartGui(LogViewerWindow logViewer, PipelineManager pipelineManager) {
         this.globalLogViewer = logViewer;
+        this.pipelineManager = pipelineManager;
+        this.pipelineManager.setParentComponent(this);
+        this.pipelineManager.setGlobalLogViewer(this.globalLogViewer);
 
-        setTitle("GSmart - Configurador de Pipeline v3.1.1");
-        setSize(800, 620);
+        setTitle("GSmart - Configurador de Pipeline v4.1");
+        setSize(850, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // --- PAINEL DE CONFIGURAÇÃO GERAL (TOPO) ---
         JPanel topConfigurationPanel = new JPanel();
         topConfigurationPanel.setLayout(new BoxLayout(topConfigurationPanel, BoxLayout.Y_AXIS));
-
         JPanel sourceSelectionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         sourceSelectionPanel.setBorder(BorderFactory.createTitledBorder("1. Selecione a Fonte de Dados"));
         sourceSelectionPanel.add(new JLabel("Tipo de Fonte:"));
@@ -69,40 +73,43 @@ public class GSmartGui extends JFrame {
 
         thingsboardConfigPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbcTb = new GridBagConstraints();
-        gbcTb.insets = new Insets(4, 5, 4, 5);
-        gbcTb.anchor = GridBagConstraints.WEST;
-        gbcTb.gridx = 0; gbcTb.gridy = 0; gbcTb.gridwidth = 1; gbcTb.fill = GridBagConstraints.NONE;
-        thingsboardConfigPanel.add(new JLabel("Perfil de Dispositivo (Tipo):"), gbcTb);
-        gbcTb.gridx = 1; gbcTb.gridy = 0; gbcTb.weightx = 1.0; gbcTb.fill = GridBagConstraints.HORIZONTAL;
-        deviceProfileSelector = new JComboBox<>();
-        thingsboardConfigPanel.add(deviceProfileSelector, gbcTb);
-        gbcTb.gridx = 2; gbcTb.gridy = 0; gbcTb.weightx = 0; gbcTb.fill = GridBagConstraints.NONE;
-        refreshProfilesButton = new JButton("Atualizar Perfis");
-        thingsboardConfigPanel.add(refreshProfilesButton, gbcTb);
-        gbcTb.gridx = 0; gbcTb.gridy = 1;
-        thingsboardConfigPanel.add(new JLabel("Dispositivo:"), gbcTb);
-        gbcTb.gridx = 1; gbcTb.gridy = 1; gbcTb.gridwidth = 2; gbcTb.fill = GridBagConstraints.HORIZONTAL;
-        deviceSelector = new JComboBox<>();
-        thingsboardConfigPanel.add(deviceSelector, gbcTb);
+        gbcTb.insets = new Insets(4, 5, 4, 5); gbcTb.anchor = GridBagConstraints.WEST;
+        gbcTb.gridx = 0; gbcTb.gridy = 0; gbcTb.gridwidth = 1; gbcTb.fill = GridBagConstraints.NONE; thingsboardConfigPanel.add(new JLabel("URL do Servidor:"), gbcTb);
+        gbcTb.gridx = 1; gbcTb.gridy = 0; gbcTb.weightx = 1.0; gbcTb.fill = GridBagConstraints.HORIZONTAL; thingsboardUrlField = new JTextField("http://10.8.0.5:8080"); thingsboardConfigPanel.add(thingsboardUrlField, gbcTb);
+        gbcTb.gridx = 2; gbcTb.gridy = 0; gbcTb.weightx = 0; gbcTb.fill = GridBagConstraints.NONE; tbConnectButton = new JButton("Conectar"); thingsboardConfigPanel.add(tbConnectButton, gbcTb);
+        gbcTb.gridx = 3; gbcTb.gridy = 0; tbStatusLabel = new JLabel("Não conectado"); tbStatusLabel.setForeground(Color.GRAY); thingsboardConfigPanel.add(tbStatusLabel, gbcTb);
+        gbcTb.gridx = 0; gbcTb.gridy = 1; thingsboardConfigPanel.add(new JLabel("Perfil de Dispositivo (Tipo):"), gbcTb);
+        gbcTb.gridx = 1; gbcTb.gridy = 1; gbcTb.gridwidth = 3; gbcTb.fill = GridBagConstraints.HORIZONTAL; deviceProfileSelector = new JComboBox<>(); deviceProfileSelector.setEnabled(false); thingsboardConfigPanel.add(deviceProfileSelector, gbcTb);
+        gbcTb.gridx = 0; gbcTb.gridy = 2; thingsboardConfigPanel.add(new JLabel("Dispositivo:"), gbcTb);
+        gbcTb.gridx = 1; gbcTb.gridy = 2; gbcTb.gridwidth = 3; gbcTb.fill = GridBagConstraints.HORIZONTAL; deviceSelector = new JComboBox<>(); deviceSelector.setEnabled(false); thingsboardConfigPanel.add(deviceSelector, gbcTb);
 
         databaseConfigPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbcDb = new GridBagConstraints();
-        gbcDb.insets = new Insets(2, 5, 2, 5);
-        gbcDb.anchor = GridBagConstraints.WEST;
+        gbcDb.insets = new Insets(2, 5, 2, 5); gbcDb.anchor = GridBagConstraints.WEST;
         gbcDb.gridx = 0; gbcDb.gridy = 0; databaseConfigPanel.add(new JLabel("URL do Banco (JDBC):"), gbcDb);
         gbcDb.gridx = 1; gbcDb.gridy = 0; gbcDb.weightx = 1.0; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbUrlField = new JTextField("jdbc:postgresql://localhost:5432/seu_banco", 30); databaseConfigPanel.add(dbUrlField, gbcDb);
-        gbcDb.gridx = 0; gbcDb.gridy = 1; gbcDb.weightx = 0; gbcDb.fill = GridBagConstraints.NONE; databaseConfigPanel.add(new JLabel("Usuário:"), gbcDb);
+        gbcDb.gridx = 2; gbcDb.gridy = 0; gbcDb.weightx = 0; gbcDb.gridheight = 3; gbcDb.fill = GridBagConstraints.VERTICAL;
+        dbConnectButton = new JButton("Conectar e Listar Tabelas");
+        databaseConfigPanel.add(dbConnectButton, gbcDb);
+        gbcDb.gridx = 3; gbcDb.gridy = 0; gbcDb.gridheight = 3;
+        dbStatusLabel = new JLabel("Não conectado");
+        dbStatusLabel.setForeground(Color.GRAY);
+        databaseConfigPanel.add(dbStatusLabel, gbcDb);
+        gbcDb.gridx = 0; gbcDb.gridy = 1; gbcDb.gridheight = 1; gbcDb.fill = GridBagConstraints.NONE; databaseConfigPanel.add(new JLabel("Usuário:"), gbcDb);
         gbcDb.gridx = 1; gbcDb.gridy = 1; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbUserField = new JTextField("postgres"); databaseConfigPanel.add(dbUserField, gbcDb);
         gbcDb.gridx = 0; gbcDb.gridy = 2; databaseConfigPanel.add(new JLabel("Senha:"), gbcDb);
         gbcDb.gridx = 1; gbcDb.gridy = 2; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbPasswordField = new JPasswordField(""); databaseConfigPanel.add(dbPasswordField, gbcDb);
-        gbcDb.gridx = 0; gbcDb.gridy = 3; databaseConfigPanel.add(new JLabel("Nome da Tabela:"), gbcDb);
-        gbcDb.gridx = 1; gbcDb.gridy = 3; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbTableNameField = new JTextField(); databaseConfigPanel.add(dbTableNameField, gbcDb);
+        gbcDb.gridx = 0; gbcDb.gridy = 3; databaseConfigPanel.add(new JLabel("Tabela:"), gbcDb);
+        gbcDb.gridx = 1; gbcDb.gridy = 3; gbcDb.fill = GridBagConstraints.HORIZONTAL;
+        dbTableSelector = new JComboBox<>();
+        dbTableSelector.setEnabled(false);
+        databaseConfigPanel.add(dbTableSelector, gbcDb);
 
         sourceConfigCardPanel.add(thingsboardConfigPanel, "Thingsboard API");
         sourceConfigCardPanel.add(databaseConfigPanel, "Banco de Dados Espelho");
 
         JPanel loadKeysPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        loadKeysButton = new JButton("2. Carregar Métricas da Fonte Selecionada");
+        loadKeysButton = new JButton("2. Carregar Métricas da Fonte");
         loadKeysPanel.add(loadKeysButton);
 
         JPanel destinationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -120,51 +127,60 @@ public class GSmartGui extends JFrame {
         metricsTable = new JTable(tableModel);
         metricsTable.setFillsViewportHeight(true);
         metricsTable.getColumnModel().getColumn(0).setMaxWidth(60);
+        metricsTable.getColumnModel().getColumn(1).setPreferredWidth(200);
+        metricsTable.getColumnModel().getColumn(2).setPreferredWidth(200);
+        metricsTable.getColumnModel().getColumn(3).setPreferredWidth(180);
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         metricsTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         JScrollPane keysScrollPane = new JScrollPane(metricsTable);
-        keysScrollPane.setBorder(BorderFactory.createTitledBorder("4. Selecionar e Mapear Métricas para Envio"));
+        keysScrollPane.setBorder(BorderFactory.createTitledBorder("4. Selecionar, Mapear e Transformar Métricas"));
 
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
-        startButton = new JButton("▶ Iniciar Monitoramento em Nova Janela");
+        startButton = new JButton("▶ Iniciar Pipeline");
         startButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         actionPanel.add(startButton);
 
-        JButton viewLogsButton = new JButton("Ver Logs da Aplicação");
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.add(actionPanel, BorderLayout.CENTER);
-        bottomPanel.add(viewLogsButton, BorderLayout.EAST);
+        JPanel bottomPanel = new JPanel(new BorderLayout(10, 0));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
+        bottomPanel.add(actionPanel, BorderLayout.WEST);
+
+        JPanel adminPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        monitoringButton = new JButton("Central de Monitoramento");
+        stopAllButton = new JButton("Parar Todos");
+        stopAllButton.setForeground(Color.RED);
+        JButton viewLogsButton = new JButton("Ver Logs");
+        adminPanel.add(monitoringButton);
+        adminPanel.add(stopAllButton);
+        adminPanel.add(viewLogsButton);
+        bottomPanel.add(adminPanel, BorderLayout.CENTER);
 
         setLayout(new BorderLayout(5, 5));
         add(topConfigurationPanel, BorderLayout.NORTH);
         add(keysScrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
+        // Listeners
         sourceSelector.addItemListener(e -> toggleSourceFields());
-        refreshProfilesButton.addActionListener(e -> loadDeviceProfiles());
+        tbConnectButton.addActionListener(e -> connectToThingsboard());
+        dbConnectButton.addActionListener(e -> connectToDatabase());
         deviceProfileSelector.addItemListener(e -> { if (e.getStateChange() == ItemEvent.SELECTED) loadDevicesByProfile(); });
         loadKeysButton.addActionListener(e -> loadAvailableKeys());
-        startButton.addActionListener(e -> startMonitoring());
+        startButton.addActionListener(e -> launchPipeline());
+        stopAllButton.addActionListener(e -> stopAllPipelines());
+        monitoringButton.addActionListener(e -> showTaskManager());
         viewLogsButton.addActionListener(e -> this.globalLogViewer.setVisible(true));
 
         toggleSourceFields();
-        loadDeviceProfiles();
     }
 
-    private void startMonitoring() {
+    private void launchPipeline() {
         try {
             String pbiUrl = pbiUrlField.getText().trim();
-            if (pbiUrl.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Por favor, insira a URL de Push do Power BI.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+            if (pbiUrl.isEmpty()) { JOptionPane.showMessageDialog(this, "Por favor, insira a URL de Push do Power BI.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE); return; }
 
             List<MetricConfig> selectedConfigs = tableModel.getSelectedMetrics();
-            if (selectedConfigs.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Nenhuma métrica foi selecionada para envio!", "Aviso", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
+            if (selectedConfigs.isEmpty()) { JOptionPane.showMessageDialog(this, "Nenhuma métrica foi selecionada para envio!", "Aviso", JOptionPane.WARNING_MESSAGE); return; }
 
             if (this.logicConfig == null || this.chaveDeAcumuloSelecionada == null) {
                 JOptionPane.showMessageDialog(this, "A configuração de Métrica de Acúmulo e da Lógica de Negócio deve ser definida.\nPor favor, carregue as métricas novamente.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE);
@@ -173,14 +189,28 @@ public class GSmartGui extends JFrame {
 
             IDataSource selectedDataSource = createSelectedDataSource(selectedConfigs.stream().map(MetricConfig::getOriginalName).collect(Collectors.toList()));
 
-            MonitoringWindow monitor = new MonitoringWindow(selectedDataSource, pbiUrl, this.chaveDeAcumuloSelecionada, selectedConfigs, this.logicConfig, this.globalLogViewer);
-            monitor.setVisible(true);
-            monitor.start();
+            PipelineConfiguration config = new PipelineConfiguration(selectedDataSource, pbiUrl, this.chaveDeAcumuloSelecionada, selectedConfigs, this.logicConfig, this.globalLogViewer);
+            pipelineManager.launchPipeline(config);
+
+            JOptionPane.showMessageDialog(this, "Pipeline para '" + selectedDataSource.getSourceName() + "' iniciada em segundo plano.\nAbra a 'Central de Monitoramento' para visualizar.", "Pipeline Iniciada", JOptionPane.INFORMATION_MESSAGE);
 
         } catch (Exception e) {
             logger.error("Falha ao preparar a pipeline: {}", e.getMessage(), e);
             JOptionPane.showMessageDialog(this, "Falha ao preparar a pipeline:\n" + e.getMessage(), "Erro Crítico", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void stopAllPipelines() {
+        pipelineManager.stopAllPipelines();
+    }
+
+    private void showTaskManager() {
+        if (taskManagerWindow == null || !taskManagerWindow.isDisplayable()) {
+            taskManagerWindow = new TaskManagerWindow(this.pipelineManager);
+            taskManagerWindow.setLocationRelativeTo(this);
+        }
+        taskManagerWindow.setVisible(true);
+        taskManagerWindow.toFront();
     }
 
     private void toggleSourceFields() {
@@ -191,41 +221,116 @@ public class GSmartGui extends JFrame {
         }
     }
 
+    private String getThingsboardUrl() {
+        String url = thingsboardUrlField.getText().trim();
+        if (url.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "A URL do Servidor ThingsBoard não pode estar vazia.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE);
+            throw new IllegalStateException("URL do ThingsBoard não fornecida.");
+        }
+        return url;
+    }
+
+    private void connectToThingsboard() {
+        tbStatusLabel.setText("Conectando...");
+        tbStatusLabel.setForeground(Color.ORANGE);
+        tbConnectButton.setEnabled(false);
+        new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() {
+                try { return new ThingsBoardSource(getThingsboardUrl(), null, null).testConnection(); }
+                catch (Exception e) { return false; }
+            }
+            @Override
+            protected void done() {
+                try {
+                    if (get()) {
+                        tbStatusLabel.setText("Conectado");
+                        tbStatusLabel.setForeground(new Color(0, 128, 0));
+                        deviceProfileSelector.setEnabled(true);
+                        loadDeviceProfiles();
+                    } else { throw new Exception("Falha na autenticação ou URL incorreta."); }
+                } catch (Exception e) {
+                    tbStatusLabel.setText("Falha!");
+                    tbStatusLabel.setForeground(Color.RED);
+                } finally {
+                    tbConnectButton.setEnabled(true);
+                }
+            }
+        }.execute();
+    }
+
+    private void connectToDatabase() {
+        dbStatusLabel.setText("Conectando...");
+        dbStatusLabel.setForeground(Color.ORANGE);
+        dbConnectButton.setEnabled(false);
+        new SwingWorker<List<String>, Void>() {
+            @Override
+            protected List<String> doInBackground() throws Exception {
+                DatabaseSource tempSource = new DatabaseSource(dbUrlField.getText().trim(), dbUserField.getText().trim(), new String(dbPasswordField.getPassword()), null, null);
+                if (tempSource.testConnection()) {
+                    return tempSource.getAvailableTables();
+                } else {
+                    throw new SQLException("Não foi possível validar a conexão com o banco de dados.");
+                }
+            }
+            @Override
+            protected void done() {
+                try {
+                    List<String> tables = get();
+                    dbStatusLabel.setText("Conectado");
+                    dbStatusLabel.setForeground(new Color(0, 128, 0));
+                    dbTableSelector.removeAllItems();
+                    tables.forEach(dbTableSelector::addItem);
+                    dbTableSelector.setEnabled(true);
+                } catch (Exception e) {
+                    dbStatusLabel.setText("Falha!");
+                    dbStatusLabel.setForeground(Color.RED);
+                    JOptionPane.showMessageDialog(GSmartGui.this, "Não foi possível conectar ao Banco de Dados:\n" + e.getCause().getMessage(), "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
+                } finally {
+                    dbConnectButton.setEnabled(true);
+                }
+            }
+        }.execute();
+    }
+
     private void loadAvailableKeys() {
         loadKeysButton.setEnabled(false);
         loadKeysButton.setText("Carregando...");
         String selectedSource = (String) sourceSelector.getSelectedItem();
-
-        if ("Thingsboard API".equals(selectedSource)) {
-            Device selectedDevice = (Device) deviceSelector.getSelectedItem();
-            if (selectedDevice == null) {
-                JOptionPane.showMessageDialog(this, "Por favor, selecione um dispositivo primeiro.", "Aviso", JOptionPane.WARNING_MESSAGE);
-                setLoadButtonReady();
-                return;
-            }
-            new SwingWorker<List<String>, Void>() {
-                @Override protected List<String> doInBackground() throws Exception {
-                    return new ThingsBoardSource("http://10.8.0.5:8080", selectedDevice.id(), null).getAvailableKeys();
+        try {
+            if ("Thingsboard API".equals(selectedSource)) {
+                Device selectedDevice = (Device) deviceSelector.getSelectedItem();
+                if (selectedDevice == null) {
+                    JOptionPane.showMessageDialog(this, "Por favor, conecte e selecione um dispositivo primeiro.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    setLoadButtonReady();
+                    return;
                 }
-                @Override protected void done() { handleKeysLoaded(this); }
-            }.execute();
-
-        } else if ("Banco de Dados Espelho".equals(selectedSource)) {
-            String dbUrl = dbUrlField.getText().trim();
-            String dbUser = dbUserField.getText().trim();
-            String dbPassword = new String(dbPasswordField.getPassword());
-            String dbTable = dbTableNameField.getText().trim();
-            if (dbUrl.isEmpty() || dbUser.isEmpty() || dbTable.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "URL do Banco, Usuário e Nome da Tabela são obrigatórios.", "Erro", JOptionPane.ERROR_MESSAGE);
-                setLoadButtonReady();
-                return;
-            }
-            new SwingWorker<List<String>, Void>() {
-                @Override protected List<String> doInBackground() throws Exception {
-                    return new DatabaseSource(dbUrl, dbUser, dbPassword, dbTable, null).getAvailableColumns(dbTable);
+                new SwingWorker<List<String>, Void>() {
+                    @Override protected List<String> doInBackground() throws Exception {
+                        return new ThingsBoardSource(getThingsboardUrl(), selectedDevice.id(), null).getAvailableKeys();
+                    }
+                    @Override protected void done() { handleKeysLoaded(this); }
+                }.execute();
+            } else if ("Banco de Dados Espelho".equals(selectedSource)) {
+                String selectedTable = (String) dbTableSelector.getSelectedItem();
+                if (selectedTable == null) {
+                    JOptionPane.showMessageDialog(this, "Por favor, conecte e selecione uma tabela primeiro.", "Aviso", JOptionPane.WARNING_MESSAGE);
+                    setLoadButtonReady();
+                    return;
                 }
-                @Override protected void done() { handleKeysLoaded(this); }
-            }.execute();
+                new SwingWorker<List<String>, Void>() {
+                    @Override protected List<String> doInBackground() throws Exception {
+                        String dbUrl = dbUrlField.getText().trim();
+                        String dbUser = dbUserField.getText().trim();
+                        String dbPassword = new String(dbPasswordField.getPassword());
+                        return new DatabaseSource(dbUrl, dbUser, dbPassword, selectedTable, null).getAvailableColumns(selectedTable);
+                    }
+                    @Override protected void done() { handleKeysLoaded(this); }
+                }.execute();
+            }
+        } catch (IllegalStateException e) {
+            logger.error("Pré-condição para carregar chaves falhou: {}", e.getMessage());
+            setLoadButtonReady();
         }
     }
 
@@ -237,20 +342,15 @@ public class GSmartGui extends JFrame {
                 tableModel.clearMetrics();
                 return;
             }
-
             String acumuloKey = showDropdownDialog(keys, "Configuração da Métrica de Acúmulo", "1/4: Selecione a métrica para o 'Acúmulo por Hora':");
             if (acumuloKey == null) { logger.warn("Usuário cancelou a configuração. Nenhuma métrica foi carregada."); tableModel.clearMetrics(); return; }
             this.chaveDeAcumuloSelecionada = acumuloKey;
-
             String tempKey = showDropdownDialog(keys, "Mapeamento da Lógica", "2/4: Selecione a métrica de 'Temperatura':\n(Pode cancelar se não aplicável)");
             String fpKey = showDropdownDialog(keys, "Mapeamento da Lógica", "3/4: Selecione a métrica de 'Fator de Potência':\n(Pode cancelar se não aplicável)");
             String ptotKey = showDropdownDialog(keys, "Mapeamento da Lógica", "4/4: Selecione a métrica de 'Potência Ativa':\n(Pode cancelar se não aplicável)");
-
             this.logicConfig = new LogicConfig(tempKey, fpKey, ptotKey);
-
             List<MetricConfig> configs = keys.stream().map(MetricConfig::new).collect(Collectors.toList());
             tableModel.setMetrics(configs);
-
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Falha ao carregar as métricas/colunas:\n" + e.getCause().getMessage(), "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
         } finally {
@@ -260,20 +360,22 @@ public class GSmartGui extends JFrame {
 
     private void setLoadButtonReady() {
         loadKeysButton.setEnabled(true);
-        loadKeysButton.setText("2. Carregar Métricas da Fonte Selecionada");
+        loadKeysButton.setText("2. Carregar Métricas da Fonte");
     }
 
     private IDataSource createSelectedDataSource(List<String> originalKeys) {
         String selectedSource = (String) sourceSelector.getSelectedItem();
         if ("Thingsboard API".equals(selectedSource)) {
+            String tbUrl = getThingsboardUrl();
             Device selectedDevice = (Device) deviceSelector.getSelectedItem();
             if (selectedDevice == null) { throw new IllegalStateException("Nenhum dispositivo do ThingsBoard foi selecionado."); }
-            return new ThingsBoardSource("http://10.8.0.5:8080", selectedDevice.id(), originalKeys);
+            return new ThingsBoardSource(tbUrl, selectedDevice.id(), originalKeys);
         } else if ("Banco de Dados Espelho".equals(selectedSource)) {
             String dbUrl = dbUrlField.getText().trim();
             String dbUser = dbUserField.getText().trim();
             String dbPassword = new String(dbPasswordField.getPassword());
-            String dbTable = dbTableNameField.getText().trim();
+            String dbTable = (String) dbTableSelector.getSelectedItem();
+            if (dbTable == null) { throw new IllegalStateException("Nenhuma tabela do banco de dados foi selecionada.");}
             return new DatabaseSource(dbUrl, dbUser, dbPassword, dbTable, originalKeys);
         }
         throw new IllegalStateException("Nenhuma fonte de dados válida foi selecionada.");
@@ -286,12 +388,12 @@ public class GSmartGui extends JFrame {
     }
 
     private void loadDeviceProfiles() {
-        refreshProfilesButton.setEnabled(false);
-        refreshProfilesButton.setText("Buscando...");
+        Object previouslySelected = deviceProfileSelector.getSelectedItem();
+        tbConnectButton.setEnabled(false);
         new SwingWorker<List<DeviceProfile>, Void>() {
             @Override
             protected List<DeviceProfile> doInBackground() throws Exception {
-                return new ThingsBoardSource("http://10.8.0.5:8080", null, null).getDeviceProfiles();
+                return new ThingsBoardSource(getThingsboardUrl(), null, null).getDeviceProfiles();
             }
             @Override
             protected void done() {
@@ -299,8 +401,21 @@ public class GSmartGui extends JFrame {
                     List<DeviceProfile> profiles = get();
                     deviceProfileSelector.removeAllItems();
                     profiles.forEach(deviceProfileSelector::addItem);
-                } catch (Exception e) { logger.error("Falha ao buscar perfis de dispositivo: {}", e.getMessage(), e);
-                } finally { refreshProfilesButton.setEnabled(true); refreshProfilesButton.setText("Atualizar Perfis"); }
+                    if (previouslySelected != null) {
+                        for (int i = 0; i < deviceProfileSelector.getItemCount(); i++) {
+                            if (Objects.equals(deviceProfileSelector.getItemAt(i), previouslySelected)) {
+                                deviceProfileSelector.setSelectedIndex(i);
+                                break;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("Falha ao buscar perfis de dispositivo: {}", e.getMessage(), e);
+                    tbStatusLabel.setText("Falha!");
+                    tbStatusLabel.setForeground(Color.RED);
+                } finally {
+                    tbConnectButton.setEnabled(true);
+                }
             }
         }.execute();
     }
@@ -308,10 +423,11 @@ public class GSmartGui extends JFrame {
     private void loadDevicesByProfile() {
         DeviceProfile selectedProfile = (DeviceProfile) deviceProfileSelector.getSelectedItem();
         if (selectedProfile == null) { deviceSelector.removeAllItems(); return; }
+        deviceSelector.setEnabled(false);
         new SwingWorker<List<Device>, Void>() {
             @Override
             protected List<Device> doInBackground() throws Exception {
-                return new ThingsBoardSource("http://10.8.0.5:8080", null, null).getDevicesByProfileId(selectedProfile.id());
+                return new ThingsBoardSource(getThingsboardUrl(), null, null).getDevicesByProfileId(selectedProfile.id());
             }
             @Override
             protected void done() {
@@ -319,54 +435,61 @@ public class GSmartGui extends JFrame {
                     List<Device> devices = get();
                     deviceSelector.removeAllItems();
                     devices.forEach(deviceSelector::addItem);
-                } catch (Exception e) { logger.error("Falha ao buscar dispositivos para o perfil '{}': {}", selectedProfile.name(), e.getMessage(), e); }
+                    deviceSelector.setEnabled(true);
+                } catch (Exception e) {
+                    logger.error("Falha ao buscar dispositivos para o perfil '{}': {}", selectedProfile.name(), e.getMessage(), e);
+                }
             }
         }.execute();
     }
+// --- CHAVE EXTRA E ERRADA AQUI ---
 }
 
 class MetricTableModel extends AbstractTableModel {
-    private final String[] columnNames = {"Enviar", "Nome Original", "Enviar Como (Alias)"};
+    private final String[] columnNames = {"Enviar", "Nome Original", "Enviar Como (Alias)", "Função/Expressão (usar 'valor')"};
     private List<MetricConfig> metrics = new ArrayList<>();
 
     public List<MetricConfig> getSelectedMetrics() {
         return metrics.stream().filter(MetricConfig::isSelected).collect(Collectors.toList());
     }
-
     public void setMetrics(List<MetricConfig> metrics) {
         this.metrics = new ArrayList<>(metrics);
         fireTableDataChanged();
     }
-
     public void clearMetrics() {
         this.metrics.clear();
         fireTableDataChanged();
     }
-
     @Override public int getRowCount() { return metrics.size(); }
     @Override public int getColumnCount() { return columnNames.length; }
     @Override public String getColumnName(int column) { return columnNames[column]; }
+
     @Override public Class<?> getColumnClass(int columnIndex) {
         if (columnIndex == 0) return Boolean.class;
         return String.class;
     }
-    @Override public boolean isCellEditable(int rowIndex, int columnIndex) { return columnIndex == 0 || columnIndex == 2; }
+
+    @Override public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 0 || columnIndex == 2 || columnIndex == 3;
+    }
 
     @Override public Object getValueAt(int rowIndex, int columnIndex) {
         MetricConfig metric = metrics.get(rowIndex);
-        switch (columnIndex) {
-            case 0: return metric.isSelected();
-            case 1: return metric.getOriginalName();
-            case 2: return metric.getAlias();
-            default: return null;
-        }
+        return switch (columnIndex) {
+            case 0 -> metric.isSelected();
+            case 1 -> metric.getOriginalName();
+            case 2 -> metric.getAlias();
+            case 3 -> metric.getExpression();
+            default -> null;
+        };
     }
 
     @Override public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         MetricConfig metric = metrics.get(rowIndex);
         switch (columnIndex) {
-            case 0: metric.setSelected((Boolean) aValue); break;
-            case 2: metric.setAlias((String) aValue); break;
+            case 0 -> metric.setSelected((Boolean) aValue);
+            case 2 -> metric.setAlias((String) aValue);
+            case 3 -> metric.setExpression((String) aValue);
         }
         fireTableCellUpdated(rowIndex, columnIndex);
     }

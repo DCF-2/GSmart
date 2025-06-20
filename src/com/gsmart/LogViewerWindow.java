@@ -7,12 +7,12 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets; // --- IMPORT ADICIONADO ---
 
 public class LogViewerWindow extends JFrame {
 
     private final JTextPane textPane;
 
-    // Definindo as cores para os logs
     private static final Color COLOR_INFO = new Color(0, 128, 0); // Verde
     private static final Color COLOR_WARN = new Color(255, 165, 0); // Laranja
     private static final Color COLOR_ERROR = Color.RED;
@@ -22,7 +22,7 @@ public class LogViewerWindow extends JFrame {
     public LogViewerWindow() {
         setTitle("GSmart - Visualizador de Logs");
         setSize(750, 450);
-        setLocationByPlatform(true); // Deixa o sistema operacional decidir a posição
+        setLocationByPlatform(true);
 
         textPane = new JTextPane();
         textPane.setEditable(false);
@@ -31,7 +31,6 @@ public class LogViewerWindow extends JFrame {
         JScrollPane scrollPane = new JScrollPane(textPane);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Não fecha a aplicação, apenas esconde a janela
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
     }
 
@@ -41,10 +40,11 @@ public class LogViewerWindow extends JFrame {
         StyleConstants.setForeground(style, color);
         try {
             doc.insertString(doc.getLength(), message, style);
-            // Auto-scroll
             textPane.setCaretPosition(doc.getLength());
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            // Em vez de imprimir no stack trace (que seria redirecionado de volta para cá),
+            // podemos lidar com isso de forma mais segura, talvez logando para um arquivo futuramente.
+            // Por enquanto, vamos evitar a recursão infinita.
         }
     }
 
@@ -52,16 +52,31 @@ public class LogViewerWindow extends JFrame {
         OutputStream out = new OutputStream() {
             @Override
             public void write(int b) throws IOException {
+                // A decodificação de bytes para char é complexa.
+                // A maneira como o PrintStream lida com isso é mais robusta.
+                // Apenas encaminhamos o byte bruto. O PrintStream fará o resto.
+                // Esta abordagem simples pode não lidar com todos os caracteres multibyte
+                // perfeitamente, mas para o Logback que envia strings completas,
+                // a especificação do charset no PrintStream é o mais importante.
                 updateTextPane(String.valueOf((char) b));
             }
+
+            @Override
+            public void write(byte[] b, int off, int len) throws IOException {
+                // O Logback geralmente chama este metodo, enviando uma string completa.
+                // Aqui garantimos a decodificação correta.
+                updateTextPane(new String(b, off, len, StandardCharsets.UTF_8));
+            }
         };
-        System.setOut(new PrintStream(out, true));
-        System.setErr(new PrintStream(out, true));
+
+        // --- MUDANÇA PRINCIPAL AQUI ---
+        // Especificamos o encoding UTF-8 ao criar o PrintStream.
+        System.setOut(new PrintStream(out, true, StandardCharsets.UTF_8));
+        System.setErr(new PrintStream(out, true, StandardCharsets.UTF_8));
     }
 
     private void updateTextPane(final String text) {
         SwingUtilities.invokeLater(() -> {
-            // Lógica para colorir o texto com base em palavras-chave
             if (text.contains("ERROR")) {
                 append(text, COLOR_ERROR);
             } else if (text.contains("WARN")) {
