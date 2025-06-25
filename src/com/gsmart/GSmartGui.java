@@ -1,7 +1,15 @@
 // Localização: src/main/java/com/gsmart/GSmartGui.java
 package com.gsmart;
 
+import com.gsmart.config.ConfigManager;
+import com.gsmart.config.LogicConfig;
+import com.gsmart.config.MetricConfig;
+import com.gsmart.config.PipelineConfiguration;
+import com.gsmart.pipeline.PipelineManager;
 import com.gsmart.sources.*;
+import com.gsmart.windows.LogViewerWindow;
+import com.gsmart.windows.MonitoringWindow;
+import com.gsmart.windows.TaskManagerWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,10 +18,13 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ItemEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 public class GSmartGui extends JFrame {
@@ -44,7 +55,9 @@ public class GSmartGui extends JFrame {
     private final JPanel sourceConfigCardPanel;
     private final LogViewerWindow globalLogViewer;
     private final PipelineManager pipelineManager;
+    private final ConfigManager configManager;
     private TaskManagerWindow taskManagerWindow;
+    private final JCheckBox runLogicCheckBox;
 
     private String chaveDeAcumuloSelecionada;
     private LogicConfig logicConfig;
@@ -52,10 +65,11 @@ public class GSmartGui extends JFrame {
     public GSmartGui(LogViewerWindow logViewer, PipelineManager pipelineManager) {
         this.globalLogViewer = logViewer;
         this.pipelineManager = pipelineManager;
+        this.configManager = new ConfigManager();
         this.pipelineManager.setParentComponent(this);
         this.pipelineManager.setGlobalLogViewer(this.globalLogViewer);
 
-        setTitle("GSmart - Configurador de Pipeline v4.1");
+        setTitle("GSmart - Configurador de Pipeline v4.3");
         setSize(850, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -70,12 +84,11 @@ public class GSmartGui extends JFrame {
         sourceSelectionPanel.add(sourceSelector);
 
         sourceConfigCardPanel = new JPanel(new CardLayout());
-
         thingsboardConfigPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbcTb = new GridBagConstraints();
         gbcTb.insets = new Insets(4, 5, 4, 5); gbcTb.anchor = GridBagConstraints.WEST;
         gbcTb.gridx = 0; gbcTb.gridy = 0; gbcTb.gridwidth = 1; gbcTb.fill = GridBagConstraints.NONE; thingsboardConfigPanel.add(new JLabel("URL do Servidor:"), gbcTb);
-        gbcTb.gridx = 1; gbcTb.gridy = 0; gbcTb.weightx = 1.0; gbcTb.fill = GridBagConstraints.HORIZONTAL; thingsboardUrlField = new JTextField("http://10.8.0.5:8080"); thingsboardConfigPanel.add(thingsboardUrlField, gbcTb);
+        gbcTb.gridx = 1; gbcTb.gridy = 0; gbcTb.weightx = 1.0; gbcTb.fill = GridBagConstraints.HORIZONTAL; thingsboardUrlField = new JTextField(); thingsboardConfigPanel.add(thingsboardUrlField, gbcTb);
         gbcTb.gridx = 2; gbcTb.gridy = 0; gbcTb.weightx = 0; gbcTb.fill = GridBagConstraints.NONE; tbConnectButton = new JButton("Conectar"); thingsboardConfigPanel.add(tbConnectButton, gbcTb);
         gbcTb.gridx = 3; gbcTb.gridy = 0; tbStatusLabel = new JLabel("Não conectado"); tbStatusLabel.setForeground(Color.GRAY); thingsboardConfigPanel.add(tbStatusLabel, gbcTb);
         gbcTb.gridx = 0; gbcTb.gridy = 1; thingsboardConfigPanel.add(new JLabel("Perfil de Dispositivo (Tipo):"), gbcTb);
@@ -87,7 +100,7 @@ public class GSmartGui extends JFrame {
         GridBagConstraints gbcDb = new GridBagConstraints();
         gbcDb.insets = new Insets(2, 5, 2, 5); gbcDb.anchor = GridBagConstraints.WEST;
         gbcDb.gridx = 0; gbcDb.gridy = 0; databaseConfigPanel.add(new JLabel("URL do Banco (JDBC):"), gbcDb);
-        gbcDb.gridx = 1; gbcDb.gridy = 0; gbcDb.weightx = 1.0; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbUrlField = new JTextField("jdbc:postgresql://localhost:5432/seu_banco", 30); databaseConfigPanel.add(dbUrlField, gbcDb);
+        gbcDb.gridx = 1; gbcDb.gridy = 0; gbcDb.weightx = 1.0; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbUrlField = new JTextField(); databaseConfigPanel.add(dbUrlField, gbcDb);
         gbcDb.gridx = 2; gbcDb.gridy = 0; gbcDb.weightx = 0; gbcDb.gridheight = 3; gbcDb.fill = GridBagConstraints.VERTICAL;
         dbConnectButton = new JButton("Conectar e Listar Tabelas");
         databaseConfigPanel.add(dbConnectButton, gbcDb);
@@ -96,7 +109,7 @@ public class GSmartGui extends JFrame {
         dbStatusLabel.setForeground(Color.GRAY);
         databaseConfigPanel.add(dbStatusLabel, gbcDb);
         gbcDb.gridx = 0; gbcDb.gridy = 1; gbcDb.gridheight = 1; gbcDb.fill = GridBagConstraints.NONE; databaseConfigPanel.add(new JLabel("Usuário:"), gbcDb);
-        gbcDb.gridx = 1; gbcDb.gridy = 1; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbUserField = new JTextField("postgres"); databaseConfigPanel.add(dbUserField, gbcDb);
+        gbcDb.gridx = 1; gbcDb.gridy = 1; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbUserField = new JTextField(); databaseConfigPanel.add(dbUserField, gbcDb);
         gbcDb.gridx = 0; gbcDb.gridy = 2; databaseConfigPanel.add(new JLabel("Senha:"), gbcDb);
         gbcDb.gridx = 1; gbcDb.gridy = 2; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbPasswordField = new JPasswordField(""); databaseConfigPanel.add(dbPasswordField, gbcDb);
         gbcDb.gridx = 0; gbcDb.gridy = 3; databaseConfigPanel.add(new JLabel("Tabela:"), gbcDb);
@@ -111,13 +124,11 @@ public class GSmartGui extends JFrame {
         JPanel loadKeysPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         loadKeysButton = new JButton("2. Carregar Métricas da Fonte");
         loadKeysPanel.add(loadKeysButton);
-
         JPanel destinationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         destinationPanel.setBorder(BorderFactory.createTitledBorder("3. Configurar Destino dos Dados"));
         destinationPanel.add(new JLabel("URL de Push do Power BI:"));
         pbiUrlField = new JTextField(45);
         destinationPanel.add(pbiUrlField);
-
         topConfigurationPanel.add(sourceSelectionPanel);
         topConfigurationPanel.add(sourceConfigCardPanel);
         topConfigurationPanel.add(loadKeysPanel);
@@ -136,10 +147,13 @@ public class GSmartGui extends JFrame {
         JScrollPane keysScrollPane = new JScrollPane(metricsTable);
         keysScrollPane.setBorder(BorderFactory.createTitledBorder("4. Selecionar, Mapear e Transformar Métricas"));
 
-        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 15));
         startButton = new JButton("▶ Iniciar Pipeline");
         startButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        runLogicCheckBox = new JCheckBox("Executar Lógica de Negócio", true);
+        runLogicCheckBox.setToolTipText("Se marcado, a lógica de insights será configurada e executada.");
         actionPanel.add(startButton);
+        actionPanel.add(runLogicCheckBox);
 
         JPanel bottomPanel = new JPanel(new BorderLayout(10, 0));
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
@@ -160,7 +174,6 @@ public class GSmartGui extends JFrame {
         add(keysScrollPane, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        // Listeners
         sourceSelector.addItemListener(e -> toggleSourceFields());
         tbConnectButton.addActionListener(e -> connectToThingsboard());
         dbConnectButton.addActionListener(e -> connectToDatabase());
@@ -171,10 +184,44 @@ public class GSmartGui extends JFrame {
         monitoringButton.addActionListener(e -> showTaskManager());
         viewLogsButton.addActionListener(e -> this.globalLogViewer.setVisible(true));
 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                saveConfiguration();
+            }
+        });
+
         toggleSourceFields();
+        loadConfiguration();
+    }
+
+    private void loadConfiguration() {
+        logger.info("Carregando configurações salvas...");
+        Properties props = configManager.loadProperties();
+        thingsboardUrlField.setText(props.getProperty("thingsboard.url", "http://10.8.0.5:8080"));
+        dbUrlField.setText(props.getProperty("db.url", "jdbc:postgresql://localhost:5432/seu_banco"));
+        dbUserField.setText(props.getProperty("db.user", "postgres"));
+        pbiUrlField.setText(props.getProperty("powerbi.url", ""));
+        sourceSelector.setSelectedItem(props.getProperty("source.last", "Thingsboard API"));
+        runLogicCheckBox.setSelected(Boolean.parseBoolean(props.getProperty("logic.run", "true")));
+    }
+
+    private void saveConfiguration() {
+        logger.info("Salvando configurações antes de fechar...");
+        Properties props = new Properties();
+        props.setProperty("thingsboard.url", thingsboardUrlField.getText());
+        props.setProperty("db.url", dbUrlField.getText());
+        props.setProperty("db.user", dbUserField.getText());
+        props.setProperty("powerbi.url", pbiUrlField.getText());
+        props.setProperty("source.last", (String) sourceSelector.getSelectedItem());
+        props.setProperty("logic.run", String.valueOf(runLogicCheckBox.isSelected()));
+        configManager.saveProperties(props);
     }
 
     private void launchPipeline() {
+        if (metricsTable.isEditing()) {
+            metricsTable.getCellEditor().stopCellEditing();
+        }
         try {
             String pbiUrl = pbiUrlField.getText().trim();
             if (pbiUrl.isEmpty()) { JOptionPane.showMessageDialog(this, "Por favor, insira a URL de Push do Power BI.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE); return; }
@@ -182,14 +229,19 @@ public class GSmartGui extends JFrame {
             List<MetricConfig> selectedConfigs = tableModel.getSelectedMetrics();
             if (selectedConfigs.isEmpty()) { JOptionPane.showMessageDialog(this, "Nenhuma métrica foi selecionada para envio!", "Aviso", JOptionPane.WARNING_MESSAGE); return; }
 
-            if (this.logicConfig == null || this.chaveDeAcumuloSelecionada == null) {
-                JOptionPane.showMessageDialog(this, "A configuração de Métrica de Acúmulo e da Lógica de Negócio deve ser definida.\nPor favor, carregue as métricas novamente.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE);
+            boolean runLogic = runLogicCheckBox.isSelected();
+
+            if (runLogic && (this.logicConfig == null || this.chaveDeAcumuloSelecionada == null)) {
+                JOptionPane.showMessageDialog(this, "A caixa 'Executar Lógica de Negócio' está marcada, mas a configuração não foi feita.\nPor favor, carregue as métricas novamente e configure a lógica.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             IDataSource selectedDataSource = createSelectedDataSource(selectedConfigs.stream().map(MetricConfig::getOriginalName).collect(Collectors.toList()));
 
-            PipelineConfiguration config = new PipelineConfiguration(selectedDataSource, pbiUrl, this.chaveDeAcumuloSelecionada, selectedConfigs, this.logicConfig, this.globalLogViewer);
+            PipelineConfiguration config = new PipelineConfiguration(
+                    selectedDataSource, pbiUrl, this.chaveDeAcumuloSelecionada,
+                    selectedConfigs, this.logicConfig, this.globalLogViewer, runLogic);
+
             pipelineManager.launchPipeline(config);
 
             JOptionPane.showMessageDialog(this, "Pipeline para '" + selectedDataSource.getSourceName() + "' iniciada em segundo plano.\nAbra a 'Central de Monitoramento' para visualizar.", "Pipeline Iniciada", JOptionPane.INFORMATION_MESSAGE);
@@ -200,9 +252,7 @@ public class GSmartGui extends JFrame {
         }
     }
 
-    private void stopAllPipelines() {
-        pipelineManager.stopAllPipelines();
-    }
+    private void stopAllPipelines() { pipelineManager.stopAllPipelines(); }
 
     private void showTaskManager() {
         if (taskManagerWindow == null || !taskManagerWindow.isDisplayable()) {
@@ -342,13 +392,32 @@ public class GSmartGui extends JFrame {
                 tableModel.clearMetrics();
                 return;
             }
-            String acumuloKey = showDropdownDialog(keys, "Configuração da Métrica de Acúmulo", "1/4: Selecione a métrica para o 'Acúmulo por Hora':");
-            if (acumuloKey == null) { logger.warn("Usuário cancelou a configuração. Nenhuma métrica foi carregada."); tableModel.clearMetrics(); return; }
-            this.chaveDeAcumuloSelecionada = acumuloKey;
-            String tempKey = showDropdownDialog(keys, "Mapeamento da Lógica", "2/4: Selecione a métrica de 'Temperatura':\n(Pode cancelar se não aplicável)");
-            String fpKey = showDropdownDialog(keys, "Mapeamento da Lógica", "3/4: Selecione a métrica de 'Fator de Potência':\n(Pode cancelar se não aplicável)");
-            String ptotKey = showDropdownDialog(keys, "Mapeamento da Lógica", "4/4: Selecione a métrica de 'Potência Ativa':\n(Pode cancelar se não aplicável)");
-            this.logicConfig = new LogicConfig(tempKey, fpKey, ptotKey);
+
+            int option = JOptionPane.showConfirmDialog(this,
+                    "Deseja ativar e configurar a Lógica de Negócio (Alertas, Insights) para esta pipeline?",
+                    "Configuração da Lógica de Negócio",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+
+            if (option == JOptionPane.YES_OPTION) {
+                runLogicCheckBox.setSelected(true);
+                String acumuloKey = showDropdownDialog(keys, "Configuração (1/4)", "Selecione a métrica para o 'Acúmulo por Hora':");
+                if (acumuloKey == null) { logger.warn("Usuário cancelou a configuração."); tableModel.clearMetrics(); return; }
+                this.chaveDeAcumuloSelecionada = acumuloKey;
+
+                String tempKey = showDropdownDialog(keys, "Mapeamento da Lógica (2/4)", "Selecione a métrica de 'Temperatura':\n(Pode cancelar se não aplicável)");
+                String fpKey = showDropdownDialog(keys, "Mapeamento da Lógica (3/4)", "Selecione a métrica de 'Fator de Potência':\n(Pode cancelar se não aplicável)");
+                String ptotKey = showDropdownDialog(keys, "Mapeamento da Lógica (4/4)", "Selecione a métrica de 'Potência Ativa':\n(Pode cancelar se não aplicável)");
+                this.logicConfig = new LogicConfig(tempKey, fpKey, ptotKey);
+                logger.info("Lógica de negócio configurada pelo usuário.");
+
+            } else {
+                runLogicCheckBox.setSelected(false);
+                this.chaveDeAcumuloSelecionada = null;
+                this.logicConfig = null;
+                logger.info("Usuário optou por não configurar a lógica de negócio.");
+            }
+
             List<MetricConfig> configs = keys.stream().map(MetricConfig::new).collect(Collectors.toList());
             tableModel.setMetrics(configs);
         } catch (Exception e) {
@@ -442,7 +511,6 @@ public class GSmartGui extends JFrame {
             }
         }.execute();
     }
-// --- CHAVE EXTRA E ERRADA AQUI ---
 }
 
 class MetricTableModel extends AbstractTableModel {
@@ -463,16 +531,13 @@ class MetricTableModel extends AbstractTableModel {
     @Override public int getRowCount() { return metrics.size(); }
     @Override public int getColumnCount() { return columnNames.length; }
     @Override public String getColumnName(int column) { return columnNames[column]; }
-
     @Override public Class<?> getColumnClass(int columnIndex) {
         if (columnIndex == 0) return Boolean.class;
         return String.class;
     }
-
     @Override public boolean isCellEditable(int rowIndex, int columnIndex) {
         return columnIndex == 0 || columnIndex == 2 || columnIndex == 3;
     }
-
     @Override public Object getValueAt(int rowIndex, int columnIndex) {
         MetricConfig metric = metrics.get(rowIndex);
         return switch (columnIndex) {
@@ -483,7 +548,6 @@ class MetricTableModel extends AbstractTableModel {
             default -> null;
         };
     }
-
     @Override public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         MetricConfig metric = metrics.get(rowIndex);
         switch (columnIndex) {
