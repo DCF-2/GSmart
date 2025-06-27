@@ -6,6 +6,7 @@ import com.gsmart.config.LogicConfig;
 import com.gsmart.config.MetricConfig;
 import com.gsmart.config.PipelineConfiguration;
 import com.gsmart.pipeline.PipelineManager;
+import com.gsmart.pipeline.PipelineTask;
 import com.gsmart.sources.*;
 import com.gsmart.windows.LogViewerWindow;
 import com.gsmart.windows.MonitoringWindow;
@@ -69,7 +70,7 @@ public class GSmartGui extends JFrame {
         this.pipelineManager.setParentComponent(this);
         this.pipelineManager.setGlobalLogViewer(this.globalLogViewer);
 
-        setTitle("GSmart - Configurador de Pipeline v4.3");
+        setTitle("GSmart - Configurador de Pipeline v4.1");
         setSize(850, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -148,7 +149,7 @@ public class GSmartGui extends JFrame {
         keysScrollPane.setBorder(BorderFactory.createTitledBorder("4. Selecionar, Mapear e Transformar Métricas"));
 
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 15));
-        startButton = new JButton("▶ Iniciar Pipeline");
+        startButton = new JButton("Iniciar Pipeline");
         startButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         runLogicCheckBox = new JCheckBox("Executar Lógica de Negócio", true);
         runLogicCheckBox.setToolTipText("Se marcado, a lógica de insights será configurada e executada.");
@@ -161,7 +162,7 @@ public class GSmartGui extends JFrame {
 
         JPanel adminPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         monitoringButton = new JButton("Central de Monitoramento");
-        stopAllButton = new JButton("Parar Todos");
+        stopAllButton = new JButton("Parar Monitoramento");
         stopAllButton.setForeground(Color.RED);
         JButton viewLogsButton = new JButton("Ver Logs");
         adminPanel.add(monitoringButton);
@@ -191,6 +192,7 @@ public class GSmartGui extends JFrame {
             }
         });
 
+
         toggleSourceFields();
         loadConfiguration();
     }
@@ -219,15 +221,24 @@ public class GSmartGui extends JFrame {
     }
 
     private void launchPipeline() {
+
         if (metricsTable.isEditing()) {
             metricsTable.getCellEditor().stopCellEditing();
         }
         try {
             String pbiUrl = pbiUrlField.getText().trim();
-            if (pbiUrl.isEmpty()) { JOptionPane.showMessageDialog(this, "Por favor, insira a URL de Push do Power BI.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE); return; }
-
+            if (pbiUrl.isEmpty() || !pbiUrl.toLowerCase().startsWith("http")) {
+                JOptionPane.showMessageDialog(this,
+                        "Por favor, insira uma URL de Push do Power BI válida (deve começar com http ou https).",
+                        "Erro de Configuração",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             List<MetricConfig> selectedConfigs = tableModel.getSelectedMetrics();
-            if (selectedConfigs.isEmpty()) { JOptionPane.showMessageDialog(this, "Nenhuma métrica foi selecionada para envio!", "Aviso", JOptionPane.WARNING_MESSAGE); return; }
+            if (selectedConfigs.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Nenhuma métrica foi selecionada para envio!", "Aviso", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
 
             boolean runLogic = runLogicCheckBox.isSelected();
 
@@ -235,6 +246,7 @@ public class GSmartGui extends JFrame {
                 JOptionPane.showMessageDialog(this, "A caixa 'Executar Lógica de Negócio' está marcada, mas a configuração não foi feita.\nPor favor, carregue as métricas novamente e configure a lógica.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+
 
             IDataSource selectedDataSource = createSelectedDataSource(selectedConfigs.stream().map(MetricConfig::getOriginalName).collect(Collectors.toList()));
 

@@ -83,7 +83,7 @@ public class DataPipeline {
 
                 logger.info("[ETAPA 1/3] Buscando dados da fonte...");
                 JsonObject telemetria = dataSource.fetchData();
-                logger.debug("Dados recebidos da fonte: {}", telemetria);
+                logger.debug("Dados recebidos da fonte: {}", dataSource.getSourceName());
 
                 JsonObject pbiPayload = new JsonObject();
                 double valorParaAcumular = 0.0;

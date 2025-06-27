@@ -41,9 +41,36 @@ public class PipelineManager {
         final PipelineTask[] taskWrapper = new PipelineTask[1];
 
         GSmartListener listener = new GSmartListener() {
-            @Override public void onInsight(String message, String type) { /* ... */ }
-            @Override public void onAlert(String title, String message) { /* ... */ }
-            @Override public void onStatusUpdate(TaskStatus status) { /* ... */ }
+            @Override public void onInsight(String message, String type) {
+                // --- INÍCIO DA MUDANÇA ---
+                PipelineTask task = taskWrapper[0];
+                if (task != null && task.getMonitoringWindow() != null) {
+                    task.getMonitoringWindow().onInsight(message, type);
+                }
+                // --- FIM DA MUDANÇA ---
+            }
+            @Override public void onAlert(String title, String message) {
+                // --- INÍCIO DA MUDANÇA ---
+                PipelineTask task = taskWrapper[0];
+                if (task != null) {
+                    task.setHasAlert(true); // Marca que a tarefa tem um alerta
+                    if (task.getMonitoringWindow() != null) {
+                        task.getMonitoringWindow().onAlert(title, message);
+                    }
+                    notifyUpdate(); // Notifica a TaskManagerWindow para redesenhar
+                }
+                // --- FIM DA MUDANÇA ---
+            }
+
+            @Override public void onStatusUpdate(TaskStatus status) {
+                // --- INÍCIO DA MUDANÇA ---
+                PipelineTask task = taskWrapper[0];
+                if (task != null) {
+                    task.setStatus(status);
+                }
+                notifyUpdate();
+                // --- FIM DA MUDANÇA ---
+            }
 
             @Override
             public void onConnectionLost(String errorMessage) {

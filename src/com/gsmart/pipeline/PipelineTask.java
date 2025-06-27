@@ -17,6 +17,7 @@ public class PipelineTask {
     private TaskStatus status;
     private final Runnable onStopCallback;
     private final PipelineConfiguration originalConfig;
+    private boolean hasAlert = false;
 
     public PipelineTask(String description, Thread pipelineThread, PipelineConfiguration config, Runnable onStopCallback) {
         this.id = UUID.randomUUID().toString();
@@ -60,4 +61,6 @@ public class PipelineTask {
     public String getDescription() { return description; }
     public TaskStatus getStatus() { return status; }
     public PipelineConfiguration getOriginalConfig() { return originalConfig; }
+    public boolean hasAlert() {return hasAlert;}
+    public void setHasAlert(boolean hasAlert) {this.hasAlert = hasAlert;}
 }
