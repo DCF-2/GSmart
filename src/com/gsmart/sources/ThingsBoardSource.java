@@ -21,14 +21,14 @@ public class ThingsBoardSource implements IDataSource {
     private final OkHttpClient client;
     private String authToken;
 
-    public ThingsBoardSource(String thingsboardUrl, String deviceId, List<String> keysToFetch) {
+    public ThingsBoardSource(String thingsboardUrl, String deviceId, List<String> keysToFetch, OkHttpClient client) {
         this.thingsboardUrl = thingsboardUrl != null && thingsboardUrl.endsWith("/") ? thingsboardUrl.substring(0, thingsboardUrl.length() - 1) : thingsboardUrl;
         this.deviceId = deviceId;
         this.keysToFetch = keysToFetch;
-        this.client = new OkHttpClient();
+        this.client = client;
     }
 
-    // --- NOVO METODO ---
+
     /**
      * Tenta autenticar no servidor para validar a URL e as credenciais.
      * @return true se a autenticação for bem-sucedida, false caso contrário.
@@ -143,5 +143,12 @@ public class ThingsBoardSource implements IDataSource {
             JsonParser.parseString(response.body().string()).getAsJsonArray().forEach(element -> keys.add(element.getAsString()));
             return keys;
         }
+    }
+    public void testConnectionAndThrow() throws IOException {
+        ensureAuthenticated(); // Este metodo já lança uma IOException em caso de falha
+    }
+    public void clearAuthToken() {
+        this.authToken = null;
+        logger.info("Token de autenticação do ThingsBoard foi limpo devido a uma falha de conexão.");
     }
 }

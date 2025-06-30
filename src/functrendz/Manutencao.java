@@ -5,8 +5,8 @@ import com.gsmart.GSmartListener;
 import java.util.Locale;
 
 public class Manutencao {
-    private static int ciclosBaixoFator = 0;
-    private static int ciclosAltaTemperatura = 0;
+    private int ciclosBaixoFator = 0;
+    private int ciclosAltaTemperatura = 0;
     private static final double LIMITE_FATOR_POTENCIA = 0.90;
     private static final double LIMITE_TEMPERATURA = 75.0;
 
@@ -16,7 +16,7 @@ public class Manutencao {
         ALERTA_TEMPERATURA
     }
 
-    public static StatusManutencao verificarManutencao(GSmartListener listener, double fatorPotencia, double temperatura) {
+    public  StatusManutencao verificarManutencao(GSmartListener listener, double fatorPotencia, double temperatura) {
         StatusManutencao status = StatusManutencao.OK;
 
         if (fatorPotencia < LIMITE_FATOR_POTENCIA && fatorPotencia != 0.0) {

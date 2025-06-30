@@ -142,4 +142,16 @@ public class DatabaseSource implements IDataSource {
     public String getSourceName() {
         return "Banco de Dados (Tabela: " + this.tableName + ")";
     }
+
+    public void testConnectionAndThrow() throws SQLException {
+        try (Connection conn = getConnection()) {
+            if (!conn.isValid(5)) {
+                throw new SQLException("Não foi possível validar a conexão com o banco de dados (timeout).");
+            }
+            logger.info("Teste de conexão com o banco de dados bem-sucedido.");
+        } catch (SQLException e) {
+            logger.error("Falha no teste de conexão com o banco de dados: {}", e.getMessage());
+            throw e; // Re-lança a exceção para ser capturada pela GSmartGui
+        }
+    }
 }

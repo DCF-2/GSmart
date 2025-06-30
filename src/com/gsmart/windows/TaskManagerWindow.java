@@ -8,15 +8,13 @@ import com.gsmart.pipeline.PipelineTask;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class TaskManagerWindow extends JFrame {
 
@@ -28,7 +26,7 @@ public class TaskManagerWindow extends JFrame {
         this.tableModel = new TaskManagerTableModel(pipelineManager.getRunningTasks());
 
         setTitle("Central de Monitoramento de Pipelines");
-        setSize(650, 400);
+        setSize(800, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -36,33 +34,44 @@ public class TaskManagerWindow extends JFrame {
         taskTable.setFillsViewportHeight(true);
         taskTable.setRowHeight(30);
         taskTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        taskTable.getColumnModel().getColumn(0).setPreferredWidth(300);
+        taskTable.getColumnModel().getColumn(0).setPreferredWidth(350);
 
+        // --- Início da Configuração CORRETA dos Renderizadores ---
         taskTable.getColumnModel().getColumn(1).setCellRenderer(new StatusCellRenderer());
-
         TableCellRenderer buttonRenderer = new ButtonColumnRenderer();
-        TableCellEditor buttonEditor = new ButtonColumnEditor();
-        taskTable.getColumnModel().getColumn(2).setCellRenderer(buttonRenderer);
-        taskTable.getColumnModel().getColumn(2).setCellEditor(buttonEditor);
         taskTable.getColumnModel().getColumn(3).setCellRenderer(buttonRenderer);
-        taskTable.getColumnModel().getColumn(3).setCellEditor(buttonEditor);
+        taskTable.getColumnModel().getColumn(4).setCellRenderer(buttonRenderer);
+        // --- Fim da Configuração ---
 
+        // --- INÍCIO DA CORREÇÃO: Lógica de clique movida para um MouseListener ---
         taskTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = taskTable.rowAtPoint(e.getPoint());
-                if (row >= 0) {
-                    int column = taskTable.columnAtPoint(e.getPoint());
-                    if (column < 2) {
-                        PipelineTask task = ((TaskManagerTableModel) taskTable.getModel()).getTaskAt(row);
-                        if (task.hasAlert()) {
-                            task.setHasAlert(false);
-                            taskTable.repaint();
-                        }
+                int column = taskTable.columnAtPoint(e.getPoint());
+                if (row < 0 || column < 0) return;
+
+                PipelineTask task = ((TaskManagerTableModel) taskTable.getModel()).getTaskAt(row);
+
+                // Ação para as colunas de botão
+                if (column == 3) { // Coluna "Visualizar"
+                    pipelineManager.showMonitorFor(task);
+                } else if (column == 4) { // Coluna "Ação"
+                    if (task.getStatus() == TaskStatus.ERROR) {
+                        pipelineManager.relaunchPipeline(task);
+                    } else {
+                        task.stop();
                     }
+                }
+
+                // Ação para limpar o alerta visual
+                if (task.hasAlert()) {
+                    task.setHasAlert(false);
+                    taskTable.repaint();
                 }
             }
         });
+        // --- FIM DA CORREÇÃO ---
 
         JScrollPane scrollPane = new JScrollPane(taskTable);
         add(scrollPane, BorderLayout.CENTER);
@@ -79,10 +88,8 @@ public class TaskManagerWindow extends JFrame {
         });
     }
 
-    // --- Início das Classes Internas ---
-
     private class TaskManagerTableModel extends AbstractTableModel {
-        private final String[] columnNames = {"Tarefa", "Status", "Visualizar", "Ação"};
+        private final String[] columnNames = {"Tarefa", "Status", "Tempo de Execução", "Visualizar", "Ação"};
         private List<PipelineTask> tasks;
 
         public TaskManagerTableModel(List<PipelineTask> tasks) {
@@ -97,23 +104,21 @@ public class TaskManagerWindow extends JFrame {
         @Override public int getRowCount() { return tasks.size(); }
         @Override public int getColumnCount() { return columnNames.length; }
         @Override public String getColumnName(int column) { return columnNames[column]; }
-        @Override public Class<?> getColumnClass(int columnIndex) { return getValueAt(0, columnIndex).getClass(); }
-
-        // --- INÍCIO DA CORREÇÃO ---
-        @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-            // Permite que as colunas 2 (Visualizar) e 3 (Ação) sejam "editáveis" (clicáveis)
-            return columnIndex == 2 || columnIndex == 3;
-        }
-        // --- FIM DA CORREÇÃO ---
 
         @Override public Object getValueAt(int rowIndex, int columnIndex) {
             PipelineTask task = tasks.get(rowIndex);
             return switch (columnIndex) {
                 case 0 -> task.getDescription();
                 case 1 -> task.getStatus();
-                case 2 -> "Mostrar Monitor";
-                case 3 -> (task.getStatus() == TaskStatus.ERROR) ? "Reiniciar" : "Parar";
+                case 2 -> {
+                    long duration = System.currentTimeMillis() - task.getStartTime();
+                    long hours = TimeUnit.MILLISECONDS.toHours(duration);
+                    long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) % 60;
+                    long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) % 60;
+                    yield String.format("%02d:%02d:%02d", hours, minutes, seconds);
+                }
+                case 3 -> "Mostrar Monitor";
+                case 4 -> (task.getStatus() == TaskStatus.ERROR) ? "Reiniciar" : "Parar";
                 default -> "";
             };
         }
@@ -130,7 +135,7 @@ public class TaskManagerWindow extends JFrame {
             PipelineTask task = ((TaskManagerTableModel) table.getModel()).getTaskAt(row);
 
             if (task.hasAlert()) {
-                setBackground(new Color(255, 255, 224)); // Amarelo claro
+                setBackground(new Color(255, 255, 224));
             } else {
                 setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
             }
@@ -142,11 +147,18 @@ public class TaskManagerWindow extends JFrame {
                     case ERROR -> setForeground(Color.RED);
                     default -> setForeground(Color.GRAY);
                 }
+            } else {
+                if(column == 2) {
+                    setHorizontalAlignment(SwingConstants.CENTER);
+                } else {
+                    setHorizontalAlignment(SwingConstants.LEFT);
+                }
             }
             return this;
         }
     }
 
+    // Renderer para as colunas de AÇÃO. A classe É UM BOTÃO.
     private class ButtonColumnRenderer extends JButton implements TableCellRenderer {
         public ButtonColumnRenderer() {
             setOpaque(true);
@@ -170,51 +182,4 @@ public class TaskManagerWindow extends JFrame {
             return this;
         }
     }
-
-    private class ButtonColumnEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
-        private final JButton button;
-        private String label;
-        private JTable table;
-        private int row;
-        private int column;
-
-        public ButtonColumnEditor() {
-            button = new JButton();
-            button.setOpaque(true);
-
-            button.addActionListener(this);
-        }
-
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            this.label = (value == null) ? "" : value.toString();
-            this.table = table;
-            this.row = row;
-            this.column = column;
-            button.setText(label);
-            return button;
-        }
-
-        @Override
-        public Object getCellEditorValue() {
-            return label;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            fireEditingStopped();
-            PipelineTask task = ((TaskManagerTableModel) table.getModel()).getTaskAt(row);
-
-            if (column == 2) {
-                pipelineManager.showMonitorFor(task);
-            } else if (column == 3) {
-                if (task.getStatus() == TaskStatus.ERROR) {
-                    pipelineManager.relaunchPipeline(task);
-                } else {
-                    task.stop();
-                }
-            }
-        }
-    }
-    // --- Fim das Classes Internas ---
 }

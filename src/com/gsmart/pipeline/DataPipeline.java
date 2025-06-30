@@ -8,6 +8,7 @@ import com.gsmart.TaskStatus;
 import com.gsmart.config.LogicConfig;
 import com.gsmart.config.MetricConfig;
 import com.gsmart.sources.IDataSource;
+import com.gsmart.sources.ThingsBoardSource;
 import conectiontingsboard.ExportacaoDadosPWBI;
 import functrendz.GeradorDeInsights;
 import functrendz.Manutencao;
@@ -17,7 +18,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
+//import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +36,11 @@ public class DataPipeline {
     private final GSmartListener listener;
     private final boolean runBusinessLogic;
 
+    // --- INÍCIO DA CORREÇÃO (Novos Campos de Instância) ---
+    private final Manutencao manutencao;
+    private final PrevisaoFalhas previsaoFalhas;
+    // --- FIM DA CORREÇÃO ---
+
     private double consumoAcumuladoNaHora = 0.0;
     private ZonedDateTime horaDeInicioDoCiclo;
     private volatile boolean restartRequested = false;
@@ -48,6 +54,11 @@ public class DataPipeline {
         this.listener = listener;
         this.runBusinessLogic = runBusinessLogic;
         this.horaDeInicioDoCiclo = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")).truncatedTo(ChronoUnit.HOURS);
+
+        // --- INÍCIO DA CORREÇÃO (Inicializar as instâncias) ---
+        this.manutencao = new Manutencao();
+        this.previsaoFalhas = new PrevisaoFalhas();
+        // --- FIM DA CORREÇÃO ---
     }
 
     public void requestRestart() {
@@ -59,20 +70,18 @@ public class DataPipeline {
         logger.info("Métrica de acúmulo configurada para: '{}'", this.chaveDeAcumulo != null ? this.chaveDeAcumulo : "Nenhuma");
         logger.info("Execução da lógica de negócio: {}", this.runBusinessLogic ? "ATIVADA" : "DESATIVADA");
 
-        long currentRetryDelay = 0; // Inicia o atraso da reconexão em 0
-        final long MAX_RETRY_DELAY = 300; // Atraso máximo de 300 segundos
-        final long RETRY_INCREMENT = 5; // Incremento de 5 segundos
+        long currentRetryDelay = 0;
+        final long MAX_RETRY_DELAY = 300;
+        final long RETRY_INCREMENT = 5;
 
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 if (restartRequested) {
                     logger.info("Pipeline reiniciada por comando do usuário.");
                     restartRequested = false;
-                    currentRetryDelay = 0; // Resetar o atraso da reconexão após um reinício manual
+                    currentRetryDelay = 0;
                 }
 
-                // Se a conexão foi perdida e depois restaurada automaticamente, o listener já notificou.
-                // Resetar o atraso para o próximo ciclo normal.
                 if (currentRetryDelay > 0) {
                     logger.info("Conexão restaurada automaticamente ou manualmente. Retomando operação normal.");
                     currentRetryDelay = 0;
@@ -145,15 +154,19 @@ public class DataPipeline {
                     double temperaturaAtual = optTemperatura.orElse(0.0);
                     double fatorPotenciaAtual = optFatorPotencia.orElse(0.0);
                     double potenciaAtivaAtual = optPotenciaAtiva.orElse(0.0);
-                    Manutencao.StatusManutencao statusManutencao = Manutencao.verificarManutencao(listener, fatorPotenciaAtual, temperaturaAtual);
-                    PrevisaoFalhas.registrarMetricas(temperaturaAtual, fatorPotenciaAtual, potenciaAtivaAtual);
-                    boolean falhaPrevista = PrevisaoFalhas.preverFalhas(listener);
+
+                    // --- INÍCIO DA CORREÇÃO (Chamar métodos da instância) ---
+                    Manutencao.StatusManutencao statusManutencao = this.manutencao.verificarManutencao(listener, fatorPotenciaAtual, temperaturaAtual);
+                    this.previsaoFalhas.registrarMetricas(temperaturaAtual, fatorPotenciaAtual, potenciaAtivaAtual);
+                    boolean falhaPrevista = this.previsaoFalhas.preverFalhas(listener);
+                    // --- FIM DA CORREÇÃO ---
+
                     GeradorDeInsights.gerarInsightsDoCiclo(listener, 95.0, fatorPotenciaAtual, temperaturaAtual, statusManutencao, falhaPrevista);
                 } else {
                     if (listener != null) listener.onInsight("[INFO] Lógica de negócio desativada.", "INFO");
                 }
 
-                pbiPayload.addProperty("timestamp", Instant.now().minus(3, ChronoUnit.HOURS).toString());
+                pbiPayload.addProperty("timestamp", horaAtualBrasil.toInstant().toString());
                 pbiPayload.addProperty("HdDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("HH:mm:ss - dd/MM/yyyy")));
                 pbiPayload.addProperty("OrigemDados", dataSource.getSourceName());
                 pbiPayload.addProperty("ConsumoParcialDaHora", consumoAcumuladoNaHora);
@@ -161,79 +174,72 @@ public class DataPipeline {
 
                 ExportacaoDadosPWBI.sendDataToPowerBI(pbiPayload, this.powerBiPushUrl);
 
-                Thread.sleep(5000); // Standard delay between cycles
+                Thread.sleep(5000);
 
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 logger.warn("Pipeline interrompida. Encerrando a execução.");
-                break; // Exit pipeline on interruption
+                break;
             } catch (Exception e) {
                 String errorMessage = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
                 logger.error("Falha fatal na pipeline: {}", errorMessage, e);
+
+                if (dataSource instanceof ThingsBoardSource) {
+                    ((ThingsBoardSource) dataSource).clearAuthToken();
+                }
 
                 if (listener != null) {
                     listener.onConnectionLost(errorMessage);
                 }
 
-                // --- Reconnection Retry Logic ---
                 boolean reconnected = false;
                 while (!Thread.currentThread().isInterrupted() && !reconnected) {
-                    // Increment delay, capping at MAX_RETRY_DELAY
                     currentRetryDelay += RETRY_INCREMENT;
                     if (currentRetryDelay > MAX_RETRY_DELAY) {
                         currentRetryDelay = MAX_RETRY_DELAY;
                     }
 
-                    // Notify listener about the attempt and delay
                     if (listener != null) {
                         listener.onReconnectionAttempt(currentRetryDelay);
                     }
 
                     try {
-                        Thread.sleep(currentRetryDelay * 1000); // Wait for the specified delay
+                        Thread.sleep(currentRetryDelay * 1000);
 
-                        // Attempt to fetch data again to check connection
                         logger.info("Attempting to reconnect and fetch data...");
-                        dataSource.fetchData(); // This will throw an exception if connection is still bad
+                        dataSource.fetchData();
 
-                        // If fetchData succeeds, it means connection is restored
                         reconnected = true;
                         if (listener != null) {
-                            listener.onConnectionRestored(); // Notify listener that connection is restored
+                            listener.onConnectionRestored();
                         }
                         logger.info("Reconnection successful. Resuming pipeline execution.");
-                        // Break out of the reconnection loop, the main while loop will continue
 
                     } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        logger.warn("Pipeline interrompida durante tentativa de reconexão. Encerrando a execução.");
-                        break; // Exit pipeline on interruption
+                        // O clique em "Reconectar" interrompe o sleep e causa esta exceção.
+                        // Em vez de encerrar, vamos apenas registrar e continuar para a próxima iteração do loop,
+                        // que tentará a reconexão imediatamente.
+                        logger.info("Tentativa de reconexão manual acionada pelo usuário.");
+                        // Não precisamos fazer mais nada, o loop continuará para a tentativa de reconexão.
+
                     } catch (Exception retryEx) {
-                        // Reconnection attempt failed, log and try again
                         errorMessage = retryEx.getMessage() != null ? retryEx.getMessage() : retryEx.getClass().getSimpleName();
                         logger.error("Reconnection attempt failed. Retrying in {} seconds. Error: {}", currentRetryDelay, errorMessage);
-                        // The onConnectionLost dialog should remain visible and updated by subsequent onReconnectionAttempt calls
                     }
                 }
 
                 if (!reconnected) {
-                    // If the loop finished without reconnecting (e.g., interrupted or a critical unrecoverable error)
                     logger.error("Failed to reconnect after multiple attempts. Pipeline will terminate.");
                     if (listener != null) {
-                        listener.onStatusUpdate(TaskStatus.ERROR); // Set pipeline status to ERROR if reconnection fails permanently
+                        listener.onStatusUpdate(TaskStatus.ERROR);
                     }
-                    break; // Exit the main pipeline loop
+                    break;
                 }
-                // If reconnected, the main while loop will automatically continue to the next iteration
             }
         }
 
-        // This block is executed only when the main while loop exits.
-        // Check if it exited due to interruption (manual stop) or an unrecoverable error.
         if (listener != null && !Thread.currentThread().isInterrupted()) {
-            // If not interrupted, it means it finished due to an unrecoverable error or other natural termination
-            listener.onStatusUpdate(TaskStatus.FINISHED); // Or TaskStatus.ERROR if that's the final state for unrecoverable.
-            // For now, FINISHED if it wasn't interrupted.
+            listener.onStatusUpdate(TaskStatus.FINISHED);
         }
         logger.info("Execução da pipeline para {} finalizada.", dataSource.getSourceName());
     }

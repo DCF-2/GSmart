@@ -18,6 +18,7 @@ public class PipelineTask {
     private final Runnable onStopCallback;
     private final PipelineConfiguration originalConfig;
     private boolean hasAlert = false;
+    private final long startTime;
 
     public PipelineTask(String description, Thread pipelineThread, PipelineConfiguration config, Runnable onStopCallback) {
         this.id = UUID.randomUUID().toString();
@@ -28,6 +29,7 @@ public class PipelineTask {
         this.status = TaskStatus.RUNNING;
         this.monitoringWindow = null;
         this.errorDialog = null;
+        this.startTime = System.currentTimeMillis();
     }
 
     public void stop() {
@@ -63,4 +65,5 @@ public class PipelineTask {
     public PipelineConfiguration getOriginalConfig() { return originalConfig; }
     public boolean hasAlert() {return hasAlert;}
     public void setHasAlert(boolean hasAlert) {this.hasAlert = hasAlert;}
+    public long getStartTime() {return startTime;}
 }

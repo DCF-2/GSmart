@@ -3,6 +3,7 @@ package com.gsmart.windows;
 
 import com.gsmart.GSmartListener;
 import com.gsmart.TaskStatus;
+import com.gsmart.pipeline.PipelineTask; // Import adicionado
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +12,7 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.TimeUnit; // Import adicionado
 import java.util.function.Consumer;
 
 public class MonitoringWindow extends JFrame implements GSmartListener {
@@ -20,12 +21,12 @@ public class MonitoringWindow extends JFrame implements GSmartListener {
 
     private final JTextPane insightsTextPane;
     private final JLabel statusLabel;
-    private final JButton stopButton;
-    private final JButton reconnectButton;
-    private Timer countdownTimer;
+    private final JLabel timerLabel; // Label para o cronômetro
+    private final Timer executionTimer; // Timer para atualizar o cronômetro
 
-    public MonitoringWindow(String title, LogViewerWindow logViewer, Runnable onStopRequest, Runnable onReconnectRequest, Consumer<MonitoringWindow> onDisposeRequest) {
-        setTitle(title);
+    // Construtor foi simplificado
+    public MonitoringWindow(PipelineTask task, Consumer<MonitoringWindow> onDisposeRequest) {
+        setTitle("Monitor: " + task.getDescription());
         setSize(700, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationByPlatform(true);
@@ -36,6 +37,7 @@ public class MonitoringWindow extends JFrame implements GSmartListener {
         JScrollPane insightsScrollPane = new JScrollPane(insightsTextPane);
         insightsScrollPane.setBorder(BorderFactory.createTitledBorder("Alertas e Insights do Processo"));
 
+        // O botão "Limpar Insights" agora fica no painel de botões de insights
         JButton clearInsightsButton = new JButton("Limpar Insights");
         clearInsightsButton.addActionListener(e -> insightsTextPane.setText(""));
         JPanel insightsButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -45,49 +47,43 @@ public class MonitoringWindow extends JFrame implements GSmartListener {
         insightsPanel.add(insightsScrollPane, BorderLayout.CENTER);
         insightsPanel.add(insightsButtonPanel, BorderLayout.SOUTH);
 
+        // --- Novo Painel Inferior ---
         statusLabel = new JLabel("Status: INICIANDO...");
         statusLabel.setForeground(Color.BLUE);
 
-        stopButton = new JButton("Parar Pipeline");
-        JButton viewLogsButton = new JButton("Ver Logs da Aplicação");
-
-        reconnectButton = new JButton("Tentar Agora");
-        reconnectButton.setVisible(false);
-
-        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        actionPanel.add(reconnectButton);
-        actionPanel.add(stopButton);
-        actionPanel.add(viewLogsButton);
+        timerLabel = new JLabel("Tempo de Execução: 00:00:00");
+        timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         bottomPanel.add(statusLabel, BorderLayout.WEST);
-        bottomPanel.add(actionPanel, BorderLayout.EAST);
+        bottomPanel.add(timerLabel, BorderLayout.CENTER);
+        // Não há mais painel de ação à direita
 
         setLayout(new BorderLayout(5, 5));
         add(insightsPanel, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
 
-        stopButton.addActionListener(e -> {
-            if (onStopRequest != null) onStopRequest.run();
+        // --- Novo Cronômetro ---
+        long startTime = task.getStartTime();
+        this.executionTimer = new Timer(1000, e -> {
+            long duration = System.currentTimeMillis() - startTime;
+            long hours = TimeUnit.MILLISECONDS.toHours(duration);
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(duration) % 60;
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(duration) % 60;
+            timerLabel.setText(String.format("Tempo de Execução: %02d:%02d:%02d", hours, minutes, seconds));
         });
+        this.executionTimer.start();
+        // --- Fim do Cronômetro ---
 
-        reconnectButton.addActionListener(e -> {
-            if (onReconnectRequest != null) onReconnectRequest.run();
-        });
-
-        viewLogsButton.addActionListener(e -> logViewer.setVisible(true));
-
-        // --- MUDANÇA IMPORTANTE AQUI ---
-        // Usamos o evento windowClosing, que é disparado ANTES de a janela ser destruída.
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 logger.info("Janela de monitoramento '{}' fechada pelo usuário via 'X'.", getTitle());
+                if (executionTimer != null) executionTimer.stop(); // Para o timer para evitar memory leak
                 if (onDisposeRequest != null) {
                     onDisposeRequest.accept(MonitoringWindow.this);
                 }
-                // O dispose() será chamado automaticamente pela configuração DISPOSE_ON_CLOSE
             }
         });
     }
@@ -107,61 +103,24 @@ public class MonitoringWindow extends JFrame implements GSmartListener {
         updateStatus(status);
     }
 
-    @Override
-    public void onConnectionLost(String errorMessage) {
-        SwingUtilities.invokeLater(() -> {
-            statusLabel.setText("Status: " + errorMessage);
-            statusLabel.setForeground(Color.RED);
-            reconnectButton.setVisible(true);
-        });
-    }
-
-    @Override
-    public void onReconnectionAttempt(long delayInSeconds) {
-        if (countdownTimer != null && countdownTimer.isRunning()) countdownTimer.stop();
-
-        AtomicLong countdown = new AtomicLong(delayInSeconds);
-
-        countdownTimer = new Timer(1000, e -> {
-            long remaining = countdown.decrementAndGet();
-            if (remaining > 0) {
-                statusLabel.setText(String.format("Status: Tentando reconectar em %d segundos...", remaining));
-            } else {
-                statusLabel.setText("Status: Reconectando...");
-                statusLabel.setForeground(Color.ORANGE);
-                reconnectButton.setVisible(false);
-                ((Timer)e.getSource()).stop();
-            }
-        });
-        countdownTimer.setInitialDelay(0);
-        countdownTimer.start();
-    }
-
-    @Override
-    public void onConnectionRestored() {
-        SwingUtilities.invokeLater(() -> {
-            if (countdownTimer != null) countdownTimer.stop();
-            reconnectButton.setVisible(false);
-            updateStatus(TaskStatus.RUNNING);
-        });
-    }
+    // Os métodos de reconexão permanecem, pois a interface GSmartListener os exige,
+    // mas eles não terão mais um efeito visual visível NESTA janela.
+    @Override public void onConnectionLost(String errorMessage) { /* Não faz nada visualmente nesta tela */ }
+    @Override public void onReconnectionAttempt(long delayInSeconds) { /* Não faz nada visualmente nesta tela */ }
+    @Override public void onConnectionRestored() { /* Não faz nada visualmente nesta tela */ }
 
     public void updateStatus(TaskStatus status) {
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("Status: " + status);
             switch (status) {
-                case RUNNING -> {
-                    statusLabel.setForeground(new Color(0, 150, 0));
-                    stopButton.setEnabled(true);
-                }
+                case RUNNING -> statusLabel.setForeground(new Color(0, 150, 0));
                 case STOPPING, FINISHED, ERROR -> {
                     statusLabel.setForeground(Color.RED);
-                    stopButton.setEnabled(false);
-                    reconnectButton.setVisible(false);
+                    if (executionTimer != null) executionTimer.stop(); // Para o timer quando a pipeline para
                     if (this.isDisplayable()) {
-                        Timer timer = new Timer(2000, e -> dispose());
-                        timer.setRepeats(false);
-                        timer.start();
+                        Timer closeTimer = new Timer(2000, e -> dispose());
+                        closeTimer.setRepeats(false);
+                        closeTimer.start();
                     }
                 }
             }

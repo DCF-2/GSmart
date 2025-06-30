@@ -148,22 +148,10 @@ public class PipelineManager {
     public void showMonitorFor(PipelineTask task) {
         if (task.getMonitoringWindow() == null || !task.getMonitoringWindow().isDisplayable()) {
             logger.info("Criando/Recriando janela de monitoramento para: {}", task.getDescription());
-
-            Runnable onStopRequest = task::stop;
-            Runnable onReconnectRequest = task::forceReconnect;
             Consumer<MonitoringWindow> onDisposeRequest = (closedWindow) -> task.clearMonitoringWindow();
-
-            // Passando os 5 argumentos corretos para o construtor.
-            MonitoringWindow newMonitor = new MonitoringWindow(
-                    "Monitor: " + task.getDescription(),
-                    this.globalLogViewer,
-                    onStopRequest,
-                    onReconnectRequest,
-                    onDisposeRequest
-            );
+            MonitoringWindow newMonitor = new MonitoringWindow(task, onDisposeRequest);
             task.setMonitoringWindow(newMonitor);
         }
-        // CORREÇÃO: Chamar setVisible(true) na MonitoringWindow, não na PipelineTask
         task.getMonitoringWindow().setVisible(true);
     }
 

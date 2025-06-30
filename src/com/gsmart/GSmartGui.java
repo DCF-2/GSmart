@@ -6,11 +6,12 @@ import com.gsmart.config.LogicConfig;
 import com.gsmart.config.MetricConfig;
 import com.gsmart.config.PipelineConfiguration;
 import com.gsmart.pipeline.PipelineManager;
-import com.gsmart.pipeline.PipelineTask;
+//import com.gsmart.pipeline.PipelineTask;
 import com.gsmart.sources.*;
 import com.gsmart.windows.LogViewerWindow;
-import com.gsmart.windows.MonitoringWindow;
+//import com.gsmart.windows.MonitoringWindow;
 import com.gsmart.windows.TaskManagerWindow;
+import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,7 @@ public class GSmartGui extends JFrame {
     private final ConfigManager configManager;
     private TaskManagerWindow taskManagerWindow;
     private final JCheckBox runLogicCheckBox;
-
+    private final OkHttpClient sharedOkHttpClient;
     private String chaveDeAcumuloSelecionada;
     private LogicConfig logicConfig;
 
@@ -69,8 +70,9 @@ public class GSmartGui extends JFrame {
         this.configManager = new ConfigManager();
         this.pipelineManager.setParentComponent(this);
         this.pipelineManager.setGlobalLogViewer(this.globalLogViewer);
+        this.sharedOkHttpClient = new OkHttpClient();
 
-        setTitle("GSmart - Configurador de Pipeline v4.1");
+        setTitle("GSmart - Configurador de Pipeline v4.4");
         setSize(850, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -78,7 +80,7 @@ public class GSmartGui extends JFrame {
         JPanel topConfigurationPanel = new JPanel();
         topConfigurationPanel.setLayout(new BoxLayout(topConfigurationPanel, BoxLayout.Y_AXIS));
         JPanel sourceSelectionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        sourceSelectionPanel.setBorder(BorderFactory.createTitledBorder("1. Selecione a Fonte de Dados"));
+        sourceSelectionPanel.setBorder(BorderFactory.createTitledBorder("Selecione a Fonte de Dados"));
         sourceSelectionPanel.add(new JLabel("Tipo de Fonte:"));
         String[] sources = {"Thingsboard API", "Banco de Dados Espelho"};
         sourceSelector = new JComboBox<>(sources);
@@ -103,9 +105,11 @@ public class GSmartGui extends JFrame {
         gbcDb.gridx = 0; gbcDb.gridy = 0; databaseConfigPanel.add(new JLabel("URL do Banco (JDBC):"), gbcDb);
         gbcDb.gridx = 1; gbcDb.gridy = 0; gbcDb.weightx = 1.0; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbUrlField = new JTextField(); databaseConfigPanel.add(dbUrlField, gbcDb);
         gbcDb.gridx = 2; gbcDb.gridy = 0; gbcDb.weightx = 0; gbcDb.gridheight = 3; gbcDb.fill = GridBagConstraints.VERTICAL;
-        dbConnectButton = new JButton("Conectar e Listar Tabelas");
+        dbConnectButton = new JButton("Conectar");
+        gbcDb.gridx = 2; gbcDb.gridy = 0; gbcDb.weightx = 0; gbcDb.gridheight = 1;
+        gbcDb.fill = GridBagConstraints.NONE;
         databaseConfigPanel.add(dbConnectButton, gbcDb);
-        gbcDb.gridx = 3; gbcDb.gridy = 0; gbcDb.gridheight = 3;
+        gbcDb.gridx = 3; gbcDb.gridy = 0; gbcDb.gridheight = 1;
         dbStatusLabel = new JLabel("Não conectado");
         dbStatusLabel.setForeground(Color.GRAY);
         databaseConfigPanel.add(dbStatusLabel, gbcDb);
@@ -123,10 +127,10 @@ public class GSmartGui extends JFrame {
         sourceConfigCardPanel.add(databaseConfigPanel, "Banco de Dados Espelho");
 
         JPanel loadKeysPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        loadKeysButton = new JButton("2. Carregar Métricas da Fonte");
+        loadKeysButton = new JButton("Carregar Métricas da Fonte");
         loadKeysPanel.add(loadKeysButton);
         JPanel destinationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        destinationPanel.setBorder(BorderFactory.createTitledBorder("3. Configurar Destino dos Dados"));
+        destinationPanel.setBorder(BorderFactory.createTitledBorder("Configurar Destino dos Dados"));
         destinationPanel.add(new JLabel("URL de Push do Power BI:"));
         pbiUrlField = new JTextField(45);
         destinationPanel.add(pbiUrlField);
@@ -146,7 +150,7 @@ public class GSmartGui extends JFrame {
         centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         metricsTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         JScrollPane keysScrollPane = new JScrollPane(metricsTable);
-        keysScrollPane.setBorder(BorderFactory.createTitledBorder("4. Selecionar, Mapear e Transformar Métricas"));
+        keysScrollPane.setBorder(BorderFactory.createTitledBorder("Selecionar, Mapear e Transformar Métricas"));
 
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 15));
         startButton = new JButton("Iniciar Pipeline");
@@ -299,7 +303,7 @@ public class GSmartGui extends JFrame {
         new SwingWorker<Boolean, Void>() {
             @Override
             protected Boolean doInBackground() {
-                try { return new ThingsBoardSource(getThingsboardUrl(), null, null).testConnection(); }
+                try { return new ThingsBoardSource(getThingsboardUrl(), null, null,sharedOkHttpClient).testConnection(); }
                 catch (Exception e) { return false; }
             }
             @Override
@@ -369,7 +373,7 @@ public class GSmartGui extends JFrame {
                 }
                 new SwingWorker<List<String>, Void>() {
                     @Override protected List<String> doInBackground() throws Exception {
-                        return new ThingsBoardSource(getThingsboardUrl(), selectedDevice.id(), null).getAvailableKeys();
+                        return new ThingsBoardSource(getThingsboardUrl(), selectedDevice.id(), null, sharedOkHttpClient).getAvailableKeys();
                     }
                     @Override protected void done() { handleKeysLoaded(this); }
                 }.execute();
@@ -441,23 +445,28 @@ public class GSmartGui extends JFrame {
 
     private void setLoadButtonReady() {
         loadKeysButton.setEnabled(true);
-        loadKeysButton.setText("2. Carregar Métricas da Fonte");
+        loadKeysButton.setText("Carregar Métricas da Fonte");
     }
 
-    private IDataSource createSelectedDataSource(List<String> originalKeys) {
+    private IDataSource createSelectedDataSource(List<String> originalKeys) throws Exception { // Adiciona "throws Exception"
         String selectedSource = (String) sourceSelector.getSelectedItem();
         if ("Thingsboard API".equals(selectedSource)) {
             String tbUrl = getThingsboardUrl();
             Device selectedDevice = (Device) deviceSelector.getSelectedItem();
             if (selectedDevice == null) { throw new IllegalStateException("Nenhum dispositivo do ThingsBoard foi selecionado."); }
-            return new ThingsBoardSource(tbUrl, selectedDevice.id(), originalKeys);
+            ThingsBoardSource tbSource = new ThingsBoardSource(tbUrl, selectedDevice.id(), originalKeys, sharedOkHttpClient);
+            tbSource.testConnectionAndThrow(); // Testa a conexão; lança exceção se falhar
+            return tbSource;
+
         } else if ("Banco de Dados Espelho".equals(selectedSource)) {
             String dbUrl = dbUrlField.getText().trim();
             String dbUser = dbUserField.getText().trim();
             String dbPassword = new String(dbPasswordField.getPassword());
             String dbTable = (String) dbTableSelector.getSelectedItem();
             if (dbTable == null) { throw new IllegalStateException("Nenhuma tabela do banco de dados foi selecionada.");}
-            return new DatabaseSource(dbUrl, dbUser, dbPassword, dbTable, originalKeys);
+            DatabaseSource dbSource = new DatabaseSource(dbUrl, dbUser, dbPassword, dbTable, originalKeys);
+            dbSource.testConnectionAndThrow(); // Testa a conexão; lança exceção se falhar
+            return dbSource;
         }
         throw new IllegalStateException("Nenhuma fonte de dados válida foi selecionada.");
     }
@@ -474,7 +483,7 @@ public class GSmartGui extends JFrame {
         new SwingWorker<List<DeviceProfile>, Void>() {
             @Override
             protected List<DeviceProfile> doInBackground() throws Exception {
-                return new ThingsBoardSource(getThingsboardUrl(), null, null).getDeviceProfiles();
+                return new ThingsBoardSource(getThingsboardUrl(), null, null, sharedOkHttpClient).getDeviceProfiles();
             }
             @Override
             protected void done() {
@@ -508,7 +517,7 @@ public class GSmartGui extends JFrame {
         new SwingWorker<List<Device>, Void>() {
             @Override
             protected List<Device> doInBackground() throws Exception {
-                return new ThingsBoardSource(getThingsboardUrl(), null, null).getDevicesByProfileId(selectedProfile.id());
+                return new ThingsBoardSource(getThingsboardUrl(), null, null, sharedOkHttpClient).getDevicesByProfileId(selectedProfile.id());
             }
             @Override
             protected void done() {

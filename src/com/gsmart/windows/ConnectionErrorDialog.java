@@ -24,7 +24,7 @@ public class ConnectionErrorDialog extends JDialog {
         statusLabel = new JLabel("Iniciando verificação de status...", SwingConstants.CENTER);
         statusLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
-        reconnectNowButton = new JButton("Tentar Agora");
+        reconnectNowButton = new JButton("Reconectar");
         JButton cancelPipelineButton = new JButton("Cancelar Pipeline");
         cancelPipelineButton.setForeground(Color.RED);
 

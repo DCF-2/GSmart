@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Locale;
 
 public class PrevisaoFalhas {
-    private static final List<Double> historicoTemperatura = new ArrayList<>();
-    private static final List<Double> historicoFatorPotencia = new ArrayList<>();
-    private static final List<Double> historicoPotenciaAtiva = new ArrayList<>();
+    private final List<Double> historicoTemperatura = new ArrayList<>();
+    private final List<Double> historicoFatorPotencia = new ArrayList<>();
+    private final List<Double> historicoPotenciaAtiva = new ArrayList<>();
 
     private static final int JANELA_ANALISE = 10;
     private static final double MULTIPLICADOR_DESVIO = 2.0;
 
-    public static void registrarMetricas(double temperatura, double fatorPotencia, double potenciaAtiva) {
+    public  void registrarMetricas(double temperatura, double fatorPotencia, double potenciaAtiva) {
         if (temperatura != 0.0) historicoTemperatura.add(temperatura);
         if (fatorPotencia != 0.0) historicoFatorPotencia.add(fatorPotencia);
         if (potenciaAtiva != 0.0) historicoPotenciaAtiva.add(potenciaAtiva);
@@ -24,7 +24,7 @@ public class PrevisaoFalhas {
         if (historicoPotenciaAtiva.size() > 100) historicoPotenciaAtiva.remove(0);
     }
 
-    public static boolean preverFalhas(GSmartListener listener) {
+    public  boolean preverFalhas(GSmartListener listener) {
         if (historicoTemperatura.size() < JANELA_ANALISE) {
             return false;
         }
