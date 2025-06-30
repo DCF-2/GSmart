@@ -18,7 +18,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import java.time.Instant;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -166,7 +166,7 @@ public class DataPipeline {
                     if (listener != null) listener.onInsight("[INFO] Lógica de negócio desativada.", "INFO");
                 }
 
-                pbiPayload.addProperty("timestamp", horaAtualBrasil.toInstant().toString());
+                pbiPayload.addProperty("timestamp", Instant.now().minus(3, ChronoUnit.HOURS).toString());
                 pbiPayload.addProperty("HdDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("HH:mm:ss - dd/MM/yyyy")));
                 pbiPayload.addProperty("OrigemDados", dataSource.getSourceName());
                 pbiPayload.addProperty("ConsumoParcialDaHora", consumoAcumuladoNaHora);
