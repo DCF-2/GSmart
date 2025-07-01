@@ -13,17 +13,19 @@ public class PipelineTask {
     private final String description;
     private final Thread pipelineThread;
     private MonitoringWindow monitoringWindow;
-    private ConnectionErrorDialog errorDialog; // --- NOVO CAMPO ---
+    private ConnectionErrorDialog errorDialog;
     private TaskStatus status;
     private final Runnable onStopCallback;
     private final PipelineConfiguration originalConfig;
+    private final DataPipeline pipeline;
     private boolean hasAlert = false;
     private final long startTime;
 
-    public PipelineTask(String description, Thread pipelineThread, PipelineConfiguration config, Runnable onStopCallback) {
+    public PipelineTask(String description, Thread pipelineThread, DataPipeline pipeline, PipelineConfiguration config, Runnable onStopCallback) {
         this.id = UUID.randomUUID().toString();
         this.description = description;
         this.pipelineThread = pipelineThread;
+        this.pipeline = pipeline;
         this.originalConfig = config;
         this.onStopCallback = onStopCallback;
         this.status = TaskStatus.RUNNING;
@@ -35,8 +37,11 @@ public class PipelineTask {
     public void stop() {
         if (status == TaskStatus.RUNNING || status == TaskStatus.ERROR) {
             setStatus(TaskStatus.STOPPING);
-            if (pipelineThread != null && pipelineThread.isAlive()) {
-                pipelineThread.interrupt();
+
+            if (pipeline != null) {
+                pipeline.requestStop();
+            } else if (pipelineThread != null && pipelineThread.isAlive()) {
+                pipelineThread.interrupt(); // Fallback
             }
             if (monitoringWindow != null) monitoringWindow.dispose();
             if (errorDialog != null) errorDialog.dispose();
@@ -51,7 +56,7 @@ public class PipelineTask {
         }
     }
 
-    // --- Getters e Setters ---
+    // --- Getters e Setters (sem alterações) ---
     public void setMonitoringWindow(MonitoringWindow w) { this.monitoringWindow = w; if(w!=null) w.updateStatus(this.status); }
     public void clearMonitoringWindow() { this.monitoringWindow = null; }
     public void setConnectionErrorDialog(ConnectionErrorDialog d) { this.errorDialog = d; }

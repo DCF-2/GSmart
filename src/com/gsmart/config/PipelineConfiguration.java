@@ -9,10 +9,9 @@ import java.util.List;
 public record PipelineConfiguration(
         IDataSource dataSource,
         String powerBiUrl,
-        String acumuloKey,
         List<MetricConfig> metricConfigs,
         LogicConfig logicConfig,
         LogViewerWindow logViewer,
-        boolean runBusinessLogic // --- NOVO CAMPO ---
+        boolean runBusinessLogic
 ) {
 }

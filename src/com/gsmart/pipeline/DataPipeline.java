@@ -9,6 +9,7 @@ import com.gsmart.config.LogicConfig;
 import com.gsmart.config.MetricConfig;
 import com.gsmart.sources.IDataSource;
 import com.gsmart.sources.ThingsBoardSource;
+import com.gsmart.utils.ReconnectionLogger;
 import conectiontingsboard.ExportacaoDadosPWBI;
 import functrendz.GeradorDeInsights;
 import functrendz.Manutencao;
@@ -30,57 +31,46 @@ public class DataPipeline {
     private static final Logger logger = LoggerFactory.getLogger(DataPipeline.class);
     private final IDataSource dataSource;
     private final String powerBiPushUrl;
-    private final String chaveDeAcumulo;
     private final List<MetricConfig> metricConfigs;
     private final LogicConfig logicConfig;
     private final GSmartListener listener;
     private final boolean runBusinessLogic;
-
-    // --- INÍCIO DA CORREÇÃO (Novos Campos de Instância) ---
     private final Manutencao manutencao;
     private final PrevisaoFalhas previsaoFalhas;
-    // --- FIM DA CORREÇÃO ---
+    private volatile boolean stopRequested = false;
 
-    private double consumoAcumuladoNaHora = 0.0;
-    private ZonedDateTime horaDeInicioDoCiclo;
-    private volatile boolean restartRequested = false;
 
-    public DataPipeline(IDataSource dataSource, String powerBiPushUrl, String chaveDeAcumulo, List<MetricConfig> metricConfigs, LogicConfig logicConfig, GSmartListener listener, boolean runBusinessLogic) {
+    public DataPipeline(IDataSource dataSource, String powerBiPushUrl, List<MetricConfig> metricConfigs, LogicConfig logicConfig, GSmartListener listener, boolean runBusinessLogic) {
         this.dataSource = dataSource;
         this.powerBiPushUrl = powerBiPushUrl;
-        this.chaveDeAcumulo = chaveDeAcumulo;
         this.metricConfigs = metricConfigs;
         this.logicConfig = logicConfig;
         this.listener = listener;
         this.runBusinessLogic = runBusinessLogic;
-        this.horaDeInicioDoCiclo = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo")).truncatedTo(ChronoUnit.HOURS);
-
-        // --- INÍCIO DA CORREÇÃO (Inicializar as instâncias) ---
         this.manutencao = new Manutencao();
         this.previsaoFalhas = new PrevisaoFalhas();
-        // --- FIM DA CORREÇÃO ---
     }
 
-    public void requestRestart() {
-        this.restartRequested = true;
+    /**
+     * Sinaliza que a pipeline deve ser permanentemente parada.
+     */
+    public void requestStop() {
+        this.stopRequested = true;
+        // Interrompemos a thread também para que ela saia de qualquer estado de espera (sleep).
+        Thread.currentThread().interrupt();
     }
 
     public void run() {
         logger.info("🚀 INICIANDO PIPELINE GENÉRICA COM FONTE: {} 🚀", dataSource.getSourceName());
-        logger.info("Métrica de acúmulo configurada para: '{}'", this.chaveDeAcumulo != null ? this.chaveDeAcumulo : "Nenhuma");
+        logger.info("Métrica de acúmulo configurada para: '{}'");
         logger.info("Execução da lógica de negócio: {}", this.runBusinessLogic ? "ATIVADA" : "DESATIVADA");
 
         long currentRetryDelay = 0;
         final long MAX_RETRY_DELAY = 300;
         final long RETRY_INCREMENT = 5;
 
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!Thread.currentThread().isInterrupted() && !stopRequested) {
             try {
-                if (restartRequested) {
-                    logger.info("Pipeline reiniciada por comando do usuário.");
-                    restartRequested = false;
-                    currentRetryDelay = 0;
-                }
 
                 if (currentRetryDelay > 0) {
                     logger.info("Conexão restaurada automaticamente ou manualmente. Retomando operação normal.");
@@ -95,7 +85,6 @@ public class DataPipeline {
                 logger.debug("Dados recebidos da fonte: {}", dataSource.getSourceName());
 
                 JsonObject pbiPayload = new JsonObject();
-                double valorParaAcumular = 0.0;
                 Optional<Double> optTemperatura = Optional.empty();
                 Optional<Double> optFatorPotencia = Optional.empty();
                 Optional<Double> optPotenciaAtiva = Optional.empty();
@@ -129,10 +118,6 @@ public class DataPipeline {
                                     if (originalName.equals(logicConfig.fatorPotenciaKey())) optFatorPotencia = Optional.of(valorNumerico);
                                     if (originalName.equals(logicConfig.potenciaAtivaKey())) optPotenciaAtiva = Optional.of(valorNumerico);
                                 }
-
-                                if (originalName.equals(this.chaveDeAcumulo)) {
-                                    valorParaAcumular = valorParaEnviar;
-                                }
                             } else {
                                 pbiPayload.addProperty(alias, valorFinal.toString());
                             }
@@ -142,24 +127,15 @@ public class DataPipeline {
                     }
                 }
 
-                double totalHoraFechada = 0.0;
-                if (horaAtualBrasil.isAfter(horaDeInicioDoCiclo.plusHours(1))) {
-                    totalHoraFechada = consumoAcumuladoNaHora;
-                    consumoAcumuladoNaHora = 0.0;
-                    horaDeInicioDoCiclo = horaDeInicioDoCiclo.plusHours(1);
-                }
-                consumoAcumuladoNaHora += valorParaAcumular;
-
                 if (this.runBusinessLogic && logicConfig != null) {
                     double temperaturaAtual = optTemperatura.orElse(0.0);
                     double fatorPotenciaAtual = optFatorPotencia.orElse(0.0);
                     double potenciaAtivaAtual = optPotenciaAtiva.orElse(0.0);
 
-                    // --- INÍCIO DA CORREÇÃO (Chamar métodos da instância) ---
                     Manutencao.StatusManutencao statusManutencao = this.manutencao.verificarManutencao(listener, fatorPotenciaAtual, temperaturaAtual);
                     this.previsaoFalhas.registrarMetricas(temperaturaAtual, fatorPotenciaAtual, potenciaAtivaAtual);
                     boolean falhaPrevista = this.previsaoFalhas.preverFalhas(listener);
-                    // --- FIM DA CORREÇÃO ---
+
 
                     GeradorDeInsights.gerarInsightsDoCiclo(listener, 95.0, fatorPotenciaAtual, temperaturaAtual, statusManutencao, falhaPrevista);
                 } else {
@@ -169,8 +145,7 @@ public class DataPipeline {
                 pbiPayload.addProperty("timestamp", Instant.now().minus(3, ChronoUnit.HOURS).toString());
                 pbiPayload.addProperty("HdDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("HH:mm:ss - dd/MM/yyyy")));
                 pbiPayload.addProperty("OrigemDados", dataSource.getSourceName());
-                pbiPayload.addProperty("ConsumoParcialDaHora", consumoAcumuladoNaHora);
-                pbiPayload.addProperty("ConsumoTotalHoraFechada", totalHoraFechada);
+
 
                 ExportacaoDadosPWBI.sendDataToPowerBI(pbiPayload, this.powerBiPushUrl);
 
@@ -190,10 +165,11 @@ public class DataPipeline {
 
                 if (listener != null) {
                     listener.onConnectionLost(errorMessage);
+                    ReconnectionLogger.logConnectionLost(dataSource.getSourceName());
                 }
 
                 boolean reconnected = false;
-                while (!Thread.currentThread().isInterrupted() && !reconnected) {
+                while (!Thread.currentThread().isInterrupted() && !stopRequested && !reconnected) {
                     currentRetryDelay += RETRY_INCREMENT;
                     if (currentRetryDelay > MAX_RETRY_DELAY) {
                         currentRetryDelay = MAX_RETRY_DELAY;
@@ -201,6 +177,7 @@ public class DataPipeline {
 
                     if (listener != null) {
                         listener.onReconnectionAttempt(currentRetryDelay);
+                        ReconnectionLogger.logConnectionLost(dataSource.getSourceName());
                     }
 
                     try {

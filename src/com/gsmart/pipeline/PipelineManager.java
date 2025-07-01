@@ -108,12 +108,11 @@ public class PipelineManager {
                 notifyUpdate();
             }
         };
-
-        DataPipeline pipeline = new DataPipeline(config.dataSource(), config.powerBiUrl(), config.acumuloKey(), config.metricConfigs(), config.logicConfig(), listener, config.runBusinessLogic());
+        DataPipeline pipeline = new DataPipeline(config.dataSource(), config.powerBiUrl(), config.metricConfigs(), config.logicConfig(), listener, config.runBusinessLogic());
 
         Thread pipelineThread = new Thread(() -> {
             try {
-                pipeline.run();
+                pipeline.run(); // A thread executa a instância da pipeline
             } catch (Exception e) {
                 logger.error("Erro inesperado na thread da pipeline.", e);
             } finally {
@@ -124,7 +123,7 @@ public class PipelineManager {
             }
         });
 
-        PipelineTask task = new PipelineTask(taskDescription, pipelineThread, config, () -> {
+        PipelineTask task = new PipelineTask(taskDescription, pipelineThread, pipeline, config, () -> {
             this.runningTasks.remove(taskWrapper[0]);
             notifyUpdate();
         });
