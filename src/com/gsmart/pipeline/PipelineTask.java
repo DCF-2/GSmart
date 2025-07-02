@@ -7,6 +7,7 @@ import com.gsmart.windows.ConnectionErrorDialog;
 import com.gsmart.windows.MonitoringWindow;
 
 import java.util.UUID;
+import static com.gsmart.pipeline.DataPipeline.logger;
 
 public class PipelineTask {
     private final String id;
@@ -35,24 +36,40 @@ public class PipelineTask {
     }
 
     public void stop() {
-        if (status == TaskStatus.RUNNING || status == TaskStatus.ERROR) {
+        if (status == TaskStatus.RUNNING || status == TaskStatus.ERROR || status == TaskStatus.STOPPING) {
+            // Evita chamadas múltiplas para parar
+            if (status == TaskStatus.STOPPING || status == TaskStatus.FINISHED) return;
+
             setStatus(TaskStatus.STOPPING);
 
+            // 1. Sinaliza para a pipeline que ela deve parar.
             if (pipeline != null) {
                 pipeline.requestStop();
-            } else if (pipelineThread != null && pipelineThread.isAlive()) {
-                pipelineThread.interrupt(); // Fallback
             }
+
+            // 2. Interrompe a thread da pipeline para que ela saia de qualquer estado de 'sleep'
+            //    e possa verificar a flag 'stopRequested'.
+            if (pipelineThread != null && pipelineThread.isAlive()) {
+                pipelineThread.interrupt();
+            }
+
+            // 3. Fecha as janelas associadas
             if (monitoringWindow != null) monitoringWindow.dispose();
             if (errorDialog != null) errorDialog.dispose();
+
+            // 4. Notifica o PipelineManager (isso também remove a tarefa da lista)
             if (onStopCallback != null) onStopCallback.run();
+
+            // 5. O status final será definido pela própria pipeline quando ela sair do loop,
+            //    ou aqui como um fallback após um pequeno tempo.
             setStatus(TaskStatus.FINISHED);
+            logger.info("Comando de parada processado para a tarefa '{}'.", description);
         }
     }
 
     public void forceReconnect() {
-        if (pipelineThread != null && pipelineThread.isAlive()) {
-            pipelineThread.interrupt();
+        if (pipeline != null) {
+            pipeline.triggerManualReconnect();
         }
     }
 

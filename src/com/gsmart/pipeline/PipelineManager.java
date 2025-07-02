@@ -81,7 +81,9 @@ public class PipelineManager {
                     SwingUtilities.invokeLater(() -> {
                         ConnectionErrorDialog newDialog = new ConnectionErrorDialog(
                                 (Frame) parentComponentForDialogs, task.getDescription(),
-                                task::forceReconnect, task::stop, task::clearConnectionErrorDialog);
+                                task::forceReconnect, // Ação de reconectar
+                                task::stop, // Ação de cancelar (parar)
+                                task::clearConnectionErrorDialog);
                         task.setConnectionErrorDialog(newDialog);
                         newDialog.showConnectionLost(errorMessage);
                     });

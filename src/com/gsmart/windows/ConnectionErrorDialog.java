@@ -6,8 +6,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+
 
 public class ConnectionErrorDialog extends JDialog {
 
@@ -37,11 +36,17 @@ public class ConnectionErrorDialog extends JDialog {
         add(buttonPanel, BorderLayout.SOUTH);
 
         reconnectNowButton.addActionListener(e -> {
-            if (onReconnectNow != null) onReconnectNow.run();
+            System.out.println("DEBUG: Botão 'Reconectar' foi clicado. Executando onReconnectNow.");
+            if (onReconnectNow != null) {
+                onReconnectNow.run();
+            }
         });
 
         cancelPipelineButton.addActionListener(e -> {
-            if (onCancelPipeline != null) onCancelPipeline.run();
+            System.out.println("DEBUG: Botão 'Cancelar Pipeline' foi clicado. Executando onCancelPipeline.");
+            if (onCancelPipeline != null) {
+                onCancelPipeline.run();
+            }
             dispose();
         });
 
