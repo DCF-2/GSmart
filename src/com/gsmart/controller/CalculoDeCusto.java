@@ -1,12 +1,4 @@
-package functrendz;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Scanner;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+package com.gsmart.controller;
 
 public class CalculoDeCusto {
     // Tarifa base em R$/kWh para a região. Pode ser atualizada pela API.

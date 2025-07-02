@@ -1,5 +1,5 @@
 // Localização: src/main/java/conectiontingsboard/ExportacaoDadosPWBI.java
-package conectiontingsboard;
+package com.gsmart.conection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

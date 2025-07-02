@@ -1,5 +1,5 @@
 // Localização: src/main/java/com/gsmart/sources/IDataSource.java
-package com.gsmart.sources;
+package com.gsmart.resources;
 
 import com.google.gson.JsonObject;
 

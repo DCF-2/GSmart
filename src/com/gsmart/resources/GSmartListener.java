@@ -1,5 +1,5 @@
 // Localização: src/main/java/com/gsmart/GSmartListener.java
-package com.gsmart;
+package com.gsmart.resources;
 
 public interface GSmartListener {
     void onInsight(String message, String type);

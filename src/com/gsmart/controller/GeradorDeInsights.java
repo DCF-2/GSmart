@@ -1,9 +1,9 @@
 // Localização: src/main/java/functrendz/GeradorDeInsights.java
-package functrendz;
+package com.gsmart.controller;
 
-import com.gsmart.GSmartListener;
+import com.gsmart.resources.GSmartListener;
 import java.util.Locale;
-import static functrendz.Manutencao.StatusManutencao;
+import static com.gsmart.controller.Manutencao.StatusManutencao;
 
 public class GeradorDeInsights {
 

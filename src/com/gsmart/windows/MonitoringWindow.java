@@ -1,8 +1,8 @@
 // Localização: src/main/java/com/gsmart/windows/MonitoringWindow.java
 package com.gsmart.windows;
 
-import com.gsmart.GSmartListener;
-import com.gsmart.TaskStatus;
+import com.gsmart.resources.GSmartListener;
+import com.gsmart.resources.TaskStatus;
 import com.gsmart.pipeline.PipelineTask; // Import adicionado
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

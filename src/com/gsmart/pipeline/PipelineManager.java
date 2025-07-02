@@ -1,8 +1,8 @@
 // Localização: src/main/java/com/gsmart/pipeline/PipelineManager.java
 package com.gsmart.pipeline;
 
-import com.gsmart.GSmartListener;
-import com.gsmart.TaskStatus;
+import com.gsmart.resources.GSmartListener;
+import com.gsmart.resources.TaskStatus;
 import com.gsmart.config.PipelineConfiguration;
 import com.gsmart.windows.ConnectionErrorDialog;
 import com.gsmart.windows.LogViewerWindow;

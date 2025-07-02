@@ -1,7 +1,7 @@
 // Localização: src/main/java/functrendz/Manutencao.java
-package functrendz;
+package com.gsmart.controller;
 
-import com.gsmart.GSmartListener;
+import com.gsmart.resources.GSmartListener;
 import java.util.Locale;
 
 public class Manutencao {

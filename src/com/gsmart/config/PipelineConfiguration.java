@@ -1,7 +1,7 @@
 // Localização: src/main/java/com/gsmart/pipeline/PipelineConfiguration.java
 package com.gsmart.config;
 
-import com.gsmart.sources.IDataSource;
+import com.gsmart.resources.IDataSource;
 import com.gsmart.windows.LogViewerWindow;
 
 import java.util.List;

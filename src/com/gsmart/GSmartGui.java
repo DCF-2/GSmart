@@ -6,6 +6,7 @@ import com.gsmart.config.LogicConfig;
 import com.gsmart.config.MetricConfig;
 import com.gsmart.config.PipelineConfiguration;
 import com.gsmart.pipeline.PipelineManager;
+import com.gsmart.resources.IDataSource;
 import com.gsmart.sources.*;
 import com.gsmart.windows.LogViewerWindow;
 import com.gsmart.windows.ReconnectionLogViewer;

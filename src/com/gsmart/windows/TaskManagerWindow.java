@@ -1,7 +1,7 @@
 // Localização: src/main/java/com/gsmart/windows/TaskManagerWindow.java
 package com.gsmart.windows;
 
-import com.gsmart.TaskStatus;
+import com.gsmart.resources.TaskStatus;
 import com.gsmart.pipeline.PipelineManager;
 import com.gsmart.pipeline.PipelineTask;
 

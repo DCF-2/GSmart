@@ -1,7 +1,7 @@
 // Localização: src/main/java/functrendz/PrevisaoFalhas.java
-package functrendz;
+package com.gsmart.controller;
 
-import com.gsmart.GSmartListener;
+import com.gsmart.resources.GSmartListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;

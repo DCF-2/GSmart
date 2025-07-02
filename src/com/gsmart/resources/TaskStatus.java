@@ -1,5 +1,5 @@
 // Localização: src/main/java/com/gsmart/TaskStatus.java
-package com.gsmart;
+package com.gsmart.resources;
 
 public enum TaskStatus {
     RUNNING("Executando"),

@@ -3,6 +3,7 @@ package com.gsmart.sources;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.gsmart.resources.IDataSource;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ThingsBoardSource implements IDataSource {
     private static final Logger logger = LoggerFactory.getLogger(ThingsBoardSource.class);
