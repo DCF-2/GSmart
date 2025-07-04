@@ -1,0 +1,26 @@
+site_name: GSmart - Documentação Técnica
+
+theme:
+  name: material
+  language: pt
+  palette:
+    primary: 'blue'
+    accent: 'cyan'
+
+# Navegação do seu site
+nav:
+  - 'Introdução': 'index.md'
+  - 'API':
+    - 'Visão Geral': 'api/index.md' # Pode criar este arquivo se quiser uma página geral para a API
+    - 'Pacote: com.gsmart.pipeline':
+      - 'PipelineManager': 'api/com/gsmart/pipeline/PipelineManager.md'
+      - 'DataPipeline': 'api/com/gsmart/pipeline/DataPipeline.md'
+      - 'PipelineTask': 'api/com/gsmart/pipeline/PipelineTask.md'
+    - 'Pacote: com.gsmart.sources':
+       - 'IDataSource': 'api/com/gsmart/resources/IDataSource.md'
+       - 'ThingsBoardSource': 'api/com/gsmart/sources/ThingsBoardSource.md'
+       - 'DatabaseSource': 'api/com/gsmart/sources/DatabaseSource.md'
+    - 'Pacote: com.gsmart.windows':
+       - 'GSmartGui': 'api/com/gsmart/GSmartGui.md'
+       - 'TaskManagerWindow': 'api/com/gsmart/windows/TaskManagerWindow.md'
+    # Adicione as outras classes aqui...

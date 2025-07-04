@@ -5,12 +5,32 @@ import com.gsmart.resources.GSmartListener;
 import java.util.Locale;
 import static com.gsmart.controller.Manutencao.StatusManutencao;
 
+/**
+ * Classe utilitária estática que atua como o motor de regras de negócio.
+ * Sua responsabilidade é analisar um conjunto de métricas de um ciclo de processamento
+ * e gerar "insights" ou alertas humanamente legíveis com base em limiares pré-definidos.
+ *
+ * As regras avaliam custos, diagnósticos de manutenção e previsões de falhas,
+ * comunicando os resultados através do {@link GSmartListener}.
+ */
 public class GeradorDeInsights {
 
     private static final double LIMIAR_EFICIENCIA_MATERIAL = 97.0;
     private static final double LIMIAR_TEMPERATURA_ALTA = 78.0;
     private static final double LIMIAR_FATOR_POTENCIA_BAIXO = 0.90;
 
+    /**
+     * Analisa as métricas consolidadas de um ciclo de pipeline e gera os insights correspondentes.
+     * Compara os valores de entrada com os limiares da classe e, se uma condição for atendida,
+     * formata uma mensagem descritiva e a envia através do listener.
+     *
+     * @param listener O canal de comunicação para enviar os insights gerados para a GUI.
+     * @param eficienciaMaterial O valor da eficiência de material a ser avaliado.
+     * @param fatorPotencia O valor do fator de potência a ser avaliado.
+     * @param temperatura O valor da temperatura a ser avaliado.
+     * @param statusManutencao O status atual da manutenção, vindo da classe {@link Manutencao}.
+     * @param falhaPrevista Um booleano indicando se uma falha foi prevista pela classe {@link PrevisaoFalhas}.
+     */
     public static void gerarInsightsDoCiclo(GSmartListener listener, double eficienciaMaterial, double fatorPotencia, double temperatura,
                                             StatusManutencao statusManutencao, boolean falhaPrevista) {
 

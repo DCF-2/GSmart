@@ -11,8 +11,23 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
+/**
+ * Classe utilitária responsável por enviar dados para a API de Push do Microsoft Power BI.
+ * Ela formata o objeto de dados em um payload JSON, conforme esperado pela API,
+ * e realiza a requisição POST para o endpoint especificado.
+ */
 public class ExportacaoDadosPWBI {
 
+    /**
+     * Envia um único objeto de dados para um endpoint da API de Push do Power BI.
+     * Este método encapsula a lógica de conexão HTTP, formatação do corpo da requisição
+     * e tratamento da resposta do servidor.
+     *
+     * @param dataObject O objeto JSON contendo os dados a serem enviados.
+     * @param powerBiApiUrl A URL completa do conjunto de dados de streaming do Power BI.
+     * @throws IllegalArgumentException se a URL do Power BI for nula, vazia ou inválida.
+     * @throws Exception se ocorrer um erro na comunicação com a API do Power BI (ex: código de resposta não-2xx).
+     */
     public static void sendDataToPowerBI(JsonObject dataObject, String powerBiApiUrl) throws Exception {
         if (powerBiApiUrl == null || powerBiApiUrl.trim().isEmpty() || powerBiApiUrl.equals("SUA_URL_DE_PUSH_DO_POWER_BI_AQUI")) {
             throw new IllegalArgumentException("A URL da API do Power BI não foi configurada corretamente.");

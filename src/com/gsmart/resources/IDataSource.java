@@ -4,22 +4,28 @@ package com.gsmart.resources;
 import com.google.gson.JsonObject;
 
 /**
- * Define o contrato que toda fonte de dados para o GSmart deve seguir.
- * Garante que a classe DataPipeline possa trabalhar com qualquer fonte
- * de forma padronizada.
+ * Define o contrato para todas as fontes de dados do sistema GSmart.
+ * Qualquer classe que represente uma fonte de dados, como um banco de dados
+ * ou uma API de IoT, deve implementar esta interface para garantir que a
+ * {@link com.gsmart.pipeline.DataPipeline} possa interagir com ela de forma padronizada.
  */
 public interface IDataSource {
 
     /**
-     * Busca os dados de telemetria mais recentes da fonte.
-     * @return Um JsonObject contendo os dados de telemetria.
-     * @throws Exception Se ocorrer um erro durante a busca dos dados.
+     * Busca o conjunto de dados mais recente da fonte.
+     * A implementação deve lidar com toda a lógica de comunicação, como
+     * requisições HTTP ou consultas a banco de dados.
+     *
+     * @return Um JsonObject contendo os dados de telemetria ou registros.
+     * @throws Exception Se ocorrer qualquer erro durante a comunicação ou coleta dos dados.
      */
     JsonObject fetchData() throws Exception;
 
-    /**
-     * Retorna um nome descritivo da fonte de dados.
-     * @return Uma String com o nome da fonte (ex: "ThingsBoard" ou "Banco de Dados").
-     */
+/**
+ * Retorna um nome descritivo e legível para a fonte de dados.
+ * Este nome é usado na interface do usuário para identificar a tarefa.
+ *
+ * @return Uma String com o nome da fonte (ex: "ThingsBoard" ou "Banco de Dados").
+ */
     String getSourceName();
 }

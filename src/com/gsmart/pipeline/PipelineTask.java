@@ -9,6 +9,18 @@ import com.gsmart.windows.MonitoringWindow;
 import java.util.UUID;
 import static com.gsmart.pipeline.DataPipeline.logger;
 
+/**
+ * Representa uma tarefa de pipeline completa e seu estado atual.
+ * Esta classe atua como um contêiner que agrupa todos os elementos associados a um
+ * único processo de monitoramento: a thread de execução, a instância da pipeline,
+ * a configuração original e as janelas de UI associadas (monitoramento e erro).
+ *
+ * Ela é o principal objeto gerenciado pelo {@link PipelineManager}.
+ *
+ * @see PipelineManager
+ * @see DataPipeline
+ * @see MonitoringWindow
+ */
 public class PipelineTask {
     private final String id;
     private final String description;
@@ -22,6 +34,15 @@ public class PipelineTask {
     private boolean hasAlert = false;
     private final long startTime;
 
+    /**
+     * Construtor da classe PipelineTask.
+     *
+     * @param description Uma descrição legível da tarefa (ex: "Fonte: ThingsBoard").
+     * @param pipelineThread A thread na qual a instância da DataPipeline está sendo executada.
+     * @param pipeline A instância da DataPipeline que contém a lógica de execução.
+     * @param config A configuração original usada para iniciar esta tarefa, útil para reiniciá-la.
+     * @param onStopCallback Um callback a ser executado quando esta tarefa é parada, notificando o PipelineManager.
+     */
     public PipelineTask(String description, Thread pipelineThread, DataPipeline pipeline, PipelineConfiguration config, Runnable onStopCallback) {
         this.id = UUID.randomUUID().toString();
         this.description = description;
@@ -35,6 +56,17 @@ public class PipelineTask {
         this.startTime = System.currentTimeMillis();
     }
 
+    /**
+     * Orquestra uma parada graciosa e completa da tarefa e de seus componentes.
+     * A sequência de parada é a seguinte:
+     * <ol>
+     * <li>Sinaliza para a instância da {@link DataPipeline} que ela deve encerrar seu loop.</li>
+     * <li>Interrompe a thread da pipeline para acordá-la de qualquer estado de espera (sleep).</li>
+     * <li>Fecha e remove as janelas de UI associadas (monitor e diálogo de erro).</li>
+     * <li>Executa o callback para notificar o {@link PipelineManager} de que a tarefa foi removida.</li>
+     * <li>Define o status final como FINISHED.</li>
+     * </ol>
+     */
     public void stop() {
         if (status == TaskStatus.RUNNING || status == TaskStatus.ERROR || status == TaskStatus.STOPPING) {
             // Evita chamadas múltiplas para parar
@@ -67,17 +99,43 @@ public class PipelineTask {
         }
     }
 
+    /**
+     * Delega a solicitação de reconexão manual para a instância da DataPipeline subjacente.
+     */
     public void forceReconnect() {
         if (pipeline != null) {
             pipeline.triggerManualReconnect();
         }
     }
 
-    // --- Getters e Setters (sem alterações) ---
+    // --- Getters e Setters ---
+    /**
+     * Define a janela de monitoramento associada e atualiza seu status.
+     * @param w A instância da MonitoringWindow.
+     */
     public void setMonitoringWindow(MonitoringWindow w) { this.monitoringWindow = w; if(w!=null) w.updateStatus(this.status); }
+
+    /**
+     * Limpa a referência à janela de monitoramento, geralmente quando ela é fechada.
+     */
     public void clearMonitoringWindow() { this.monitoringWindow = null; }
+
+    /**
+     * Define o diálogo de erro de conexão associado a esta tarefa.
+     * @param d A instância do ConnectionErrorDialog.
+     */
     public void setConnectionErrorDialog(ConnectionErrorDialog d) { this.errorDialog = d; }
+
+    /**
+     * Limpa a referência ao diálogo de erro de conexão.
+     */
     public void clearConnectionErrorDialog() { this.errorDialog = null; }
+
+    /**
+     * Atualiza o status da tarefa e notifica a janela de monitoramento, se existir.
+     * @param status O novo TaskStatus.
+     */
+
     public void setStatus(TaskStatus status) { this.status = status; if (this.monitoringWindow != null) this.monitoringWindow.updateStatus(status); }
     public MonitoringWindow getMonitoringWindow() { return monitoringWindow; }
     public ConnectionErrorDialog getConnectionErrorDialog() { return errorDialog; }

@@ -12,6 +12,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementação da interface {@link IDataSource} para se conectar e interagir
+ * com uma instância da plataforma de IoT ThingsBoard.
+ * Esta classe utiliza a biblioteca OkHttp para realizar chamadas à API REST do ThingsBoard
+ * para autenticação, busca de metadados (perfis, dispositivos) e coleta de
+ * dados de telemetria.
+ *
+ * @see IDataSource
+ * @see okhttp3.OkHttpClient
+ */
 public class ThingsBoardSource implements IDataSource {
     private static final Logger logger = LoggerFactory.getLogger(ThingsBoardSource.class);
 
@@ -21,6 +31,14 @@ public class ThingsBoardSource implements IDataSource {
     private final OkHttpClient client;
     private String authToken;
 
+    /**
+     * Construtor da classe ThingsBoardSource.
+     *
+     * @param thingsboardUrl A URL base do servidor ThingsBoard (ex: "http://host:port").
+     * @param deviceId O ID do dispositivo específico do qual os dados serão buscados.
+     * @param keysToFetch Uma lista de chaves de telemetria a serem requisitadas.
+     * @param client Uma instância compartilhada de OkHttpClient para realizar as requisições HTTP.
+     */
     public ThingsBoardSource(String thingsboardUrl, String deviceId, List<String> keysToFetch, OkHttpClient client) {
         this.thingsboardUrl = thingsboardUrl != null && thingsboardUrl.endsWith("/") ? thingsboardUrl.substring(0, thingsboardUrl.length() - 1) : thingsboardUrl;
         this.deviceId = deviceId;
@@ -30,7 +48,9 @@ public class ThingsBoardSource implements IDataSource {
 
 
     /**
-     * Tenta autenticar no servidor para validar a URL e as credenciais.
+     * Tenta autenticar no servidor para validar a URL e as credenciais padrão.
+     * É um método de baixo custo para verificar a conectividade básica.
+     *
      * @return true se a autenticação for bem-sucedida, false caso contrário.
      */
     public boolean testConnection() {
@@ -51,6 +71,13 @@ public class ThingsBoardSource implements IDataSource {
         return "ThingsBoard";
     }
 
+    /**
+     * Garante que uma sessão autenticada com o ThingsBoard exista.
+     * Se um token de autenticação ainda não foi obtido, este método realiza a
+     * requisição de login e armazena o token para uso em chamadas futuras.
+     *
+     * @throws IOException se a requisição de autenticação falhar.
+     */
     private void ensureAuthenticated() throws IOException {
         if (this.authToken != null) { return; }
         logger.info("Autenticando no ThingsBoard em {}...", this.thingsboardUrl);
@@ -68,6 +95,15 @@ public class ThingsBoardSource implements IDataSource {
         }
     }
 
+    /**
+     * Busca metadados do servidor ThingsBoard.
+     * (getDeviceProfiles -> Busca todos os perfis de dispositivo disponíveis.)
+     * (getDevicesByProfileId -> Busca todos os dispositivos associados a um perfil específico.)
+     * (getAvailableKeys -> Busca todas as chaves de telemetria de um dispositivo específico.)
+     *
+     * @return Uma lista contendo os metadados solicitados (DeviceProfile, Device, ou String).
+     * @throws IOException se a requisição à API falhar.
+     */
     public List<DeviceProfile> getDeviceProfiles() throws IOException {
         ensureAuthenticated();
         // Endpoint para buscar informações dos perfis de dispositivo (funciona em v2.5+)
@@ -92,6 +128,16 @@ public class ThingsBoardSource implements IDataSource {
         }
     }
 
+    /**
+     * Busca metadados do servidor ThingsBoard.
+     * (getDeviceProfiles -> Busca todos os perfis de dispositivo disponíveis.)
+     * (getDevicesByProfileId -> Busca todos os dispositivos associados a um perfil específico.)
+     * (getAvailableKeys -> Busca todas as chaves de telemetria de um dispositivo específico.)
+     *
+     * @param deviceProfileId (Apenas para getDevicesByProfileId) O ID do perfil do dispositivo.
+     * @return Uma lista contendo os metadados solicitados (DeviceProfile, Device, ou String).
+     * @throws IOException se a requisição à API falhar.
+     */
     public List<Device> getDevicesByProfileId(String deviceProfileId) throws IOException {
         ensureAuthenticated();
         // Este é o endpoint correto e robusto para buscar dispositivos por ID de perfil
@@ -131,6 +177,15 @@ public class ThingsBoardSource implements IDataSource {
         }
     }
 
+    /**
+     * Busca metadados do servidor ThingsBoard.
+     * (getDeviceProfiles -> Busca todos os perfis de dispositivo disponíveis.)
+     * (getDevicesByProfileId -> Busca todos os dispositivos associados a um perfil específico.)
+     * (getAvailableKeys -> Busca todas as chaves de telemetria de um dispositivo específico.)
+     *
+     * @return Uma lista contendo os metadados solicitados (DeviceProfile, Device, ou String).
+     * @throws IOException se a requisição à API falhar.
+     */
     public List<String> getAvailableKeys() throws IOException {
         ensureAuthenticated();
         String keysUrl = String.format("%s/api/plugins/telemetry/DEVICE/%s/keys/timeseries", this.thingsboardUrl, this.deviceId);
@@ -147,6 +202,12 @@ public class ThingsBoardSource implements IDataSource {
     public void testConnectionAndThrow() throws IOException {
         ensureAuthenticated(); // Este metodo já lança uma IOException em caso de falha
     }
+
+    /**
+     * Limpa o token de autenticação armazenado.
+     * Este método é chamado quando ocorre uma falha de conexão, forçando
+     * uma nova tentativa de autenticação no próximo ciclo.
+     */
     public void clearAuthToken() {
         this.authToken = null;
         logger.info("Token de autenticação do ThingsBoard foi limpo devido a uma falha de conexão.");

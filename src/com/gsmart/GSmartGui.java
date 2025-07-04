@@ -29,6 +29,19 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+/**
+ * A classe principal da interface gráfica (GUI) para a aplicação GSmart.
+ * Esta janela (JFrame) serve como o painel de controle central, permitindo ao usuário:
+ * <ol>
+ * <li>Selecionar e configurar a fonte de dados (ThingsBoard ou Banco de Dados).</li>
+ * <li>Conectar-se à fonte para carregar metadados como perfis, dispositivos e tabelas.</li>
+ * <li>Carregar, selecionar e configurar as métricas a serem monitoradas.</li>
+ * <li>Configurar o destino dos dados (URL de push do Power BI).</li>
+ * <li>Lançar, monitorar e parar os pipelines de dados através do {@link PipelineManager}.</li>
+ * </ol>
+ * A classe gerencia o estado da UI, lida com eventos do usuário e usa {@link SwingWorker}
+ * para operações de longa duração (rede/IO) para não congelar a interface.
+ */
 public class GSmartGui extends JFrame {
     private static final Logger logger = LoggerFactory.getLogger(GSmartGui.class);
     private final JComboBox<String> sourceSelector;
@@ -62,6 +75,14 @@ public class GSmartGui extends JFrame {
     private final OkHttpClient sharedOkHttpClient;
     private LogicConfig logicConfig;
 
+    /**
+     * Construtor da classe GSmartGui.
+     * Inicializa e monta todos os componentes da interface gráfica (Swing),
+     * configura os listeners de eventos e carrega as configurações salvas anteriormente.
+     *
+     * @param logViewer A instância da janela de log geral.
+     * @param pipelineManager O gerenciador central de pipelines que será controlado por esta GUI.
+     */
     public GSmartGui(LogViewerWindow logViewer, PipelineManager pipelineManager) {
         this.globalLogViewer = logViewer;
         this.pipelineManager = pipelineManager;
@@ -234,6 +255,12 @@ public class GSmartGui extends JFrame {
         configManager.saveProperties(props);
     }
 
+    /**
+     * Valida as configurações da UI e lança um novo pipeline.
+     * Coleta todas as informações dos campos (URL do Power BI, métricas selecionadas),
+     * cria um objeto {@link PipelineConfiguration} e o submete ao {@link PipelineManager}
+     * para iniciar a execução em segundo plano.
+     */
     private void launchPipeline() {
         if (metricsTable.isEditing()) {
             metricsTable.getCellEditor().stopCellEditing();
@@ -296,6 +323,11 @@ public class GSmartGui extends JFrame {
         return url;
     }
 
+    /**
+     * Inicia uma tentativa de conexão com a fonte de dados (ThingsBoard/Banco de Dados)
+     * em uma thread de trabalho em segundo plano usando {@link SwingWorker}.
+     * Atualiza a UI com o status da conexão (sucesso ou falha) sem congelar a aplicação.
+     */
     private void connectToThingsboard() {
         tbStatusLabel.setText("Conectando...");
         tbStatusLabel.setForeground(Color.ORANGE);
@@ -330,6 +362,11 @@ public class GSmartGui extends JFrame {
         }.execute();
     }
 
+    /**
+     * Inicia uma tentativa de conexão com a fonte de dados (ThingsBoard/Banco de Dados)
+     * em uma thread de trabalho em segundo plano usando {@link SwingWorker}.
+     * Atualiza a UI com o status da conexão (sucesso ou falha) sem congelar a aplicação.
+     */
     private void connectToDatabase() {
         dbStatusLabel.setText("Conectando...");
         dbStatusLabel.setForeground(Color.ORANGE);
@@ -364,6 +401,11 @@ public class GSmartGui extends JFrame {
         }.execute();
     }
 
+    /**
+     * Busca as "chaves" (métricas de telemetria ou colunas de tabela) disponíveis na fonte
+     * de dados atualmente configurada. Utiliza um {@link SwingWorker} para a operação de rede
+     * e, em caso de sucesso, preenche a tabela de métricas com os resultados.
+     */
     private void loadAvailableKeys() {
         loadKeysButton.setEnabled(false);
         loadKeysButton.setText("Carregando...");
@@ -443,6 +485,16 @@ public class GSmartGui extends JFrame {
         loadKeysButton.setText("Carregar Métricas da Fonte");
     }
 
+    /**
+     * Cria e retorna uma instância concreta de {@link IDataSource} com base na seleção
+     * atual do usuário na interface gráfica.
+     * Este método valida se todas as informações necessárias (URLs, dispositivo, tabela, etc.)
+     * estão presentes antes de instanciar o objeto da fonte de dados.
+     *
+     * @param originalKeys A lista de nomes originais das métricas a serem buscadas.
+     * @return Uma instância de IDataSource pronta para ser usada pela pipeline.
+     * @throws Exception se a conexão com a fonte não puder ser estabelecida ou se a configuração estiver incompleta.
+     */
     private IDataSource createSelectedDataSource(List<String> originalKeys) throws Exception { // Adiciona "throws Exception"
         String selectedSource = (String) sourceSelector.getSelectedItem();
         if ("Thingsboard API".equals(selectedSource)) {
@@ -539,6 +591,12 @@ public class GSmartGui extends JFrame {
     }
 }
 // As classes internas MetricTableModel e SystemMetricCellRenderer permanecem aqui, sem alterações.
+
+/**
+ * Modelo de dados (TableModel) para a JTable que exibe as métricas.
+ * Gerencia a lista de {@link MetricConfig}, controlando quais dados são exibidos
+ * e como eles podem ser editados pelo usuário.
+ */
 class MetricTableModel extends AbstractTableModel {
     private final String[] columnNames = {"Enviar", "Nome Original", "Enviar Como (Alias)", "Função/Expressão (usar 'valor')"};
     private List<MetricConfig> metrics = new ArrayList<>();
@@ -595,6 +653,12 @@ class MetricTableModel extends AbstractTableModel {
     }
 }
 
+/**
+ * Renderizador de células customizado para a tabela de métricas.
+ * Sua principal função é alterar a aparência (fonte e cor) das métricas
+ * que são consideradas "de sistema" (timestamp, etc.), diferenciando-as
+ * visualmente das métricas normais.
+ */
 class SystemMetricCellRenderer extends DefaultTableCellRenderer {
     private final Font defaultFont = new Font("Segoe UI", Font.PLAIN, 12);
     private final Font systemFont = new Font("Segoe UI", Font.ITALIC, 12);

@@ -11,6 +11,15 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementação da interface {@link IDataSource} para se conectar e interagir
+ * com um banco de dados relacional através de JDBC.
+ * Esta classe é projetada para buscar o registro mais recente de uma tabela específica,
+ * simulando uma fonte de dados de telemetria.
+ *
+ * @see IDataSource
+ * @see java.sql.Connection
+ */
 public class DatabaseSource implements IDataSource {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseSource.class);
 
@@ -20,6 +29,15 @@ public class DatabaseSource implements IDataSource {
     private final String tableName;
     private final List<String> selectedColumns;
 
+    /**
+     * Construtor da classe DatabaseSource.
+     *
+     * @param dbUrl A string de conexão JDBC para o banco de dados.
+     * @param user O nome de usuário para a conexão.
+     * @param password A senha para a conexão.
+     * @param tableName O nome da tabela da qual os dados serão buscados.
+     * @param selectedColumns A lista de nomes das colunas a serem incluídas na busca.
+     */
     public DatabaseSource(String dbUrl, String user, String password, String tableName, List<String> selectedColumns) {
         this.dbUrl = dbUrl;
         this.user = user;
@@ -33,8 +51,9 @@ public class DatabaseSource implements IDataSource {
     }
 
     /**
-     * Tenta estabelecer uma conexão com o banco de dados para validar as credenciais.
-     * @return true se a conexão for bem-sucedida, false caso contrário.
+     * Tenta estabelecer uma conexão com o banco de dados para validar a URL e as credenciais.
+     *
+     * @return true se a conexão for bem-sucedida e válida, false caso contrário.
      */
     public boolean testConnection() {
         try (Connection conn = getConnection()) {
@@ -49,8 +68,9 @@ public class DatabaseSource implements IDataSource {
 
     /**
      * Busca e retorna uma lista com os nomes de todas as tabelas visíveis no schema 'public'.
+     *
      * @return Uma lista de nomes de tabelas.
-     * @throws SQLException se ocorrer um erro de acesso ao banco.
+     * @throws SQLException se ocorrer um erro de acesso ao banco de dados durante a busca.
      */
     public List<String> getAvailableTables() throws SQLException {
         logger.info("Buscando tabelas disponíveis no banco de dados...");
@@ -68,6 +88,14 @@ public class DatabaseSource implements IDataSource {
         return tables;
     }
 
+    /**
+     * Busca o registro mais recente (ordenado por 'timestamp' descendente) da tabela configurada.
+     * Constrói e retorna um objeto JSON formatado de maneira similar à API do ThingsBoard
+     * para manter a compatibilidade com o resto da pipeline.
+     *
+     * @return Um JsonObject contendo os dados do registro mais recente.
+     * @throws Exception se a busca no banco de dados falhar ou se a configuração estiver incompleta.
+     */
     @Override
     public JsonObject fetchData() throws Exception {
         if (tableName == null || tableName.trim().isEmpty()) {
@@ -116,6 +144,13 @@ public class DatabaseSource implements IDataSource {
         return data;
     }
 
+    /**
+     * Retorna uma lista com os nomes de todas as colunas de uma tabela específica.
+     *
+     * @param tableName O nome da tabela cujas colunas serão listadas.
+     * @return Uma lista contendo os nomes das colunas.
+     * @throws SQLException se a tabela não for encontrada ou se ocorrer um erro de acesso ao banco.
+     */
     public List<String> getAvailableColumns(String tableName) throws SQLException {
         if (tableName == null || tableName.trim().isEmpty()) {
             throw new SQLException("Nome da tabela não pode ser nulo ou vazio para buscar colunas.");
@@ -144,6 +179,13 @@ public class DatabaseSource implements IDataSource {
         return "Banco de Dados (Tabela: " + this.tableName + ")";
     }
 
+    /**
+     * Testa a conexão com o banco de dados e lança uma exceção em caso de falha.
+     * Diferente de {@link #testConnection()}, este método é projetado para interromper o fluxo
+     * caso a conexão não possa ser estabelecida, propagando a exceção.
+     *
+     * @throws SQLException se a conexão falhar ou não for válida.
+     */
     public void testConnectionAndThrow() throws SQLException {
         try (Connection conn = getConnection()) {
             if (!conn.isValid(5)) {

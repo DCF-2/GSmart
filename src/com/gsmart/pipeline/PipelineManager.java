@@ -16,6 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Gerencia o ciclo de vida de múltiplas tarefas de pipeline (DataPipeline).
+ * Esta classe é responsável por iniciar, parar e monitorar todas as tarefas ativas,
+ * mantendo um registro delas em um mapa.
+ * Ela utiliza um ExecutorService para gerenciar as threads de forma eficiente.
+ *
+ * @see DataPipeline
+ * @see PipelineTask
+ */
 public class PipelineManager {
 
     private static final Logger logger = LoggerFactory.getLogger(PipelineManager.class);
@@ -24,16 +33,44 @@ public class PipelineManager {
     private LogViewerWindow globalLogViewer;
     private Component parentComponentForDialogs;
 
+    /**
+     * Define um callback (Runnable) a ser executado sempre que a lista de tarefas
+     * for atualizada (adição ou remoção).
+     * Isso é usado para notificar a GUI para redesenhar a lista de tarefas.
+     *
+     * @param onTaskListUpdated O Runnable a ser executado.
+     */
     public void setOnTaskListUpdated(Runnable onTaskListUpdated) { this.onTaskListUpdated = onTaskListUpdated; }
+
+
     public void setParentComponent(Component parentComponent) { this.parentComponentForDialogs = parentComponent; }
+
+
     public void setGlobalLogViewer(LogViewerWindow logViewer) { this.globalLogViewer = logViewer; }
 
     private void notifyUpdate() {
         if (onTaskListUpdated != null) SwingUtilities.invokeLater(onTaskListUpdated);
     }
 
+    /**
+     * Retorna uma cópia da lista de tarefas atualmente em execução.
+     * A lista é copiada para evitar problemas de concorrência (ConcurrentModificationException)
+     * ao iterar sobre ela enquanto a original pode ser modificada.
+     *
+     * @return Uma nova lista contendo as tarefas em execução.
+     */
     public List<PipelineTask> getRunningTasks() { return new ArrayList<>(runningTasks); }
 
+    /**
+     * Lança um novo pipeline com base em uma configuração fornecida.
+     * Este método orquestra a criação de todos os componentes necessários:
+     * 1. O GSmartListener para capturar eventos da pipeline.
+     * 2. A instância de DataPipeline (a lógica principal).
+     * 3. A Thread que executará a pipeline.
+     * 4. O PipelineTask que encapsula todos esses componentes e seu estado.
+     *
+     * @param config O objeto de configuração contendo todos os parâmetros para o pipeline.
+     */
     public void launchPipeline(PipelineConfiguration config) {
         String taskDescription = config.dataSource().getSourceName();
         logger.info("Recebida ordem para lançar pipeline: {}", taskDescription);
@@ -138,6 +175,12 @@ public class PipelineManager {
         logger.info("Pipeline para '{}' iniciada em segundo plano.", taskDescription);
     }
 
+    /**
+     * Para uma tarefa antiga e lança uma nova com base na configuração original da tarefa.
+     * Útil para reiniciar uma pipeline que parou ou encontrou um erro.
+     *
+     * @param oldTask A tarefa existente que precisa ser reiniciada.
+     */
     public void relaunchPipeline(PipelineTask oldTask) {
         logger.info("Recebida ordem para reiniciar a pipeline: {}", oldTask.getDescription());
         PipelineConfiguration config = oldTask.getOriginalConfig();
@@ -146,6 +189,13 @@ public class PipelineManager {
         launchPipeline(config);
     }
 
+    /**
+     * Exibe a janela de monitoramento para uma tarefa específica.
+     * Se a janela ainda não existir ou tiver sido fechada, uma nova é criada.
+     * Se já existir, ela é trazida para a frente.
+     *
+     * @param task A tarefa para a qual o monitor deve ser exibido.
+     */
     public void showMonitorFor(PipelineTask task) {
         if (task.getMonitoringWindow() == null || !task.getMonitoringWindow().isDisplayable()) {
             logger.info("Criando/Recriando janela de monitoramento para: {}", task.getDescription());
@@ -156,6 +206,11 @@ public class PipelineManager {
         task.getMonitoringWindow().setVisible(true);
     }
 
+    /**
+     * Tenta parar todas as tarefas de monitoramento em execução.
+     * Exibe um diálogo de confirmação ao usuário antes de prosseguir. Se confirmado,
+     * invoca o método stop() de cada tarefa ativa.
+     */
     public void stopAllPipelines() {
         if (runningTasks.isEmpty()) {
             JOptionPane.showMessageDialog(parentComponentForDialogs, "Não há nenhum monitoramento em execução.", "Informação", JOptionPane.INFORMATION_MESSAGE);

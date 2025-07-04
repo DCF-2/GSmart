@@ -12,15 +12,35 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Uma janela (JFrame) que funciona como a "Central de Monitoramento".
+ * Ela exibe uma tabela (JTable) com todas as tarefas de pipeline ativas,
+ * mostrando informações cruciais como seu status e tempo de execução.
+ *
+ * Esta classe se comunica com o {@link PipelineManager} para receber atualizações
+ * em tempo real e permite que o usuário interaja com as tarefas (visualizar,
+ * parar ou reiniciar) diretamente pela interface.
+ *
+ * @see PipelineManager
+ * @see PipelineTask
+ */
 public class TaskManagerWindow extends JFrame {
 
     private final PipelineManager pipelineManager;
     private final TaskManagerTableModel tableModel;
 
+    /**
+     * Construtor da Central de Monitoramento.
+     *
+     * @param pipelineManager A instância do gerenciador de pipelines que fornecerá os
+     * dados das tarefas a serem exibidas e gerenciadas.
+     */
     public TaskManagerWindow(PipelineManager pipelineManager) {
         this.pipelineManager = pipelineManager;
         this.tableModel = new TaskManagerTableModel(pipelineManager.getRunningTasks());
@@ -36,14 +56,13 @@ public class TaskManagerWindow extends JFrame {
         taskTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         taskTable.getColumnModel().getColumn(0).setPreferredWidth(350);
 
-        // --- Início da Configuração CORRETA dos Renderizadores ---
         taskTable.getColumnModel().getColumn(1).setCellRenderer(new StatusCellRenderer());
         TableCellRenderer buttonRenderer = new ButtonColumnRenderer();
         taskTable.getColumnModel().getColumn(3).setCellRenderer(buttonRenderer);
         taskTable.getColumnModel().getColumn(4).setCellRenderer(buttonRenderer);
-        // --- Fim da Configuração ---
 
-        // --- INÍCIO DA CORREÇÃO: Lógica de clique movida para um MouseListener ---
+
+
         taskTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -53,10 +72,10 @@ public class TaskManagerWindow extends JFrame {
 
                 PipelineTask task = ((TaskManagerTableModel) taskTable.getModel()).getTaskAt(row);
 
-                // Ação para as colunas de botão
-                if (column == 3) { // Coluna "Visualizar"
+
+                if (column == 3) {
                     pipelineManager.showMonitorFor(task);
-                } else if (column == 4) { // Coluna "Ação"
+                } else if (column == 4) {
                     if (task.getStatus() == TaskStatus.ERROR) {
                         pipelineManager.relaunchPipeline(task);
                     } else {
@@ -64,14 +83,14 @@ public class TaskManagerWindow extends JFrame {
                     }
                 }
 
-                // Ação para limpar o alerta visual
+
                 if (task.hasAlert()) {
                     task.setHasAlert(false);
                     taskTable.repaint();
                 }
             }
         });
-        // --- FIM DA CORREÇÃO ---
+
 
         JScrollPane scrollPane = new JScrollPane(taskTable);
         add(scrollPane, BorderLayout.CENTER);
@@ -80,9 +99,9 @@ public class TaskManagerWindow extends JFrame {
             tableModel.updateTasks(this.pipelineManager.getRunningTasks());
         });
 
-        addWindowListener(new java.awt.event.WindowAdapter() {
+        addWindowListener(new WindowAdapter() {
             @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+            public void windowClosing(WindowEvent windowEvent) {
                 TaskManagerWindow.this.pipelineManager.setOnTaskListUpdated(null);
             }
         });
@@ -92,10 +111,22 @@ public class TaskManagerWindow extends JFrame {
         private final String[] columnNames = {"Tarefa", "Status", "Tempo de Execução", "Visualizar", "Ação"};
         private List<PipelineTask> tasks;
 
+        /**
+         * Atualiza a lista de tarefas exibidas na tabela e notifica a JTable
+         * para que ela se redesenhe, refletindo o estado mais recente.
+         *
+         * @param tasks A nova lista de tarefas ativas vinda do PipelineManager.
+         */
         public TaskManagerTableModel(List<PipelineTask> tasks) {
             this.tasks = new ArrayList<>(tasks);
         }
 
+        /**
+         * Atualiza a lista de tarefas exibidas na tabela e notifica a JTable
+         * para que ela se redesenhe, refletindo o estado mais recente.
+         *
+         * @param newTasks A nova lista de tarefas ativas vinda do PipelineManager.
+         */
         public void updateTasks(List<PipelineTask> newTasks) {
             this.tasks = new ArrayList<>(newTasks);
             fireTableDataChanged();
@@ -128,6 +159,12 @@ public class TaskManagerWindow extends JFrame {
         }
     }
 
+    /**
+     * Renderizador de células customizado para a tabela, responsável por dar
+     * feedback visual sobre o estado da tarefa.
+     * Altera a cor do texto com base no {@link TaskStatus} e destaca a cor de
+     * fundo da linha caso a tarefa tenha um alerta pendente.
+     */
     private class StatusCellRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -159,6 +196,12 @@ public class TaskManagerWindow extends JFrame {
     }
 
     // Renderer para as colunas de AÇÃO. A classe É UM BOTÃO.
+    /**
+     * Renderizador de células que faz com que uma célula da tabela se pareça
+     * com um botão (JButton).
+     * É usado para as colunas de ação ("Visualizar", "Parar", "Reiniciar"),
+     * fornecendo um feedback visual claro de que a célula é clicável.
+     */
     private class ButtonColumnRenderer extends JButton implements TableCellRenderer {
         public ButtonColumnRenderer() {
             setOpaque(true);
