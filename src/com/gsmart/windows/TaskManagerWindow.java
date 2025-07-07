@@ -20,15 +20,15 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Uma janela (JFrame) que funciona como a "Central de Monitoramento".
- * Ela exibe uma tabela (JTable) com todas as tarefas de pipeline ativas,
- * mostrando informações cruciais como seu status e tempo de execução.
  *
- * Esta classe se comunica com o {@link PipelineManager} para receber atualizações
- * em tempo real e permite que o usuário interaja com as tarefas (visualizar,
+ * Ela exibe uma tabela (JTable) com todas as tarefas de pipeline ativas,
+ * mostrando informações cruciais como seu estado, descrição e tempo de execução.
+ * Esta classe comunica-se com o {@code PipelineManager} para receber atualizações
+ * em tempo real e permite que o utilizador interaja com as tarefas (visualizar,
  * parar ou reiniciar) diretamente pela interface.
  *
- * @see PipelineManager
- * @see PipelineTask
+ * @see com.gsmart.pipeline.PipelineManager
+ * @see com.gsmart.pipeline.PipelineTask
  */
 public class TaskManagerWindow extends JFrame {
 
@@ -38,7 +38,7 @@ public class TaskManagerWindow extends JFrame {
     /**
      * Construtor da Central de Monitoramento.
      *
-     * @param pipelineManager A instância do gerenciador de pipelines que fornecerá os
+     * @param pipelineManager A instância do gestor de pipelines que fornecerá os
      * dados das tarefas a serem exibidas e gerenciadas.
      */
     public TaskManagerWindow(PipelineManager pipelineManager) {
@@ -112,10 +112,10 @@ public class TaskManagerWindow extends JFrame {
         private List<PipelineTask> tasks;
 
         /**
-         * Atualiza a lista de tarefas exibidas na tabela e notifica a JTable
-         * para que ela se redesenhe, refletindo o estado mais recente.
+         * Modelo de dados (TableModel) customizado para a JTable da janela de monitoramento.
          *
-         * @param tasks A nova lista de tarefas ativas vinda do PipelineManager.
+         * Ele adapta a lista de objetos {@code PipelineTask} para o formato esperado pela JTable,
+         * definindo o que será exibido em cada célula e como os dados devem ser formatados.
          */
         public TaskManagerTableModel(List<PipelineTask> tasks) {
             this.tasks = new ArrayList<>(tasks);
@@ -162,8 +162,9 @@ public class TaskManagerWindow extends JFrame {
     /**
      * Renderizador de células customizado para a tabela, responsável por dar
      * feedback visual sobre o estado da tarefa.
-     * Altera a cor do texto com base no {@link TaskStatus} e destaca a cor de
-     * fundo da linha caso a tarefa tenha um alerta pendente.
+     *
+     * Altera a cor do texto com base no {@code TaskStatus} e destaca a cor de
+     * fundo da linha caso a tarefa tenha um alerta pendente que ainda não foi visto.
      */
     private class StatusCellRenderer extends DefaultTableCellRenderer {
         @Override
@@ -199,6 +200,7 @@ public class TaskManagerWindow extends JFrame {
     /**
      * Renderizador de células que faz com que uma célula da tabela se pareça
      * com um botão (JButton).
+     *
      * É usado para as colunas de ação ("Visualizar", "Parar", "Reiniciar"),
      * fornecendo um feedback visual claro de que a célula é clicável.
      */

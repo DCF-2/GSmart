@@ -13,17 +13,20 @@ import java.util.Scanner;
 
 /**
  * Classe utilitária responsável por enviar dados para a API de Push do Microsoft Power BI.
- * Ela formata o objeto de dados em um payload JSON, conforme esperado pela API,
- * e realiza a requisição POST para o endpoint especificado.
+ *
+ * Esta classe contém um método estático que formata o objeto de dados num payload JSON,
+ * conforme esperado pela API, e realiza uma requisição POST para o endpoint especificado,
+ * tratando a resposta do servidor.
  */
 public class ExportacaoDadosPWBI {
 
     /**
      * Envia um único objeto de dados para um endpoint da API de Push do Power BI.
-     * Este método encapsula a lógica de conexão HTTP, formatação do corpo da requisição
-     * e tratamento da resposta do servidor.
      *
-     * @param dataObject O objeto JSON contendo os dados a serem enviados.
+     * Este método encapsula a lógica de conexão HTTP, a formatação do corpo da requisição
+     * e o tratamento da resposta do servidor para garantir que os dados foram recebidos com sucesso.
+     *
+     * @param dataObject O objeto {@code JsonObject} contendo os dados a serem enviados.
      * @param powerBiApiUrl A URL completa do conjunto de dados de streaming do Power BI.
      * @throws IllegalArgumentException se a URL do Power BI for nula, vazia ou inválida.
      * @throws Exception se ocorrer um erro na comunicação com a API do Power BI (ex: código de resposta não-2xx).

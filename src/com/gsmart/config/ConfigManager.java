@@ -11,6 +11,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Properties;
 
+/**
+ * Gere a persistência das configurações da aplicação.
+ *
+ * Esta classe é responsável por carregar as configurações do utilizador da última
+ * sessão (como URLs, nomes de utilizador, etc.) de um ficheiro {@code .properties}
+ * quando a aplicação inicia, e por salvar as configurações atuais quando a
+ * aplicação é fechada.
+ *
+ * Isto garante uma melhor experiência do utilizador, que não precisa de reintroduzir
+ * os mesmos dados a cada execução.
+ */
 public class ConfigManager {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigManager.class);

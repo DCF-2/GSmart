@@ -30,18 +30,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Representa a lógica de execução de um único pipeline de dados.
- * Esta classe opera como um "worker" que roda em sua própria thread. Suas
- * responsabilidades principais são:
- * 1. Executar um loop de vida contínuo até que a parada seja solicitada.
- * 2. Buscar dados de uma {@link IDataSource}.
- * 3. Processar os dados brutos, aplicando expressões matemáticas das {@link MetricConfig}.
- * 4. Executar a lógica de negócio (insights, manutenção, previsão) se ativada.
- * 5. Enviar os dados processados para a URL de push do Power BI.
- * 6. Gerenciar seu próprio ciclo de vida, incluindo um robusto mecanismo de
- * tratamento de falhas e reconexão automática com delay progressivo.
  *
- * @see PipelineTask
- * @see GSmartListener
+ * Esta classe opera como um "worker" que roda em sua própria thread e é responsável
+ * por todo o fluxo de trabalho de um monitoramento contínuo. Suas principais
+ * responsabilidades incluem a conexão com a fonte de dados, a coleta periódica,
+ * o processamento e o envio dos dados para o destino final.
+ *
+ * Ela também implementa uma lógica robusta de tratamento de falhas e reconexão
+ * automática para garantir a resiliência do sistema.
+ *
+ * @see com.gsmart.pipeline.PipelineManager
+ * @see com.gsmart.resources.IDataSource
+ * @see com.gsmart.resources.GSmartListener
  */
 public class DataPipeline {
     /** Logger principal para eventos gerais da classe. */
@@ -64,7 +64,7 @@ public class DataPipeline {
     /**
      * Construtor da classe DataPipeline.
      *
-     * @param dataSource A fonte de dados (ex: ThingsBoard, Banco de Dados) de onde as informações serão extraídas.
+     * @param dataSource A fonte de dados (implementação de {@code IDataSource}) de onde as informações serão extraídas.
      * @param powerBiPushUrl A URL da API do Power BI para onde os dados processados serão enviados.
      * @param metricConfigs A lista de configurações de métricas, definindo como os dados brutos devem ser processados.
      * @param logicConfig A configuração contendo as chaves para a lógica de negócio (ex: chave de temperatura).
@@ -84,7 +84,9 @@ public class DataPipeline {
 
     /**
      * Sinaliza para a thread da pipeline que uma reconexão manual e imediata deve ser tentada.
-     * Este método interrompe o sono atual da thread para forçar uma verificação imediata do gatilho.
+     *
+     * Este método interrompe o estado de espera (`sleep`) da thread para forçar uma verificação
+     * imediata do gatilho de reconexão, sendo útil para ações iniciadas pelo usuário.
      */
     public void triggerManualReconnect() {
         logger.info("Sinal de reconexão manual recebido.");
@@ -95,7 +97,9 @@ public class DataPipeline {
 
     /**
      * Solicita que a pipeline pare sua execução de forma graciosa.
-     * A flag de parada será verificada no final do ciclo atual ou durante um loop de reconexão.
+     *
+     * A flag de parada será verificada no final do ciclo atual ou durante um loop de reconexão,
+     * garantindo que a thread termine de forma segura sem interromper uma operação no meio.
      */
     public void requestStop() {
         this.stopRequested = true;
@@ -103,9 +107,10 @@ public class DataPipeline {
 
     /**
      * Ponto de entrada principal para a execução da pipeline na sua thread.
+     *
      * Contém o loop de vida da pipeline, que consiste em um bloco de operação normal
-     * e um bloco de tratamento de falhas e reconexão. O loop só termina quando o método
-     * {@link #requestStop()} é chamado e a flag de parada é acionada.
+     * (coleta, processamento, envio) e um bloco de tratamento de falhas e reconexão.
+     * O loop só termina quando o método {@code requestStop()} é chamado.
      */
     public void run() {
         logger.info("🚀 INICIANDO PIPELINE GENÉRICA COM FONTE: {} 🚀", dataSource.getSourceName());

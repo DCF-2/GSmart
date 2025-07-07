@@ -40,6 +40,7 @@ com\gsmart\resources\TaskStatus.class
 com\gsmart\config\MetricConfig.class
 com\gsmart\pipeline\PipelineTask.class
 com\gsmart\windows\MonitoringWindow$1.class
+com\gsmart\tools\MarkdownGenerator.class
 com\gsmart\sources\ThingsBoardSource.class
 com\gsmart\controller\Manutencao.class
 com\gsmart\MetricTableModel.class

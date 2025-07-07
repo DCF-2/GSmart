@@ -4,6 +4,14 @@ package com.gsmart.controller;
 import com.gsmart.resources.GSmartListener;
 import java.util.Locale;
 
+/**
+ * Modela a lógica de negócio para a manutenção preditiva.
+ *
+ * Esta classe avalia as métricas de telemetria, como fator de potência e temperatura,
+ * para determinar o estado de manutenção de um equipamento ou sistema. Ela pode
+ * acionar alertas através do {@code GSmartListener} quando os limiares de
+ * manutenção são atingidos.
+ */
 public class Manutencao {
     private int ciclosBaixoFator = 0;
     private int ciclosAltaTemperatura = 0;

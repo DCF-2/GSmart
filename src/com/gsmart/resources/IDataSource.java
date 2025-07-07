@@ -5,27 +5,34 @@ import com.google.gson.JsonObject;
 
 /**
  * Define o contrato para todas as fontes de dados do sistema GSmart.
+ *
  * Qualquer classe que represente uma fonte de dados, como um banco de dados
- * ou uma API de IoT, deve implementar esta interface para garantir que a
- * {@link com.gsmart.pipeline.DataPipeline} possa interagir com ela de forma padronizada.
+ * ou uma API de IoT, deve implementar esta interface. Isso garante que a
+ * {@code DataPipeline} possa interagir com qualquer fonte de forma padronizada,
+ * promovendo a extensibilidade do sistema.
  */
 public interface IDataSource {
 
     /**
      * Busca o conjunto de dados mais recente da fonte.
-     * A implementação deve lidar com toda a lógica de comunicação, como
-     * requisições HTTP ou consultas a banco de dados.
      *
-     * @return Um JsonObject contendo os dados de telemetria ou registros.
-     * @throws Exception Se ocorrer qualquer erro durante a comunicação ou coleta dos dados.
+     * A implementação deste método deve lidar com toda a lógica de comunicação,
+     * como realizar requisições HTTP ou executar consultas a um banco de dados.
+     *
+     * @return Um objeto {@code JsonObject} contendo os dados de telemetria ou os
+     * registos obtidos. O formato deve ser consistente para o processamento.
+     * @throws Exception Se ocorrer qualquer erro durante a comunicação ou a
+     * coleta dos dados (ex: falha de rede, erro de autenticação).
      */
     JsonObject fetchData() throws Exception;
 
-/**
- * Retorna um nome descritivo e legível para a fonte de dados.
- * Este nome é usado na interface do usuário para identificar a tarefa.
- *
- * @return Uma String com o nome da fonte (ex: "ThingsBoard" ou "Banco de Dados").
- */
+    /**
+     * Retorna um nome descritivo e legível para a fonte de dados.
+     *
+     * Este nome é utilizado na interface do utilizador para identificar a tarefa
+     * de monitoramento e em logs para facilitar a depuração.
+     *
+     * @return Uma {@code String} com o nome da fonte (ex: "ThingsBoard" ou "Banco de Dados").
+     */
     String getSourceName();
 }

@@ -30,17 +30,13 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
- * A classe principal da interface gráfica (GUI) para a aplicação GSmart.
- * Esta janela (JFrame) serve como o painel de controle central, permitindo ao usuário:
- * <ol>
- * <li>Selecionar e configurar a fonte de dados (ThingsBoard ou Banco de Dados).</li>
- * <li>Conectar-se à fonte para carregar metadados como perfis, dispositivos e tabelas.</li>
- * <li>Carregar, selecionar e configurar as métricas a serem monitoradas.</li>
- * <li>Configurar o destino dos dados (URL de push do Power BI).</li>
- * <li>Lançar, monitorar e parar os pipelines de dados através do {@link PipelineManager}.</li>
- * </ol>
- * A classe gerencia o estado da UI, lida com eventos do usuário e usa {@link SwingWorker}
- * para operações de longa duração (rede/IO) para não congelar a interface.
+ * Classe principal da interface grafica (GUI) da aplicacao GSmart.
+ *
+ * Esta janela serve como o painel de controlo central, permitindo ao utilizador
+ * configurar e gerir os pipelines de dados. A classe e responsavel por toda a
+ * interacao com o utilizador e por orquestrar as operacoes de backend.
+ *
+ * @see com.gsmart.pipeline.PipelineManager
  */
 public class GSmartGui extends JFrame {
     private static final Logger logger = LoggerFactory.getLogger(GSmartGui.class);
@@ -77,11 +73,9 @@ public class GSmartGui extends JFrame {
 
     /**
      * Construtor da classe GSmartGui.
-     * Inicializa e monta todos os componentes da interface gráfica (Swing),
-     * configura os listeners de eventos e carrega as configurações salvas anteriormente.
      *
-     * @param logViewer A instância da janela de log geral.
-     * @param pipelineManager O gerenciador central de pipelines que será controlado por esta GUI.
+     * @param logViewer A instancia da janela de log geral.
+     * @param pipelineManager O gestor central de pipelines.
      */
     public GSmartGui(LogViewerWindow logViewer, PipelineManager pipelineManager) {
         this.globalLogViewer = logViewer;
@@ -256,10 +250,10 @@ public class GSmartGui extends JFrame {
     }
 
     /**
-     * Valida as configurações da UI e lança um novo pipeline.
-     * Coleta todas as informações dos campos (URL do Power BI, métricas selecionadas),
-     * cria um objeto {@link PipelineConfiguration} e o submete ao {@link PipelineManager}
-     * para iniciar a execução em segundo plano.
+     * Valida a configuracao da UI e lanca um novo pipeline.
+     *
+     * Este metodo recolhe as informacoes dos campos da GUI, cria um
+     * objeto de configuracao e o submete ao PipelineManager para execucao.
      */
     private void launchPipeline() {
         if (metricsTable.isEditing()) {
@@ -594,8 +588,12 @@ public class GSmartGui extends JFrame {
 
 /**
  * Modelo de dados (TableModel) para a JTable que exibe as métricas.
- * Gerencia a lista de {@link MetricConfig}, controlando quais dados são exibidos
- * e como eles podem ser editados pelo usuário.
+ *
+ * Esta classe interna gerencia a lista de objetos {@code MetricConfig}, controlando
+ * quais dados são exibidos na tabela e como eles podem ser editados pelo utilizador
+ * (seleção, alias e expressões).
+ * @see javax.swing.table.AbstractTableModel
+ * @see com.gsmart.config.MetricConfig
  */
 class MetricTableModel extends AbstractTableModel {
     private final String[] columnNames = {"Enviar", "Nome Original", "Enviar Como (Alias)", "Função/Expressão (usar 'valor')"};
@@ -655,9 +653,11 @@ class MetricTableModel extends AbstractTableModel {
 
 /**
  * Renderizador de células customizado para a tabela de métricas.
- * Sua principal função é alterar a aparência (fonte e cor) das métricas
- * que são consideradas "de sistema" (timestamp, etc.), diferenciando-as
- * visualmente das métricas normais.
+ *
+ * A sua principal função é alterar a aparência (fonte e cor) das métricas
+ * que são consideradas "de sistema" (como timestamp), diferenciando-as
+ * visualmente das métricas normais para uma melhor legibilidade.
+ * @see javax.swing.table.DefaultTableCellRenderer
  */
 class SystemMetricCellRenderer extends DefaultTableCellRenderer {
     private final Font defaultFont = new Font("Segoe UI", Font.PLAIN, 12);

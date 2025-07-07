@@ -9,10 +9,11 @@ public class MetricConfig {
     private final boolean isSystemMetric;
 
     /**
-     * Construtor principal que permite definir todos os campos.
-     * @param originalName O nome da métrica.
-     * @param isSelected Se ela deve ser enviada por padrão.
-     * @param isSystem Se é uma métrica interna do sistema (para travar o checkbox).
+     * Representa a configuração para uma única métrica a ser processada pela pipeline.
+     *
+     * Esta classe contém todos os detalhes sobre como uma métrica específica, vinda da
+     * fonte de dados, deve ser selecionada, transformada e nomeada. Uma lista destes
+     * objetos é usada pela {@code DataPipeline} para construir o payload final.
      */
     public MetricConfig(String originalName, boolean isSelected, boolean isSystem) {
         this.selected = isSelected;

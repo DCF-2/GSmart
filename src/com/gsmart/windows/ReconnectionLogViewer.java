@@ -12,6 +12,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
+/**
+ * Uma janela de UI dedicada a exibir os logs de reconexão da aplicação.
+ *
+ * Esta classe foca-se em ler o ficheiro de log específico de reconexões
+ * (ex: reconnection.log) e apresentar o seu conteúdo. Isto permite isolar
+ * e analisar facilmente os eventos de perda e restabelecimento de conexão
+ * das pipelines, facilitando a depuração de problemas de rede.
+ */
 public class ReconnectionLogViewer extends JFrame {
 
     private final JTextPane textPane; // MUDANÇA: De JTextArea para JTextPane

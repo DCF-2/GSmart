@@ -15,6 +15,17 @@ import java.awt.event.WindowEvent;
 import java.util.concurrent.TimeUnit; // Import adicionado
 import java.util.function.Consumer;
 
+/**
+ * Representa a janela de monitorização detalhada para uma única tarefa de pipeline.
+ *
+ * Esta janela fornece uma visão em tempo real do estado de uma pipeline específica,
+ * exibindo o seu estado atual (a correr, erro, etc.) e uma área de log para
+ * insights e alertas gerados por essa tarefa.
+ *
+ * Cada instância desta classe está associada a uma única {@code PipelineTask}.
+ *
+ * @see com.gsmart.pipeline.PipelineTask
+ */
 public class MonitoringWindow extends JFrame implements GSmartListener {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitoringWindow.class);

@@ -1,5 +1,12 @@
 package com.gsmart.controller;
 
+/**
+ * Ponto de entrada (entry point) principal para a aplicação GSmart.
+ *
+ * A única responsabilidade desta classe é conter o método {@code main}, que
+ * inicializa e exibe a primeira janela da interface gráfica, a {@code LoginWindow},
+ * dando início à execução do programa.
+ */
 public class CalculoDeCusto {
     // Tarifa base em R$/kWh para a região. Pode ser atualizada pela API.
     private static double tarifaEnergia = 0.70; // Ex: R$ 0,70 por kWh

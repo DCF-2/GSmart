@@ -12,12 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Implementação da interface {@link IDataSource} para se conectar e interagir
+ * Implementação da interface {@code IDataSource} para se conectar e interagir
  * com um banco de dados relacional através de JDBC.
- * Esta classe é projetada para buscar o registro mais recente de uma tabela específica,
- * simulando uma fonte de dados de telemetria.
  *
- * @see IDataSource
+ * Esta classe é projetada para buscar o registo mais recente de uma tabela específica,
+ * simulando uma fonte de dados de telemetria. Ela lida com a conexão, execução de
+ * queries e formatação dos resultados para o formato JSON esperado pela pipeline.
+ *
+ * @see com.gsmart.resources.IDataSource
  * @see java.sql.Connection
  */
 public class DatabaseSource implements IDataSource {
@@ -32,8 +34,8 @@ public class DatabaseSource implements IDataSource {
     /**
      * Construtor da classe DatabaseSource.
      *
-     * @param dbUrl A string de conexão JDBC para o banco de dados.
-     * @param user O nome de usuário para a conexão.
+     * @param dbUrl A string de conexão JDBC para o banco de dados (ex: "jdbc:postgresql://host:port/database").
+     * @param user O nome de utilizador para a conexão.
      * @param password A senha para a conexão.
      * @param tableName O nome da tabela da qual os dados serão buscados.
      * @param selectedColumns A lista de nomes das colunas a serem incluídas na busca.
@@ -53,7 +55,7 @@ public class DatabaseSource implements IDataSource {
     /**
      * Tenta estabelecer uma conexão com o banco de dados para validar a URL e as credenciais.
      *
-     * @return true se a conexão for bem-sucedida e válida, false caso contrário.
+     * @return {@code true} se a conexão for bem-sucedida e válida, {@code false} caso contrário.
      */
     public boolean testConnection() {
         try (Connection conn = getConnection()) {
@@ -70,7 +72,7 @@ public class DatabaseSource implements IDataSource {
      * Busca e retorna uma lista com os nomes de todas as tabelas visíveis no schema 'public'.
      *
      * @return Uma lista de nomes de tabelas.
-     * @throws SQLException se ocorrer um erro de acesso ao banco de dados durante a busca.
+     * @throws java.sql.SQLException se ocorrer um erro de acesso ao banco de dados durante a busca.
      */
     public List<String> getAvailableTables() throws SQLException {
         logger.info("Buscando tabelas disponíveis no banco de dados...");
@@ -149,7 +151,7 @@ public class DatabaseSource implements IDataSource {
      *
      * @param tableName O nome da tabela cujas colunas serão listadas.
      * @return Uma lista contendo os nomes das colunas.
-     * @throws SQLException se a tabela não for encontrada ou se ocorrer um erro de acesso ao banco.
+     * @throws java.sql.SQLException se a tabela não for encontrada ou se ocorrer um erro de acesso ao banco.
      */
     public List<String> getAvailableColumns(String tableName) throws SQLException {
         if (tableName == null || tableName.trim().isEmpty()) {

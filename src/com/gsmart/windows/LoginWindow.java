@@ -8,6 +8,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
+/**
+ * Apresenta a janela de login inicial da aplicação GSmart.
+ *
+ * Esta classe é responsável por obter as credenciais do utilizador e validá-las.
+ * Em caso de sucesso na autenticação, ela fecha-se e abre a janela principal
+ * da aplicação, a {@code GSmartGui}.
+ *
+ * Atualmente, a validação é feita com credenciais fixas no código, mas a
+ * estrutura permite a sua substituição por um mecanismo de autenticação mais robusto.
+ */
 public class LoginWindow extends JFrame {
 
     // --- CREDENCIAIS FIXAS ---

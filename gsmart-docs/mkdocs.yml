@@ -1,5 +1,7 @@
+# Nome do seu projeto
 site_name: GSmart - Documentação Técnica
 
+# Configuração do tema
 theme:
   name: material
   language: pt
@@ -7,20 +9,41 @@ theme:
     primary: 'blue'
     accent: 'cyan'
 
-# Navegação do seu site
+# Estrutura de navegação completa e corrigida
 nav:
   - 'Introdução': 'index.md'
+  - 'Visão Geral do Projeto': 'visao-geral.md'
   - 'API':
-    - 'Visão Geral': 'api/index.md' # Pode criar este arquivo se quiser uma página geral para a API
+    - 'Pacote: com.gsmart':
+      - 'GSmartGui': 'api/com/gsmart/GSmartGui.md'
+      - 'GSmartGui.MetricTableModel': 'api/com/gsmart/MetricTableModel.md'
+      - 'GSmartGui.SystemMetricCellRenderer': 'api/com/gsmart/SystemMetricCellRenderer.md'
+      - 'GSmartGuiLauncher': 'api/com/gsmart/GSmartGuiLauncher.md'
+    - 'Pacote: com.gsmart.config':
+      - 'ConfigManager': 'api/com/gsmart/config/ConfigManager.md'
+      - 'JsonHelper': 'api/com/gsmart/config/JsonHelper.md'
+    - 'Pacote: com.gsmart.conection':
+      - 'ExportacaoDadosPWBI': 'api/com/gsmart/conection/ExportacaoDadosPWBI.md'
+    - 'Pacote: com.gsmart.controller':
+      - 'GeradorDeInsights': 'api/com/gsmart/controller/GeradorDeInsights.md'
+      - 'Manutencao': 'api/com/gsmart/controller/Manutencao.md'
+      - 'PrevisaoFalhas': 'api/com/gsmart/controller/PrevisaoFalhas.md'
+      - 'CalculoDeCusto': 'api/com/gsmart/controller/CalculoDeCusto.md'
     - 'Pacote: com.gsmart.pipeline':
       - 'PipelineManager': 'api/com/gsmart/pipeline/PipelineManager.md'
       - 'DataPipeline': 'api/com/gsmart/pipeline/DataPipeline.md'
       - 'PipelineTask': 'api/com/gsmart/pipeline/PipelineTask.md'
+    - 'Pacote: com.gsmart.resources':
+      - 'IDataSource': 'api/com/gsmart/resources/IDataSource.md'
+      - 'GSmartListener': 'api/com/gsmart/resources/GSmartListener.md'
     - 'Pacote: com.gsmart.sources':
-       - 'IDataSource': 'api/com/gsmart/resources/IDataSource.md'
-       - 'ThingsBoardSource': 'api/com/gsmart/sources/ThingsBoardSource.md'
-       - 'DatabaseSource': 'api/com/gsmart/sources/DatabaseSource.md'
+      - 'ThingsBoardSource': 'api/com/gsmart/sources/ThingsBoardSource.md'
+      - 'DatabaseSource': 'api/com/gsmart/sources/DatabaseSource.md'
     - 'Pacote: com.gsmart.windows':
-       - 'GSmartGui': 'api/com/gsmart/GSmartGui.md'
-       - 'TaskManagerWindow': 'api/com/gsmart/windows/TaskManagerWindow.md'
-    # Adicione as outras classes aqui...
+      - 'TaskManagerWindow': 'api/com/gsmart/windows/TaskManagerWindow.md'
+      - 'TaskManagerWindow.ButtonColumnRenderer': 'api/com/gsmart/windows/TaskManagerWindow.ButtonColumnRenderer.md'
+      - 'TaskManagerWindow.StatusCellRenderer': 'api/com/gsmart/windows/TaskManagerWindow.StatusCellRenderer.md'
+      - 'LogViewerWindow': 'api/com/gsmart/windows/LogViewerWindow.md'
+      - 'LoginWindow': 'api/com/gsmart/windows/LoginWindow.md'
+      - 'MonitoringWindow': 'api/com/gsmart/windows/MonitoringWindow.md'
+      - 'ReconnectionLogViewer': 'api/com/gsmart/windows/ReconnectionLogViewer.md'
