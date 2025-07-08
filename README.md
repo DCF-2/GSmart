@@ -1,9 +1,3 @@
-Of course! A well-styled README.md is the front door to your project and makes a great impression. We can definitely make it more visually appealing using advanced Markdown features that work perfectly on GitHub and GitLab.
-
-I've created a more modern and structured version below. It uses tables, more emojis for visual cues, and a clearer layout to guide the reader.
-
-Just copy and paste this content into your README.md file.
-
 GSmart - IoT Data Processing Pipeline 🚀
 GSmart is a desktop ETL (Extract, Transform, Load) application built with Java Swing. It provides a visual interface to create, manage, and monitor robust data pipelines, connecting to various IoT sources and forwarding processed data to Business Intelligence platforms.
 
