@@ -22,28 +22,33 @@ nav:
     - 'Pacote: com.gsmart.config':
       - 'ConfigManager': 'api/com/gsmart/config/ConfigManager.md'
       - 'JsonHelper': 'api/com/gsmart/config/JsonHelper.md'
+      - 'LogicConfig': 'api/com/gsmart/config/LogicConfig.md'
+      - 'MetricConfig': 'api/com/gsmart/config/MetricConfig.md'
+      - 'PipelineConfiguration': 'api/com/gsmart/config/PipelineConfiguration.md'
     - 'Pacote: com.gsmart.conection':
       - 'ExportacaoDadosPWBI': 'api/com/gsmart/conection/ExportacaoDadosPWBI.md'
     - 'Pacote: com.gsmart.controller':
+      - 'CalculoDeCusto': 'api/com/gsmart/controller/CalculoDeCusto.md'
       - 'GeradorDeInsights': 'api/com/gsmart/controller/GeradorDeInsights.md'
       - 'Manutencao': 'api/com/gsmart/controller/Manutencao.md'
       - 'PrevisaoFalhas': 'api/com/gsmart/controller/PrevisaoFalhas.md'
-      - 'CalculoDeCusto': 'api/com/gsmart/controller/CalculoDeCusto.md'
     - 'Pacote: com.gsmart.pipeline':
-      - 'PipelineManager': 'api/com/gsmart/pipeline/PipelineManager.md'
       - 'DataPipeline': 'api/com/gsmart/pipeline/DataPipeline.md'
+      - 'PipelineManager': 'api/com/gsmart/pipeline/PipelineManager.md'
       - 'PipelineTask': 'api/com/gsmart/pipeline/PipelineTask.md'
     - 'Pacote: com.gsmart.resources':
-      - 'IDataSource': 'api/com/gsmart/resources/IDataSource.md'
       - 'GSmartListener': 'api/com/gsmart/resources/GSmartListener.md'
+      - 'IDataSource': 'api/com/gsmart/resources/IDataSource.md'
+      - 'TaskStatus': 'api/com/gsmart/resources/TaskStatus.md'
     - 'Pacote: com.gsmart.sources':
-      - 'ThingsBoardSource': 'api/com/gsmart/sources/ThingsBoardSource.md'
       - 'DatabaseSource': 'api/com/gsmart/sources/DatabaseSource.md'
+      - 'ThingsBoardSource': 'api/com/gsmart/sources/ThingsBoardSource.md'
     - 'Pacote: com.gsmart.windows':
-      - 'TaskManagerWindow': 'api/com/gsmart/windows/TaskManagerWindow.md'
-      - 'TaskManagerWindow.ButtonColumnRenderer': 'api/com/gsmart/windows/TaskManagerWindow.ButtonColumnRenderer.md'
-      - 'TaskManagerWindow.StatusCellRenderer': 'api/com/gsmart/windows/TaskManagerWindow.StatusCellRenderer.md'
+      - 'ConnectionErrorDialog': 'api/com/gsmart/windows/ConnectionErrorDialog.md'
       - 'LogViewerWindow': 'api/com/gsmart/windows/LogViewerWindow.md'
       - 'LoginWindow': 'api/com/gsmart/windows/LoginWindow.md'
       - 'MonitoringWindow': 'api/com/gsmart/windows/MonitoringWindow.md'
       - 'ReconnectionLogViewer': 'api/com/gsmart/windows/ReconnectionLogViewer.md'
+      - 'TaskManagerWindow': 'api/com/gsmart/windows/TaskManagerWindow.md'
+      - 'TaskManagerWindow.ButtonColumnRenderer': 'api/com/gsmart/windows/TaskManagerWindow.ButtonColumnRenderer.md'
+      - 'TaskManagerWindow.StatusCellRenderer': 'api/com/gsmart/windows/TaskManagerWindow.StatusCellRenderer.md'
