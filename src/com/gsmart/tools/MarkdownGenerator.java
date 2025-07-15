@@ -47,6 +47,7 @@ public class MarkdownGenerator {
         System.out.println("Iniciando geração da documentação em Markdown...");
         cleanOutputDirectory(outputPath);
 
+        // Forçando a reanálise de linguagem do GitHub
         try (Stream<Path> paths = Files.walk(Paths.get(sourcePath))) {
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".java"))
