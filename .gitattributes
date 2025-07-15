@@ -1,12 +1,16 @@
-# Ficheiro .gitattributes para o GSmart
+# Força a linguagem principal como Java
+*.java linguist-language=Java
 
-# Força o GitHub a detetar ficheiros .java como Java, mesmo dentro de subdiretórios.
-*.java linguist-detectable=true
+# Define arquivos ignorados na contagem de linguagens
+*.md linguist-documentation
+*.yml linguist-generated
+*.json linguist-generated
+*.png linguist-generated
+*.jpg linguist-generated
 
-# Garante que os ficheiros de configuração do Maven e de propriedades sejam considerados.
-*.xml linguist-detectable=true
-*.properties linguist-detectable=true
+# Arquivos do Swing GUI Builder (caso use .form)
+*.form linguist-generated
 
-# Garante que os ficheiros de documentação do MkDocs sejam reconhecidos.
-*.md linguist-detectable=true
-*.yml linguist-detectable=true
+# Ignora arquivos gerados pela IDE
+.idea/* linguist-generated
+*.iml linguist-generated
