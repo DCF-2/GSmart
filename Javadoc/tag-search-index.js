@@ -1,0 +1,1 @@
+tagSearchIndex = [{"l":"Principais Responsabilidades:","h":"class com.gsmart.pipeline.PipelineManager","d":"Section","u":"com/gsmart/pipeline/PipelineManager.html#principais-responsabilidades--heading"},{"l":"Serialized Form","h":"","u":"serialized-form.html"}];updateSearchResults();

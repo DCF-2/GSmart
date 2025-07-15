@@ -9,21 +9,25 @@
       
       
       
+        <link rel="prev" href="../../sources/ThingsBoardSource/">
       
       
-      <link rel="icon" href="../../../../../../assets/images/favicon.png">
+        <link rel="next" href="../../GSmartGui/">
+      
+      
+      <link rel="icon" href="../../../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.15">
     
     
       
-        <title>Classe: StatusCellRenderer - GSmart - Documentação Técnica</title>
+        <title>ReconnectionLogger - GSmart - Documentação Técnica</title>
       
     
     
-      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.342714a4.min.css">
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.342714a4.min.css">
       
         
-        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.06af60db.min.css">
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -42,7 +46,7 @@
       
     
     
-    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -66,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#classe-statuscellrenderer" class="md-skip">
+        <a href="#classe-reconnectionlogger" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -82,7 +86,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Cabeçalho">
-    <a href="../../../../../.." title="GSmart - Documentação Técnica" class="md-header__button md-logo" aria-label="GSmart - Documentação Técnica" data-md-component="logo">
+    <a href="../../../../.." title="GSmart - Documentação Técnica" class="md-header__button md-logo" aria-label="GSmart - Documentação Técnica" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -102,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Classe: StatusCellRenderer
+              ReconnectionLogger
             
           </span>
         </div>
@@ -180,7 +184,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navegação" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../../../.." title="GSmart - Documentação Técnica" class="md-nav__button md-logo" aria-label="GSmart - Documentação Técnica" data-md-component="logo">
+    <a href="../../../../.." title="GSmart - Documentação Técnica" class="md-nav__button md-logo" aria-label="GSmart - Documentação Técnica" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -198,7 +202,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../.." class="md-nav__link">
+      <a href="../../../../.." class="md-nav__link">
         
   
   
@@ -220,7 +224,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../../visao-geral/" class="md-nav__link">
+      <a href="../../../../../visao-geral/" class="md-nav__link">
         
   
   
@@ -239,18 +243,20 @@
       
   
   
+    
   
   
+  
     
     
     
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
@@ -266,7 +272,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             API
@@ -296,7 +302,7 @@
   
   
   <span class="md-ellipsis">
-    Pacote: com.gsmart
+    Pacote: com.gsmart.conection
     
   </span>
   
@@ -307,7 +313,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_1">
             <span class="md-nav__icon md-icon"></span>
-            Pacote: com.gsmart
+            Pacote: com.gsmart.conection
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -318,81 +324,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../GSmartGui/" class="md-nav__link">
+      <a href="../../conection/ExportacaoDadosPWBI/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    GSmartGui
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../MetricTableModel.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    GSmartGui.MetricTableModel
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../SystemMetricCellRenderer.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    GSmartGui.SystemMetricCellRenderer
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../GSmartGuiLauncher/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    GSmartGuiLauncher
+    ExportacaoDadosPWBI
     
   </span>
   
@@ -456,7 +393,30 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../config/ConfigManager/" class="md-nav__link">
+      <a href="../../config/AlertRule/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    AlertRule
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../config/ConfigManager/" class="md-nav__link">
         
   
   
@@ -479,7 +439,30 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../config/JsonHelper/" class="md-nav__link">
+      <a href="../../config/InsightRule/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    InsightRule
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../config/JsonHelper/" class="md-nav__link">
         
   
   
@@ -502,30 +485,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../config/LogicConfig.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    LogicConfig
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../config/MetricConfig.md" class="md-nav__link">
+      <a href="../../config/MetricConfig/" class="md-nav__link">
         
   
   
@@ -548,7 +508,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../config/PipelineConfiguration.md" class="md-nav__link">
+      <a href="../../config/PipelineConfiguration.md" class="md-nav__link">
         
   
   
@@ -595,7 +555,7 @@
   
   
   <span class="md-ellipsis">
-    Pacote: com.gsmart.conection
+    Pacote: com.gsmart.controller
     
   </span>
   
@@ -606,7 +566,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_3">
             <span class="md-nav__icon md-icon"></span>
-            Pacote: com.gsmart.conection
+            Pacote: com.gsmart.controller
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -617,12 +577,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../conection/ExportacaoDadosPWBI/" class="md-nav__link">
+      <a href="../../controller/CalculoDeCusto/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    ExportacaoDadosPWBI
+    CalculoDeCusto
     
   </span>
   
@@ -664,7 +624,7 @@
   
   
   <span class="md-ellipsis">
-    Pacote: com.gsmart.controller
+    Pacote: com.gsmart.Gui
     
   </span>
   
@@ -675,7 +635,45 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
-            Pacote: com.gsmart.controller
+            Pacote: com.gsmart.Gui
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4_1" id="__nav_3_4_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Pacote: com.gsmart.windows
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            Pacote: com.gsmart.windows
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -686,12 +684,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../controller/CalculoDeCusto/" class="md-nav__link">
+      <a href="../../Gui/windows/AlertRuleDialog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    CalculoDeCusto
+    AlertRuleDialog
     
   </span>
   
@@ -709,12 +707,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../controller/GeradorDeInsights.md" class="md-nav__link">
+      <a href="../../Gui/windows/ConnectionErrorDialog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    GeradorDeInsights
+    ConnectionErrorDialog
     
   </span>
   
@@ -732,12 +730,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../controller/Manutencao.md" class="md-nav__link">
+      <a href="../../Gui/windows/InsightRuleDialog/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Manutencao
+    InsightRuleDialog
     
   </span>
   
@@ -755,12 +753,250 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../controller/PrevisaoFalhas.md" class="md-nav__link">
+      <a href="../../Gui/windows/LogViewerWindow/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    PrevisaoFalhas
+    LogViewerWindow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Gui/windows/LoginWindow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LoginWindow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Gui/windows/MonitoringWindow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MonitoringWindow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Gui/windows/ReconnectionLogViewer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ReconnectionLogViewer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Gui/windows/TaskManagerWindow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TaskManagerWindow
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Gui/windows/TaskManagerWindow.ButtonColumnRenderer.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TaskManagerWindow.ButtonColumnRenderer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Gui/windows/TaskManagerWindow.StatusCellRenderer.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    TaskManagerWindow.StatusCellRenderer
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Gui/AlertRuleTableModel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    AlertRuleTableModel
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Gui/InsightRuleTableModel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    InsightRuleTableModel
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Gui/MetricTableModel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MetricTableModel
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Gui/SystemMetricCellRenderer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SystemMetricCellRenderer
     
   </span>
   
@@ -824,7 +1060,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../pipeline/DataPipeline/" class="md-nav__link">
+      <a href="../../pipeline/DataPipeline/" class="md-nav__link">
         
   
   
@@ -847,7 +1083,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../pipeline/PipelineManager/" class="md-nav__link">
+      <a href="../../pipeline/PipelineManager/" class="md-nav__link">
         
   
   
@@ -870,7 +1106,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../pipeline/PipelineTask/" class="md-nav__link">
+      <a href="../../pipeline/PipelineTask/" class="md-nav__link">
         
   
   
@@ -939,7 +1175,30 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../resources/GSmartListener/" class="md-nav__link">
+      <a href="../../resources/ConditionType.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    ConditionType
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../resources/GSmartListener/" class="md-nav__link">
         
   
   
@@ -962,7 +1221,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../resources/IDataSource/" class="md-nav__link">
+      <a href="../../resources/IDataSource/" class="md-nav__link">
         
   
   
@@ -985,7 +1244,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../resources/TaskStatus.md" class="md-nav__link">
+      <a href="../../resources/TaskStatus.md" class="md-nav__link">
         
   
   
@@ -1054,7 +1313,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../sources/DatabaseSource/" class="md-nav__link">
+      <a href="../../sources/DatabaseSource/" class="md-nav__link">
         
   
   
@@ -1077,7 +1336,53 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../sources/ThingsBoardSource/" class="md-nav__link">
+      <a href="../../sources/Device.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Device
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sources/DeviceProfile.md" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    DeviceProfile
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sources/ThingsBoardSource/" class="md-nav__link">
         
   
   
@@ -1124,7 +1429,7 @@
   
   
   <span class="md-ellipsis">
-    Pacote: com.gsmart.windows
+    Pacote: com.gsmart.tools
     
   </span>
   
@@ -1135,7 +1440,7 @@
         <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_8">
             <span class="md-nav__icon md-icon"></span>
-            Pacote: com.gsmart.windows
+            Pacote: com.gsmart.tools
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -1146,12 +1451,236 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../windows/ConnectionErrorDialog.md" class="md-nav__link">
+      <a href="../../tools/MarkdownGenerator.md" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    ConnectionErrorDialog
+    MarkdownGenerator
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Pacote: com.gsmart.utils
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_9">
+            <span class="md-nav__icon md-icon"></span>
+            Pacote: com.gsmart.utils
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    ReconnectionLogger
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    ReconnectionLogger
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#descricao-geral" class="md-nav__link">
+    <span class="md-ellipsis">
+      Descrição Geral
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metodos-da-classe" class="md-nav__link">
+    <span class="md-ellipsis">
+      Métodos da Classe
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Métodos da Classe">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#public-static-void-logconnectionloststring-pipelinename" class="md-nav__link">
+    <span class="md-ellipsis">
+      public static void logConnectionLost(String pipelineName)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#public-static-void-logconnectionrestoredstring-pipelinename" class="md-nav__link">
+    <span class="md-ellipsis">
+      public static void logConnectionRestored(String pipelineName)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_10" id="__nav_3_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Pacote: com.gsmart
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_10">
+            <span class="md-nav__icon md-icon"></span>
+            Pacote: com.gsmart
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../GSmartGui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GSmartGui
     
   </span>
   
@@ -1169,150 +1698,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../windows/LogViewerWindow.md" class="md-nav__link">
+      <a href="../../GSmartGuiLauncher/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    LogViewerWindow
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../windows/LoginWindow.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    LoginWindow
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../windows/MonitoringWindow.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    MonitoringWindow
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../windows/ReconnectionLogViewer.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    ReconnectionLogViewer
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../windows/TaskManagerWindow.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    TaskManagerWindow
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../windows/TaskManagerWindow.ButtonColumnRenderer.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    TaskManagerWindow.ButtonColumnRenderer
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../windows/TaskManagerWindow.StatusCellRenderer.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    TaskManagerWindow.StatusCellRenderer
+    GSmartGuiLauncher
     
   </span>
   
@@ -1380,6 +1771,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Métodos da Classe">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#public-static-void-logconnectionloststring-pipelinename" class="md-nav__link">
+    <span class="md-ellipsis">
+      public static void logConnectionLost(String pipelineName)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#public-static-void-logconnectionrestoredstring-pipelinename" class="md-nav__link">
+    <span class="md-ellipsis">
+      public static void logConnectionRestored(String pipelineName)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
     </ul>
@@ -1398,14 +1813,27 @@
 
 
 
-<h1 id="classe-statuscellrenderer">Classe: StatusCellRenderer</h1>
-<p><strong>Pacote:</strong> <code>com.gsmart.Gui.windows</code></p>
+<h1 id="classe-reconnectionlogger">Classe: <code>ReconnectionLogger</code></h1>
+<p><strong>Pacote:</strong> <code>com.gsmart.utils</code></p>
 <h2 id="descricao-geral">Descrição Geral</h2>
-<p>Renderizador de células customizado para a tabela, responsável por dar</p>
-<p>feedback visual sobre o estado da tarefa.</p>
-<p>Altera a cor do texto com base no <code>TaskStatus</code> e destaca a cor de</p>
-<p>fundo da linha caso a tarefa tenha um alerta pendente que ainda não foi visto.</p>
+<p>Classe utilitária dedicada a registar eventos específicos de conexão da pipeline.</p>
+<p>Esta classe utiliza um logger com o nome "ReconnectionLogger", que é configurado</p>
+<p>no ficheiro logback.xml para escrever num ficheiro de log separado (ex: reconnection.log).</p>
+<p>Isto permite isolar e analisar facilmente os eventos de perda e restabelecimento</p>
+<p>de conexão, facilitando a depuração de problemas de rede sem poluir o log geral da aplicação.</p>
 <h2 id="metodos-da-classe">Métodos da Classe</h2>
+<hr />
+<h3 id="public-static-void-logconnectionloststring-pipelinename"><code>public static void logConnectionLost(String pipelineName)</code></h3>
+<p>Regista uma mensagem de "Conexão Perdida" no log de reconexão.</p>
+<ul>
+<li><strong>Parâmetro:</strong> <code>pipelineName</code> - O nome da pipeline que perdeu a conexão.</li>
+</ul>
+<hr />
+<h3 id="public-static-void-logconnectionrestoredstring-pipelinename"><code>public static void logConnectionRestored(String pipelineName)</code></h3>
+<p>Regista uma mensagem de "Conexão Restabelecida" no log de reconexão.</p>
+<ul>
+<li><strong>Parâmetro:</strong> <code>pipelineName</code> - O nome da pipeline que restabeleceu a conexão.</li>
+</ul>
 
 
 
@@ -1454,10 +1882,10 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../../../../../..", "features": [], "search": "../../../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../../../../..", "features": [], "search": "../../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado para \u00e1rea de transfer\u00eancia", "clipboard.copy": "Copiar para \u00e1rea de transfer\u00eancia", "search.result.more.one": "Mais 1 nesta p\u00e1gina", "search.result.more.other": "Mais # nesta p\u00e1gina", "search.result.none": "Nenhum resultado encontrado", "search.result.one": "1 resultado encontrado", "search.result.other": "# resultados encontrados", "search.result.placeholder": "Digite para iniciar a busca", "search.result.term.missing": "Ausente", "select.version": "Selecione a vers\u00e3o"}, "version": null}</script>
     
     
-      <script src="../../../../../../assets/javascripts/bundle.56ea9cef.min.js"></script>
+      <script src="../../../../../assets/javascripts/bundle.56ea9cef.min.js"></script>
       
     
   </body>

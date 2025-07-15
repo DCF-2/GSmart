@@ -1,139 +1,130 @@
-GSmart - IoT Data Processing Pipeline 🚀
-GSmart is a desktop ETL (Extract, Transform, Load) application built with Java Swing. It provides a visual interface to create, manage, and monitor robust data pipelines, connecting to various IoT sources and forwarding processed data to Business Intelligence platforms.
 
-✨ Key Features
-Feature
+# GSmart - Pipeline de Processamento de Dados IoT v5.0 🚀
 
-Description
+O **GSmart** é uma aplicação de desktop ETL (Extração, Transformação e Carga) construída com Java Swing. Ele fornece uma interface visual para criar, gerir e monitorizar robustos pipelines de dados, conectando-se a várias fontes de IoT e enviando os dados processados para plataformas de Business Intelligence.
 
-Multi-Source Connectivity
+A versão 5.0 introduz um **motor de regras duplo e totalmente configurável**, transformando o GSmart numa plataforma de inteligência proativa.
 
-Natively connect to the ThingsBoard IoT platform or mirror databases via PostgreSQL.
+---
 
-Real-Time Processing
+### ✨ Principais Funcionalidades
 
-Each pipeline runs on a separate thread to ensure a responsive UI while processing data.
+| Funcionalidade                | Descrição |
+|------------------------------|-----------|
+| **Conectividade Multi-Fonte** | Conecte-se nativamente à API da plataforma de IoT **ThingsBoard** ou a bases de dados espelho via **JDBC**. |
+| **Processamento em Tempo Real** | Cada pipeline é executado numa thread separada para garantir uma UI responsiva durante o processamento de dados. |
+| **Motor de Alertas Configurável** | Crie regras personalizadas que disparam notificações críticas e imediatas via **MQTT** quando as condições são satisfeitas. |
+| **Motor de Alarmes (Insights)** | Defina regras para gerar inteligência e observações proativas (ex: "Consumo de energia elevado"), que são exibidas na aplicação e enviadas para um tópico MQTT separado. |
+| **Exportação para Power BI** | Envie os dados processados diretamente para um conjunto de dados de streaming no **Microsoft Power BI**. |
+| **Persistência de Configuração** | Salva as suas últimas configurações de URLs e fontes de dados para um fluxo de trabalho mais rápido. |
 
-Embedded Business Logic
+---
 
-Generate insights, predict failures, and analyze costs with integrated controller modules.
+### 🏛️ Arquitetura e Fluxo de Dados (v5.0)
 
-Power BI Export
+O projeto segue uma arquitetura modular que separa a interface, a orquestração e o processamento de dados. O diagrama abaixo ilustra o novo fluxo de dados.
 
-Send processed data directly to a streaming dataset in Microsoft Power BI.
-
-Intuitive GUI
-
-A user-friendly interface to configure all pipelines, data sources, and metrics visually.
-
-Configuration Persistence
-
-Saves your last-used settings for URLs and data sources for a faster workflow.
-
-
-Exportar para as Planilhas
-🏛️ Architecture Overview
-The project follows a multi-layered architecture that separates the UI, control logic, and data access. The diagram below illustrates the main data flow.
-
-Snippet de código
-
+```mermaid
 graph TD
-subgraph "Presentation Layer (UI)"
-A["<br>fa:fa-user User<br>GSmartGui"]
-F["<br>fa:fa-bell GSmartListener<br>Updates UI"]
-end
+    subgraph "Interface do Utilizador (GSmartGui)"
+        A["<br>fa:fa-user Utilizador<br>Configura Regras"]
+        F["<br>fa:fa-desktop Janela de Monitorização<br>Recebe Alarmes"]
+    end
 
-    subgraph "Service Layer (Core)"
-        B["<br>fa:fa-cogs PipelineManager<br>Orchestrator"]
+    subgraph "Núcleo da Aplicação"
+        B["<br>fa:fa-cogs PipelineManager<br>Orquestrador"]
         C{"<br>fa:fa-sync-alt DataPipeline<br>(Worker Thread)"}
     end
 
-    subgraph "Data Access Layer"
-        D["<br>fa:fa-database IDataSource<br>(Interface)"]
-        D1["fa:fa-cloud ThingsBoardSource"]
-        D2["fa:fa-server DatabaseSource"]
+    subgraph "Fontes e Destinos"
+        D["<br>fa:fa-database Fontes de Dados<br>(IDataSource)"]
+        H["<br>fa:fa-chart-bar Power BI<br>(Destino)"]
+        I["<br>fa:fa-paper-plane Node-RED / MQTT<br>(Destino)"]
     end
 
-    subgraph "Business Logic Layer"
-        E["<br>fa:fa-brain Controllers<br>(Analysis)"]
-    end
+    %% Fluxo
+    A -- "1. Inicia Pipeline" --> B
+    B -- "2. Lança Tarefa" --> C
+    C -- "3. Busca Dados" --> D
+    C -- "4. Avalia Regras" --o E1["fa:fa-bolt Alertas"] & E2["fa:fa-lightbulb Alarmes"]
+    E1 -- "5a. Notificação Crítica" --> I
+    E2 -- "5b. Insight Proativo" --> I
+    E2 -- "5c. Exibe na GUI" --> F
+    C -- "6. Envia Dados" --> H
 
-    subgraph "Integration Layer"
-        G["<br>fa:fa-paper-plane ExportData<br>to Power BI"]
-        H["<br>fa:fa-chart-bar Power BI<br>(Destination)"]
-    end
+    %% Estilos
+    style C fill:#ffdead,stroke:#333,stroke-width:4px
+    style A fill:#e6e6fa,stroke:#333,stroke-width:2px
+    style H fill:#add8e6,stroke:#333,stroke-width:2px
+    style I fill:#90ee90,stroke:#333,stroke-width:2px
+```
 
-    A -- "1. Configure" --> B
-    B -- "2. Launch" --> C
-    C -- "3. Fetch()" --> D
-    D -.-> D1 & D2
-    C -- "4. Process()" --> E
-    C -- "6. Send()" --> G
-    G --> H
-    C -- "5. Notify()" --> F
-    F --> A
-🛠️ Tech Stack
-Language: Java 17
+---
 
-Framework: Swing (for the GUI)
+### 🛠️ Tecnologias Utilizadas
 
-Build Tool: Apache Maven
+- **Linguagem:** Java 17
+- **Framework:** Swing (para a GUI)
+- **Build:** Apache Maven
+- **Bibliotecas Principais:**
+    - **OkHttp:** Para requisições HTTP (API do ThingsBoard, Node-RED)
+    - **PostgreSQL JDBC Driver:** Para conectividade com a base de dados
+    - **Gson:** Para parsing e manipulação de JSON
+    - **SLF4J & Logback:** Para um sistema de logging robusto
+    - **exp4j:** Para avaliação de expressões matemáticas nas métricas
+    - **JavaParser:** Para a geração automática de documentação
 
-Libraries:
+---
 
-OkHttp: For HTTP requests to the ThingsBoard API.
+### ⚙️ Como Construir e Executar
 
-PostgreSQL JDBC Driver: For database connectivity.
+Este projeto é gerido pelo Apache Maven.
 
-Gson: For JSON parsing and manipulation.
+#### Pré-requisitos
 
-SLF4J & Logback: For robust logging.
+- Java JDK 17 ou superior
+- Apache Maven configurado nas variáveis de ambiente do seu sistema
 
-jSerialComm: For serial port communication.
+#### Passos para Construir
 
-exp4j: For evaluating mathematical expressions.
+1. Clone o repositório:
+    ```bash
+    git clone [URL_DO_SEU_REPOSITORIO]
+    cd GSmart
+    ```
 
-⚙️ How to Build and Run
-This project is managed by Apache Maven.
+2. Construa com o Maven:
+    ```bash
+    mvn clean package
+    ```
 
-Prerequisites
-Java JDK 17 or higher.
+Isso irá compilar o código, resolver as dependências e criar um JAR executável na pasta `target/`.
 
-Apache Maven configured in your system's PATH.
+#### Executar a Aplicação
 
-Build Steps
-Clone the repository:
+Após a construção, o JAR principal estará disponível. Execute-o com o seguinte comando:
 
-Bash
-
-git clone [YOUR_REPOSITORY_URL]
-
-cd GSmart
-
-Build with Maven:
-Run the following command in the project root. This will compile the code, resolve dependencies, and create an executable JAR in the target/ folder.
-
-Bash
-
-mvn clean package
-Run the Application:
-After the build is complete, the main JAR will be available. Run it with the following command:
-
-Bash
-
+```bash
 java -jar target/GSmart-Processador-gui.jar
+```
 
-📖 Documentation
-The complete project documentation, including the API reference, can be viewed by generating it locally.
+---
 
-Navigate to the documentation folder:
+### 📖 Documentação
 
-Bash
+A documentação completa do projeto, incluindo a referência da API, pode ser visualizada localmente.
 
-cd gsmart-docs
-Start the local server:
+1. Navegue para a pasta da documentação:
+    ```bash
+    cd gsmart-docs
+    ```
 
-Bash
+2. Inicie o servidor local:
+    ```bash
+    mkdocs serve
+    ```
 
-mkdocs serve
-Open your browser and go to http://127.0.0.1:8000.
+3. Acesse via navegador:
+    ```
+    http://127.0.0.1:8000
+    ```
