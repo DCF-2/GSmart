@@ -1,0 +1,12 @@
+# Ficheiro .gitattributes para o GSmart
+
+# Força o GitHub a detetar ficheiros .java como Java, mesmo dentro de subdiretórios.
+*.java linguist-detectable=true
+
+# Garante que os ficheiros de configuração do Maven e de propriedades sejam considerados.
+*.xml linguist-detectable=true
+*.properties linguist-detectable=true
+
+# Garante que os ficheiros de documentação do MkDocs sejam reconhecidos.
+*.md linguist-detectable=true
+*.yml linguist-detectable=true
