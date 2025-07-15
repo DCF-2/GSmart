@@ -10,51 +10,38 @@ O seu objetivo principal é conectar-se a fontes de dados como a plataforma de I
 
 O projeto segue uma arquitetura modular que separa a interface do utilizador, a gestão de pipelines e o processamento de regras. O diagrama abaixo ilustra o fluxo principal da aplicação na sua versão atual.
 
-# **Mermaid**
-```
+
+```mermaid
 graph TD
     subgraph "Interface do Utilizador (GSmartGui)"
-        A[/"Utilizador configura Métricas, Alertas e Alarmes"/]
-        F(Janela de Monitorização)
+        A["<br>fa:fa-user Utilizador<br>Configura Regras"]
+        F["<br>fa:fa-desktop Janela de Monitorização<br>Recebe Alarmes"]
     end
 
     subgraph "Núcleo da Aplicação"
-        B(PipelineManager)
-        C{DataPipeline <br> (Thread)}
-    end
-    
-    subgraph "Fontes de Dados"
-        D(IDataSource)
-        D1[ThingsBoardSource]
-        D2[DatabaseSource]
-    end
-    
-    subgraph "Motor de Regras Configurável"
-        E(Avaliação de Regras)
-        E1[Regras de Alerta]
-        E2[Regras de Alarme]
-    end
-    
-    subgraph "Serviços Externos"
-        G[Power BI]
-        H(Node-RED / Broker MQTT)
+        B["<br>fa:fa-cogs PipelineManager<br>Orquestrador"]
+        C{"<br>fa:fa-sync-alt DataPipeline<br>(Worker Thread)"}
     end
 
-    %% Fluxo Principal
-    A -- "1. Inicia Pipeline com Configs" --> B
+    subgraph "Fontes e Destinos"
+        D["<br>fa:fa-database Fontes de Dados<br>(IDataSource)"]
+        H["<br>fa:fa-chart-bar Power BI<br>(Destino)"]
+        I["<br>fa:fa-paper-plane Node-RED / MQTT<br>(Destino)"]
+    end
+
+    %% Fluxo
+    A -- "1. Inicia Pipeline" --> B
     B -- "2. Lança Tarefa" --> C
     C -- "3. Busca Dados" --> D
-    D -- " " --> D1 & D2
-    D -- "4. Retorna Dados" --> C
-    C -- "5. Avalia Regras" --> E
-    E -- "Utiliza" --> E1 & E2
-    E -- "6a. Dispara Alerta Crítico" --> H
-    E -- "6b. Gera Alarme Proativo" --> H & F
-    C -- "7. Envia Dados" --> G
-    
+    C -- "4. Avalia Regras" --o E1["fa:fa-bolt Alertas"] & E2["fa:fa-lightbulb Alarmes"]
+    E1 -- "5a. Notificação Crítica" --> I
+    E2 -- "5b. Insight Proativo" --> I
+    E2 -- "5c. Exibe na GUI" --> F
+    C -- "6. Envia Dados" --> H
+
     %% Estilos
     style C fill:#ffdead,stroke:#333,stroke-width:4px
     style A fill:#e6e6fa,stroke:#333,stroke-width:2px
-    style H fill:#90ee90,stroke:#333,stroke-width:2px
-    style G fill:#add8e6,stroke:#333,stroke-width:2px 
+    style H fill:#add8e6,stroke:#333,stroke-width:2px
+    style I fill:#90ee90,stroke:#333,stroke-width:2px
 ```
