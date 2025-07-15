@@ -1,4 +1,4 @@
-# Classe: PipelineTask
+# Classe: `PipelineTask`
 
 **Pacote:** `com.gsmart.pipeline`
 
@@ -12,9 +12,9 @@ a configuração original e as janelas de UI associadas (monitoramento e erro).
   
 É o principal objeto gerido pelo `PipelineManager`.
 
-- **`@see`**: com.gsmart.pipeline.PipelineManager
-- **`@see`**: com.gsmart.pipeline.DataPipeline
-- **`@see`**: com.gsmart.windows.MonitoringWindow
+- **Ver Também:** com.gsmart.pipeline.PipelineManager
+- **Ver Também:** com.gsmart.pipeline.DataPipeline
+- **Ver Também:** MonitoringWindow
 
 
 ## Métodos da Classe
@@ -69,4 +69,64 @@ Define o diálogo de erro de conexão associado a esta tarefa.
 ### `public void clearConnectionErrorDialog()`
 
 Limpa a referência ao diálogo de erro de conexão.
+
+---
+
+### `public void setStatus(TaskStatus status)`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public MonitoringWindow getMonitoringWindow()`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public ConnectionErrorDialog getConnectionErrorDialog()`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public String getId()`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public String getDescription()`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public TaskStatus getStatus()`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public PipelineConfiguration getOriginalConfig()`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public boolean hasAlert()`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public void setHasAlert(boolean hasAlert)`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public long getStartTime()`
+
+*Nenhuma documentação de método fornecida.*
 

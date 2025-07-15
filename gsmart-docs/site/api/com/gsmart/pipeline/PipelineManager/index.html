@@ -347,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../MetricTableModel/" class="md-nav__link">
+      <a href="../../MetricTableModel.md" class="md-nav__link">
         
   
   
@@ -370,7 +370,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../SystemMetricCellRenderer/" class="md-nav__link">
+      <a href="../../SystemMetricCellRenderer.md" class="md-nav__link">
         
   
   
@@ -715,7 +715,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../controller/GeradorDeInsights/" class="md-nav__link">
+      <a href="../../controller/GeradorDeInsights.md" class="md-nav__link">
         
   
   
@@ -738,7 +738,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../controller/Manutencao/" class="md-nav__link">
+      <a href="../../controller/Manutencao.md" class="md-nav__link">
         
   
   
@@ -761,7 +761,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../controller/PrevisaoFalhas/" class="md-nav__link">
+      <a href="../../controller/PrevisaoFalhas.md" class="md-nav__link">
         
   
   
@@ -936,15 +936,6 @@
   <a href="#public-listpipelinetask-getrunningtasks" class="md-nav__link">
     <span class="md-ellipsis">
       public List&lt;PipelineTask&gt; getRunningTasks()
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#public-void-launchpipelinepipelineconfiguration-config" class="md-nav__link">
-    <span class="md-ellipsis">
-      public void launchPipeline(PipelineConfiguration config)
     </span>
   </a>
   
@@ -1297,7 +1288,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/LogViewerWindow/" class="md-nav__link">
+      <a href="../../windows/LogViewerWindow.md" class="md-nav__link">
         
   
   
@@ -1320,7 +1311,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/LoginWindow/" class="md-nav__link">
+      <a href="../../windows/LoginWindow.md" class="md-nav__link">
         
   
   
@@ -1343,7 +1334,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/MonitoringWindow/" class="md-nav__link">
+      <a href="../../windows/MonitoringWindow.md" class="md-nav__link">
         
   
   
@@ -1366,7 +1357,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/ReconnectionLogViewer/" class="md-nav__link">
+      <a href="../../windows/ReconnectionLogViewer.md" class="md-nav__link">
         
   
   
@@ -1389,7 +1380,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/TaskManagerWindow/" class="md-nav__link">
+      <a href="../../windows/TaskManagerWindow.md" class="md-nav__link">
         
   
   
@@ -1412,7 +1403,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/TaskManagerWindow.ButtonColumnRenderer/" class="md-nav__link">
+      <a href="../../windows/TaskManagerWindow.ButtonColumnRenderer.md" class="md-nav__link">
         
   
   
@@ -1435,7 +1426,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/TaskManagerWindow.StatusCellRenderer/" class="md-nav__link">
+      <a href="../../windows/TaskManagerWindow.StatusCellRenderer.md" class="md-nav__link">
         
   
   
@@ -1530,15 +1521,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#public-void-launchpipelinepipelineconfiguration-config" class="md-nav__link">
-    <span class="md-ellipsis">
-      public void launchPipeline(PipelineConfiguration config)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#public-void-relaunchpipelinepipelinetask-oldtask" class="md-nav__link">
     <span class="md-ellipsis">
       public void relaunchPipeline(PipelineTask oldTask)
@@ -1589,26 +1571,31 @@
 <h1 id="classe-pipelinemanager">Classe: PipelineManager</h1>
 <p><strong>Pacote:</strong> <code>com.gsmart.pipeline</code></p>
 <h2 id="descricao-geral">Descrição Geral</h2>
-<p>Gerencia o ciclo de vida de múltiplas tarefas de pipeline (<code>PipelineTask</code>).</p>
-<p>Esta classe é o orquestrador central que lança, reinicia e para os pipelines.</p>
-<h3>Responsabilidades:</h3>
+<p>Orquestrador central para o ciclo de vida de múltiplas tarefas de pipeline (PipelineTask).</p>
+<p>Esta classe atua como o "maestro" do sistema, responsável por instanciar,</p>
+<p>gerir e finalizar os processos de monitorização de dados. Ela faz a ponte</p>
+<p>entre as configurações definidas na com.gsmart.GSmartGui e a execução</p>
+<p>real das DataPipeline em threads separadas.</p>
+<h3>Principais Responsabilidades:</h3>
 
 <ul>
 
-<li>Lançar novos pipelines com base em uma configuração.</li>
+<li>Lançar novas tarefas de pipeline com base numa com.gsmart.config.PipelineConfiguration fornecida pela GUI.</li>
 
-<li>Manter uma lista de todas as tarefas em execução.</li>
+<li>Manter e fornecer uma lista atualizada de todas as tarefas em execução.</li>
 
-<li>Gerenciar a comunicação entre a lógica de fundo e a interface gráfica.</li>
+<li>Gerir a comunicação entre a lógica de fundo (`DataPipeline`) e a interface gráfica (GUI), utilizando um com.gsmart.resources.GSmartListener.</li>
 
-<li>Exibir janelas de monitoramento e diálogos de erro de conexão.</li>
+<li>Controlar a exibição de janelas de monitorização individuais e diálogos de erro de conexão.</li>
+
+<li>Fornecer métodos para reiniciar ou parar tarefas de forma segura.</li>
 
 </ul>
 
 <ul>
 <li><strong><code>@see</code></strong>: com.gsmart.pipeline.PipelineTask</li>
 <li><strong><code>@see</code></strong>: com.gsmart.pipeline.DataPipeline</li>
-<li><strong><code>@see</code></strong>: com.gsmart.resources.GSmartListener</li>
+<li><strong><code>@see</code></strong>: com.gsmart.GSmartGui</li>
 </ul>
 <h2 id="metodos-da-classe">Métodos da Classe</h2>
 <hr />
@@ -1627,16 +1614,6 @@
 <ul>
 <li><strong><code>@return</code></strong>: Uma nova lista contendo as tarefas em execução.</li>
 </ul>
-<hr />
-<h3 id="public-void-launchpipelinepipelineconfiguration-config"><code>public void launchPipeline(PipelineConfiguration config)</code></h3>
-<p>Lança um novo pipeline com base em uma configuração fornecida.</p>
-<p>Este método instancia e configura todos os componentes necessários para uma nova</p>
-<p>tarefa de monitoramento, incluindo a <code>DataPipeline</code>, a <code>Thread</code> de execução</p>
-<p>e o listener de eventos, encapsulando tudo em um objeto <code>PipelineTask</code>.</p>
-<ul>
-<li><strong>Parâmetro:</strong> <code>config</code> - O objeto de configuração contendo todos os parâmetros necessários</li>
-</ul>
-<p>para o pipeline, como a fonte de dados, métricas e URL de destino.</p>
 <hr />
 <h3 id="public-void-relaunchpipelinepipelinetask-oldtask"><code>public void relaunchPipeline(PipelineTask oldTask)</code></h3>
 <p>Para uma tarefa antiga e lança uma nova com base na configuração original da tarefa.</p>

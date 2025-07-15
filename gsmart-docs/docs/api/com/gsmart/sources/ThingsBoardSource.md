@@ -1,4 +1,4 @@
-# Classe: ThingsBoardSource
+# Classe: `ThingsBoardSource`
 
 **Pacote:** `com.gsmart.sources`
 
@@ -11,8 +11,8 @@ Esta classe utiliza a biblioteca OkHttp para realizar chamadas à API REST do Th
 para autenticação, busca de metadados (perfis de dispositivo, dispositivos) e  
 coleta de dados de telemetria em tempo real.
 
-- **`@see`**: com.gsmart.resources.IDataSource
-- **`@see`**: okhttp3.OkHttpClient
+- **Ver Também:** com.gsmart.resources.IDataSource
+- **Ver Também:** okhttp3.OkHttpClient
 
 
 ## Métodos da Classe
@@ -25,8 +25,14 @@ Tenta autenticar no servidor ThingsBoard para validar a URL e as credenciais pad
 É um método de baixo custo para verificar a conectividade básica antes de  
 prosseguir com operações mais complexas.
 
-- **`@return`**: `true` se a autenticação for bem-sucedida, `false` caso contrário.
+- **Retorna:** `true` se a autenticação for bem-sucedida, `false` caso contrário.
 
+
+---
+
+### `public String getSourceName()`
+
+*Nenhuma documentação de método fornecida.*
 
 ---
 
@@ -45,7 +51,7 @@ requisição de login e armazena o token para uso em chamadas futuras.
 
 Busca no servidor ThingsBoard a lista de todos os perfis de dispositivo disponíveis.
 
-- **`@return`**: Uma lista de objetos `DeviceProfile`, cada um contendo o nome e o ID de um perfil.
+- **Retorna:** Uma lista de objetos `DeviceProfile`, cada um contendo o nome e o ID de um perfil.
 - **`@throws`**: se a requisição à API falhar.
 
 
@@ -57,9 +63,15 @@ Busca no servidor ThingsBoard a lista de todos os dispositivos associados a um
 perfil de dispositivo específico.
 
 - **Parâmetro:** `deviceProfileId` - O ID do perfil de dispositivo cujos dispositivos serão listados.
-- **`@return`**: Uma lista de objetos `Device`.
+- **Retorna:** Uma lista de objetos `Device`.
 - **`@throws`**: se a requisição à API falhar.
 
+
+---
+
+### `public JsonObject fetchData() throws IOException`
+
+*Nenhuma documentação de método fornecida.*
 
 ---
 
@@ -68,9 +80,15 @@ perfil de dispositivo específico.
 Busca no servidor ThingsBoard a lista de todas as chaves de telemetria  
 disponíveis para o dispositivo atualmente configurado.
 
-- **`@return`**: Uma lista de `String` contendo os nomes das chaves (ex: "temperatura", "humidade").
+- **Retorna:** Uma lista de `String` contendo os nomes das chaves (ex: "temperatura", "humidade").
 - **`@throws`**: se a requisição à API falhar.
 
+
+---
+
+### `public void testConnectionAndThrow() throws IOException`
+
+*Nenhuma documentação de método fornecida.*
 
 ---
 

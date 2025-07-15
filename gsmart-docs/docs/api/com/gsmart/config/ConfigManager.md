@@ -1,4 +1,4 @@
-# Classe: ConfigManager
+# Classe: `ConfigManager`
 
 **Pacote:** `com.gsmart.config`
 
@@ -23,7 +23,7 @@ os mesmos dados a cada execução.
 Carrega as propriedades do arquivo de configuração.  
 Se o arquivo não existir, retorna um objeto de propriedades vazio.
 
-- **`@return`**: Um objeto Properties com as configurações carregadas.
+- **Retorna:** Um objeto Properties com as configurações carregadas.
 
 
 ---

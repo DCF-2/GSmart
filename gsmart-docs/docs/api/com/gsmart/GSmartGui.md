@@ -1,64 +1,164 @@
-# Classe: GSmartGui
+# Classe: `GSmartGui`
 
 **Pacote:** `com.gsmart`
 
 ## Descrição Geral
 
-Classe principal da interface grafica (GUI) da aplicacao GSmart.  
+Classe principal da interface gráfica (GUI) e ponto de controlo central da aplicação GSmart.  
   
-Esta janela serve como o painel de controlo central, permitindo ao utilizador  
-configurar e gerir os pipelines de dados. A classe e responsavel por toda a  
-interacao com o utilizador e por orquestrar as operacoes de backend.
+Esta janela orquestra toda a interação com o utilizador, permitindo a configuração  
+e gestão completa dos pipelines de dados. As suas principais responsabilidades incluem:  
+<ul>  
+<li>Configurar a fonte de dados (ThingsBoard ou Base de Dados).</li>  
+<li>Gerir a seleção e transformação de métricas a serem processadas.</li>  
+<li>Permitir a criação e edição de Regras de Alerta (notificações críticas).</li>  
+<li>Permitir a criação e edição de Regras de Alarme (insights inteligentes).</li>  
+<li>Iniciar, parar e monitorizar as tarefas de pipeline através do `PipelineManager`.</li>  
+</ul>
 
-- **`@see`**: com.gsmart.pipeline.PipelineManager
+- **Ver Também:** com.gsmart.pipeline.PipelineManager
 
 
 ## Métodos da Classe
 
 ---
 
+### `private void showReconnectionLog()`
+
+Exibe a janela de logs de reconexão.  
+Se a janela ainda não existir, uma nova é criada. Se já existir,  
+ela é trazida para a frente e o seu conteúdo é recarregado.
+
+---
+
+### `private void loadConfiguration()`
+
+Carrega as configurações da última sessão a partir do ficheiro gsmart.properties.  
+Isto inclui URLs e a última fonte de dados selecionada, melhorando a experiência do utilizador.
+
+---
+
+### `private void saveConfiguration()`
+
+Salva as configurações atuais (URLs, etc.) no ficheiro gsmart.properties.  
+Este método é chamado automaticamente quando a janela da aplicação é fechada.
+
+---
+
 ### `private void launchPipeline()`
 
-Valida a configuracao da UI e lanca um novo pipeline.  
-  
-Este metodo recolhe as informacoes dos campos da GUI, cria um  
-objeto de configuracao e o submete ao PipelineManager para execucao.
+Orquestra o lançamento de uma nova tarefa de pipeline.  
+Recolhe todas as configurações da interface (fonte de dados, métricas, regras de alerta e alarme),  
+cria um objeto `PipelineConfiguration` e entrega-o ao `PipelineManager` para execução.
+
+---
+
+### `private void stopAllPipelines()`
+
+Delega ao PipelineManager a tarefa de parar todas as pipelines em execução,  
+geralmente após uma confirmação do utilizador.
+
+---
+
+### `private void showTaskManager()`
+
+Exibe a "Central de Monitoramento".  
+Se a janela ainda não existir, uma nova é criada. Se já existir,  
+é simplesmente trazida para a frente.
+
+---
+
+### `private void toggleSourceFields()`
+
+Alterna a visibilidade dos painéis de configuração de fonte de dados (ThingsBoard ou Base de Dados)  
+com base na seleção do utilizador no JComboBox principal.
+
+---
+
+### `private String getThingsboardUrl()`
+
+Obtém e valida a URL do servidor ThingsBoard a partir do campo de texto correspondente.  
+Lança uma IllegalStateException se o campo estiver vazio.
+
+- **Retorna:** A URL do ThingsBoard como uma String.
+
 
 ---
 
 ### `private void connectToThingsboard()`
 
-Inicia uma tentativa de conexão com a fonte de dados (ThingsBoard/Banco de Dados)  
-em uma thread de trabalho em segundo plano usando SwingWorker.  
-Atualiza a UI com o status da conexão (sucesso ou falha) sem congelar a aplicação.
+Tenta estabelecer uma conexão com o servidor ThingsBoard.  
+Se bem-sucedido, ativa os seletores de perfil de dispositivo e carrega os perfis disponíveis.  
+Utiliza um `SwingWorker` para não bloquear a interface durante a conexão.
 
 ---
 
 ### `private void connectToDatabase()`
 
-Inicia uma tentativa de conexão com a fonte de dados (ThingsBoard/Banco de Dados)  
-em uma thread de trabalho em segundo plano usando SwingWorker.  
-Atualiza a UI com o status da conexão (sucesso ou falha) sem congelar a aplicação.
+Tenta estabelecer uma conexão com a base de dados configurada via JDBC.  
+Se bem-sucedido, ativa o seletor de tabelas e carrega as tabelas disponíveis.  
+Utiliza um `SwingWorker` para não bloquear a interface durante a conexão.
 
 ---
 
 ### `private void loadAvailableKeys()`
 
-Busca as "chaves" (métricas de telemetria ou colunas de tabela) disponíveis na fonte  
-de dados atualmente configurada. Utiliza um SwingWorker para a operação de rede  
-e, em caso de sucesso, preenche a tabela de métricas com os resultados.
+Carrega as chaves de telemetria (ThingsBoard) ou os nomes das colunas (Base de Dados)  
+da fonte de dados selecionada e popula a tabela de métricas na interface.  
+Utiliza um `SwingWorker` para executar a operação em segundo plano.
+
+---
+
+### `private void handleKeysLoaded(SwingWorker<List<String>, Void> worker)`
+
+Processa o resultado do SwingWorker que busca as métricas/colunas.  
+Popula a tabela de métricas com os dados recebidos ou exibe uma mensagem de erro.
+
+- **Parâmetro:** `worker` - O SwingWorker que completou a sua execução.
+
+
+---
+
+### `private void setLoadButtonReady()`
+
+Restaura o estado do botão "Carregar Métricas", reativando-o e  
+redefinindo o seu texto para o estado inicial.
 
 ---
 
 ### `private IDataSource createSelectedDataSource(List<String> originalKeys) throws Exception`
 
-Cria e retorna uma instância concreta de IDataSource com base na seleção  
-atual do usuário na interface gráfica.  
-Este método valida se todas as informações necessárias (URLs, dispositivo, tabela, etc.)  
-estão presentes antes de instanciar o objeto da fonte de dados.
+Cria e retorna uma instância da fonte de dados (IDataSource) apropriada  
+com base na seleção do utilizador na interface.
 
-- **Parâmetro:** `originalKeys` - A lista de nomes originais das métricas a serem buscadas.
-- **`@return`**: Uma instância de IDataSource pronta para ser usada pela pipeline.
-- **`@throws`**: se a conexão com a fonte não puder ser estabelecida ou se a configuração estiver incompleta.
+- **Parâmetro:** `originalKeys` - A lista de métricas/colunas que a fonte de dados deve buscar.
+- **Retorna:** Uma instância de ThingsBoardSource ou DatabaseSource.
+- **`@throws`**: Se a conexão com a fonte de dados falhar ou a configuração for inválida.
 
+
+---
+
+### `private String showDropdownDialog(List<String> options, String title, String message)`
+
+Exibe um diálogo de seleção (JOptionPane) com uma lista de opções.
+
+- **Parâmetro:** `options` - A lista de strings a serem exibidas no dropdown.
+- **Parâmetro:** `title` - O título da janela de diálogo.
+- **Parâmetro:** `message` - A mensagem a ser exibida ao utilizador.
+- **Retorna:** A string selecionada pelo utilizador ou null se o diálogo for cancelado.
+
+
+---
+
+### `private void loadDeviceProfiles()`
+
+Carrega a lista de Perfis de Dispositivo do servidor ThingsBoard e popula  
+o JComboBox correspondente.
+
+---
+
+### `private void loadDevicesByProfile()`
+
+Carrega a lista de Dispositivos associados a um Perfil de Dispositivo específico  
+do servidor ThingsBoard e popula o JComboBox correspondente.
 

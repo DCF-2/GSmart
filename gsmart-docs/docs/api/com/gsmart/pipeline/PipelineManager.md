@@ -1,23 +1,28 @@
-# Classe: PipelineManager
+# Classe: `PipelineManager`
 
 **Pacote:** `com.gsmart.pipeline`
 
 ## Descrição Geral
 
-Gerencia o ciclo de vida de múltiplas tarefas de pipeline (`PipelineTask`).  
-Esta classe é o orquestrador central que lança, reinicia e para os pipelines.  
+Orquestrador central para o ciclo de vida de múltiplas tarefas de pipeline (`PipelineTask`).  
   
-<h3>Responsabilidades:</h3>  
+Esta classe atua como o "maestro" do sistema, responsável por instanciar,  
+gerir e finalizar os processos de monitorização de dados. Ela faz a ponte  
+entre as configurações definidas na `com.gsmart.GSmartGui` e a execução  
+real das `DataPipeline` em threads separadas.  
+  
+<h3>Principais Responsabilidades:</h3>  
 <ul>  
-<li>Lançar novos pipelines com base em uma configuração.</li>  
-<li>Manter uma lista de todas as tarefas em execução.</li>  
-<li>Gerenciar a comunicação entre a lógica de fundo e a interface gráfica.</li>  
-<li>Exibir janelas de monitoramento e diálogos de erro de conexão.</li>  
+<li>Lançar novas tarefas de pipeline com base numa `com.gsmart.config.PipelineConfiguration` fornecida pela GUI.</li>  
+<li>Manter e fornecer uma lista atualizada de todas as tarefas em execução.</li>  
+<li>Gerir a comunicação entre a lógica de fundo (`DataPipeline`) e a interface gráfica (GUI), utilizando um `com.gsmart.resources.GSmartListener`.</li>  
+<li>Controlar a exibição de janelas de monitorização individuais e diálogos de erro de conexão.</li>  
+<li>Fornecer métodos para reiniciar ou parar tarefas de forma segura.</li>  
 </ul>
 
-- **`@see`**: com.gsmart.pipeline.PipelineTask
-- **`@see`**: com.gsmart.pipeline.DataPipeline
-- **`@see`**: com.gsmart.resources.GSmartListener
+- **Ver Também:** com.gsmart.pipeline.PipelineTask
+- **Ver Também:** com.gsmart.pipeline.DataPipeline
+- **Ver Também:** com.gsmart.GSmartGui
 
 
 ## Métodos da Classe
@@ -35,28 +40,38 @@ Isso é usado para notificar a GUI para redesenhar a lista de tarefas.
 
 ---
 
+### `public void setParentComponent(Component parentComponent)`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public void setGlobalLogViewer(LogViewerWindow logViewer)`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `private void notifyUpdate()`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
 ### `public List<PipelineTask> getRunningTasks()`
 
 Retorna uma cópia da lista de tarefas atualmente em execução.  
 A lista é copiada para evitar problemas de concorrência (ConcurrentModificationException)  
 ao iterar sobre ela enquanto a original pode ser modificada.
 
-- **`@return`**: Uma nova lista contendo as tarefas em execução.
+- **Retorna:** Uma nova lista contendo as tarefas em execução.
 
 
 ---
 
 ### `public void launchPipeline(PipelineConfiguration config)`
 
-Lança um novo pipeline com base em uma configuração fornecida.  
-  
-Este método instancia e configura todos os componentes necessários para uma nova  
-tarefa de monitoramento, incluindo a `DataPipeline`, a `Thread` de execução  
-e o listener de eventos, encapsulando tudo em um objeto `PipelineTask`.
-
-- **Parâmetro:** `config` - O objeto de configuração contendo todos os parâmetros necessários  
-para o pipeline, como a fonte de dados, métricas e URL de destino.
-
+*Nenhuma documentação de método fornecida.*
 
 ---
 

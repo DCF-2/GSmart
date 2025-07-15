@@ -3,8 +3,8 @@ package com.gsmart.pipeline;
 
 import com.gsmart.resources.TaskStatus;
 import com.gsmart.config.PipelineConfiguration;
-import com.gsmart.windows.ConnectionErrorDialog;
-import com.gsmart.windows.MonitoringWindow;
+import com.gsmart.Gui.windows.ConnectionErrorDialog;
+import com.gsmart.Gui.windows.MonitoringWindow;
 
 import java.util.UUID;
 import static com.gsmart.pipeline.DataPipeline.logger;
@@ -20,7 +20,7 @@ import static com.gsmart.pipeline.DataPipeline.logger;
  *
  * @see com.gsmart.pipeline.PipelineManager
  * @see com.gsmart.pipeline.DataPipeline
- * @see com.gsmart.windows.MonitoringWindow
+ * @see MonitoringWindow
  */
 public class PipelineTask {
     private final String id;

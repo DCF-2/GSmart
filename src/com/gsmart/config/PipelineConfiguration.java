@@ -2,7 +2,7 @@
 package com.gsmart.config;
 
 import com.gsmart.resources.IDataSource;
-import com.gsmart.windows.LogViewerWindow;
+import com.gsmart.Gui.windows.LogViewerWindow;
 
 import java.util.List;
 
@@ -19,15 +19,15 @@ import java.util.List;
  * @param dataSource A implementação de {@code IDataSource} que servirá como fonte dos dados.
  * @param powerBiUrl A URL de push do Power BI para onde os dados serão enviados.
  * @param metricConfigs Uma lista de {@code MetricConfig} que define as métricas a serem processadas.
- * @param logicConfig A configuração {@code LogicConfig} com as chaves para a lógica de negócio.
- * @param runBusinessLogic Um booleano que ativa ou desativa a execução da lógica de negócio.
+ * @param alertRules A lista de regras de alerta customizadas a serem avaliadas.
+ * @param insightRules  A lista de regras de Insights customizadas a serem avaliadas.
  */
 public record PipelineConfiguration(
         IDataSource dataSource,
         String powerBiUrl,
         List<MetricConfig> metricConfigs,
-        LogicConfig logicConfig,
         LogViewerWindow logViewer,
-        boolean runBusinessLogic
+        List<AlertRule> alertRules,
+        List<InsightRule> insightRules
 ) {
 }

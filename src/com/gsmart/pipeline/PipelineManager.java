@@ -1,12 +1,13 @@
 // Localização: src/main/java/com/gsmart/pipeline/PipelineManager.java
 package com.gsmart.pipeline;
 
+import com.gsmart.config.AlertRule;
 import com.gsmart.resources.GSmartListener;
 import com.gsmart.resources.TaskStatus;
 import com.gsmart.config.PipelineConfiguration;
-import com.gsmart.windows.ConnectionErrorDialog;
-import com.gsmart.windows.LogViewerWindow;
-import com.gsmart.windows.MonitoringWindow;
+import com.gsmart.Gui.windows.ConnectionErrorDialog;
+import com.gsmart.Gui.windows.LogViewerWindow;
+import com.gsmart.Gui.windows.MonitoringWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,20 +18,25 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Gerencia o ciclo de vida de múltiplas tarefas de pipeline (`PipelineTask`).
- * Esta classe é o orquestrador central que lança, reinicia e para os pipelines.
+ * Orquestrador central para o ciclo de vida de múltiplas tarefas de pipeline ({@link PipelineTask}).
  *
- * <h3>Responsabilidades:</h3>
+ * Esta classe atua como o "maestro" do sistema, responsável por instanciar,
+ * gerir e finalizar os processos de monitorização de dados. Ela faz a ponte
+ * entre as configurações definidas na {@link com.gsmart.GSmartGui} e a execução
+ * real das {@link DataPipeline} em threads separadas.
+ *
+ * <h3>Principais Responsabilidades:</h3>
  * <ul>
- * <li>Lançar novos pipelines com base em uma configuração.</li>
- * <li>Manter uma lista de todas as tarefas em execução.</li>
- * <li>Gerenciar a comunicação entre a lógica de fundo e a interface gráfica.</li>
- * <li>Exibir janelas de monitoramento e diálogos de erro de conexão.</li>
+ * <li>Lançar novas tarefas de pipeline com base numa {@link com.gsmart.config.PipelineConfiguration} fornecida pela GUI.</li>
+ * <li>Manter e fornecer uma lista atualizada de todas as tarefas em execução.</li>
+ * <li>Gerir a comunicação entre a lógica de fundo ({@code DataPipeline}) e a interface gráfica (GUI), utilizando um {@link com.gsmart.resources.GSmartListener}.</li>
+ * <li>Controlar a exibição de janelas de monitorização individuais e diálogos de erro de conexão.</li>
+ * <li>Fornecer métodos para reiniciar ou parar tarefas de forma segura.</li>
  * </ul>
  *
  * @see com.gsmart.pipeline.PipelineTask
  * @see com.gsmart.pipeline.DataPipeline
- * @see com.gsmart.resources.GSmartListener
+ * @see com.gsmart.GSmartGui
  */
 public class PipelineManager {
 
@@ -78,6 +84,8 @@ public class PipelineManager {
      * @param config O objeto de configuração contendo todos os parâmetros necessários
      * para o pipeline, como a fonte de dados, métricas e URL de destino.
      */
+    // Localização: src/com/gsmart/pipeline/PipelineManager.java
+
     public void launchPipeline(PipelineConfiguration config) {
         String taskDescription = config.dataSource().getSourceName();
         logger.info("Recebida ordem para lançar pipeline: {}", taskDescription);
@@ -94,14 +102,13 @@ public class PipelineManager {
             @Override public void onAlert(String title, String message) {
                 PipelineTask task = taskWrapper[0];
                 if (task != null) {
-                    task.setHasAlert(true); // Marca que a tarefa tem um alerta
+                    task.setHasAlert(true);
                     if (task.getMonitoringWindow() != null) {
                         task.getMonitoringWindow().onAlert(title, message);
                     }
-                    notifyUpdate(); // Notifica a TaskManagerWindow para redesenhar
+                    notifyUpdate();
                 }
             }
-
             @Override public void onStatusUpdate(TaskStatus status) {
                 PipelineTask task = taskWrapper[0];
                 if (task != null) {
@@ -109,7 +116,6 @@ public class PipelineManager {
                 }
                 notifyUpdate();
             }
-
             @Override
             public void onConnectionLost(String errorMessage) {
                 PipelineTask task = taskWrapper[0];
@@ -119,15 +125,14 @@ public class PipelineManager {
                     SwingUtilities.invokeLater(() -> {
                         ConnectionErrorDialog newDialog = new ConnectionErrorDialog(
                                 (Frame) parentComponentForDialogs, task.getDescription(),
-                                task::forceReconnect, // Ação de reconectar
-                                task::stop, // Ação de cancelar (parar)
+                                task::forceReconnect,
+                                task::stop,
                                 task::clearConnectionErrorDialog);
                         task.setConnectionErrorDialog(newDialog);
                         newDialog.showConnectionLost(errorMessage);
                     });
                 }
             }
-
             @Override
             public void onReconnectionAttempt(long delayInSeconds) {
                 PipelineTask task = taskWrapper[0];
@@ -135,7 +140,6 @@ public class PipelineManager {
                     task.getConnectionErrorDialog().startCountdown(delayInSeconds);
                 }
             }
-
             @Override
             public void onConnectionRestored() {
                 PipelineTask task = taskWrapper[0];
@@ -148,11 +152,13 @@ public class PipelineManager {
                 notifyUpdate();
             }
         };
-        DataPipeline pipeline = new DataPipeline(config.dataSource(), config.powerBiUrl(), config.metricConfigs(), config.logicConfig(), listener, config.runBusinessLogic());
+
+
+        DataPipeline pipeline = new DataPipeline(config.dataSource(), config.powerBiUrl(), config.metricConfigs(), listener, config.alertRules(), config.insightRules());
 
         Thread pipelineThread = new Thread(() -> {
             try {
-                pipeline.run(); // A thread executa a instância da pipeline
+                pipeline.run();
             } catch (Exception e) {
                 logger.error("Erro inesperado na thread da pipeline.", e);
             } finally {

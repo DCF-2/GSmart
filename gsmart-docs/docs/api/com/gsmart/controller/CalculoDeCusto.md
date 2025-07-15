@@ -1,4 +1,4 @@
-# Classe: CalculoDeCusto
+# Classe: `CalculoDeCusto`
 
 **Pacote:** `com.gsmart.controller`
 
@@ -19,7 +19,7 @@ dando início à execução do programa.
 Calcula o custo do consumo de energia desde a última medição.
 
 - **Parâmetro:** `consumoTotalAtual_kWh` - O valor total de kWh lido do medidor (EAkWh).
-- **`@return`**: O custo em Reais (R$) para o período.
+- **Retorna:** O custo em Reais (R$) para o período.
 
 
 ---
@@ -29,6 +29,6 @@ Calcula o custo do consumo de energia desde a última medição.
 Placeholder para uma futura integração com a API da Neoenergia.  
 Atualmente, retorna um valor fixo.
 
-- **`@return`**: A tarifa de energia em R$/kWh.
+- **Retorna:** A tarifa de energia em R$/kWh.
 
 

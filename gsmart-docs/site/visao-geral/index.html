@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#visao-geral-do-projeto-gsmart" class="md-skip">
+        <a href="#visao-geral-do-projeto-gsmart-v50" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -283,9 +283,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-arquitetura-e-fluxo-de-dados" class="md-nav__link">
+  <a href="#2-arquitetura-e-componentes" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Arquitetura e Fluxo de Dados
+      2. Arquitetura e Componentes
     </span>
   </a>
   
@@ -405,7 +405,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/MetricTableModel/" class="md-nav__link">
+      <a href="../api/com/gsmart/MetricTableModel.md" class="md-nav__link">
         
   
   
@@ -428,7 +428,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/SystemMetricCellRenderer/" class="md-nav__link">
+      <a href="../api/com/gsmart/SystemMetricCellRenderer.md" class="md-nav__link">
         
   
   
@@ -773,7 +773,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/controller/GeradorDeInsights/" class="md-nav__link">
+      <a href="../api/com/gsmart/controller/GeradorDeInsights.md" class="md-nav__link">
         
   
   
@@ -796,7 +796,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/controller/Manutencao/" class="md-nav__link">
+      <a href="../api/com/gsmart/controller/Manutencao.md" class="md-nav__link">
         
   
   
@@ -819,7 +819,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/controller/PrevisaoFalhas/" class="md-nav__link">
+      <a href="../api/com/gsmart/controller/PrevisaoFalhas.md" class="md-nav__link">
         
   
   
@@ -1233,7 +1233,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/windows/LogViewerWindow/" class="md-nav__link">
+      <a href="../api/com/gsmart/windows/LogViewerWindow.md" class="md-nav__link">
         
   
   
@@ -1256,7 +1256,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/windows/LoginWindow/" class="md-nav__link">
+      <a href="../api/com/gsmart/windows/LoginWindow.md" class="md-nav__link">
         
   
   
@@ -1279,7 +1279,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/windows/MonitoringWindow/" class="md-nav__link">
+      <a href="../api/com/gsmart/windows/MonitoringWindow.md" class="md-nav__link">
         
   
   
@@ -1302,7 +1302,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/windows/ReconnectionLogViewer/" class="md-nav__link">
+      <a href="../api/com/gsmart/windows/ReconnectionLogViewer.md" class="md-nav__link">
         
   
   
@@ -1325,7 +1325,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/windows/TaskManagerWindow/" class="md-nav__link">
+      <a href="../api/com/gsmart/windows/TaskManagerWindow.md" class="md-nav__link">
         
   
   
@@ -1348,7 +1348,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/windows/TaskManagerWindow.ButtonColumnRenderer/" class="md-nav__link">
+      <a href="../api/com/gsmart/windows/TaskManagerWindow.ButtonColumnRenderer.md" class="md-nav__link">
         
   
   
@@ -1371,7 +1371,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/com/gsmart/windows/TaskManagerWindow.StatusCellRenderer/" class="md-nav__link">
+      <a href="../api/com/gsmart/windows/TaskManagerWindow.StatusCellRenderer.md" class="md-nav__link">
         
   
   
@@ -1438,9 +1438,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-arquitetura-e-fluxo-de-dados" class="md-nav__link">
+  <a href="#2-arquitetura-e-componentes" class="md-nav__link">
     <span class="md-ellipsis">
-      2. Arquitetura e Fluxo de Dados
+      2. Arquitetura e Componentes
     </span>
   </a>
   
@@ -1462,21 +1462,21 @@
 
 
 
-<h1 id="visao-geral-do-projeto-gsmart">Visão Geral do Projeto GSmart</h1>
+<h1 id="visao-geral-do-projeto-gsmart-v50">Visão Geral do Projeto GSmart v5.0</h1>
 <h2 id="1-introducao">1. Introdução</h2>
-<p>O <strong>GSmart</strong> é uma aplicação de desktop desenvolvida em Java com a biblioteca Swing. Ele funciona como uma ferramenta de ETL (Extração, Transformação e Carga) projetada para criar e gerenciar pipelines de dados de forma visual e intuitiva.</p>
-<p>O objetivo principal do sistema é conectar-se a diversas fontes de dados, como a plataforma de IoT <strong>ThingsBoard</strong> e bancos de dados <strong>PostgreSQL</strong>, processar as informações coletadas para gerar insights e, em seguida, enviar os dados processados para plataformas de Business Intelligence, como o <strong>Microsoft Power BI</strong>.</p>
-<h2 id="2-arquitetura-e-fluxo-de-dados">2. Arquitetura e Fluxo de Dados</h2>
-<p>O projeto segue uma arquitetura multicamadas que separa a interface do utilizador, a lógica de controlo e o acesso aos dados. O diagrama abaixo ilustra o fluxo principal.</p>
+<p>O <strong>GSmart</strong> é uma aplicação de desktop desenvolvida em Java com a biblioteca Swing. Na sua versão 5.0, ele evoluiu de uma simples ferramenta de ETL para uma <strong>plataforma de monitorização e inteligência de dados</strong>.</p>
+<p>O seu objetivo principal é conectar-se a fontes de dados como a plataforma de IoT <strong>ThingsBoard</strong> ou bases de dados, e processar essa informação através de um <strong>motor de regras duplo e configurável</strong>, permitindo a geração de <strong>Alertas</strong> críticos e <strong>Alarmes</strong> proativos. Os dados tratados e os eventos gerados podem ser enviados para o <strong>Microsoft Power BI</strong> e para sistemas externos via <strong>MQTT</strong>.</p>
+<h2 id="2-arquitetura-e-componentes">2. Arquitetura e Componentes</h2>
+<p>O projeto segue uma arquitetura modular que separa a interface do utilizador, a gestão de pipelines e o processamento de regras. O diagrama abaixo ilustra o fluxo principal da aplicação na sua versão atual.</p>
 <p>```mermaid
 graph TD
-    subgraph "Interface do Utilizador"
-        A[/"Utilizador na GSmartGui"/]
+    subgraph "Interface do Utilizador (GSmartGui)"
+        A[/"Utilizador configura Métricas, Alertas e Alarmes"/]
+        F(Janela de Monitorização)
     end</p>
 <pre><code>subgraph "Núcleo da Aplicação"
     B(PipelineManager)
     C{DataPipeline &lt;br&gt; (Thread)}
-    F(GSmartListener)
 end
 
 subgraph "Fontes de Dados"
@@ -1485,35 +1485,34 @@ subgraph "Fontes de Dados"
     D2[DatabaseSource]
 end
 
-subgraph "Lógica de Negócio"
-    E(Controllers)
-    E1[GeradorDeInsights]
-    E2[PrevisaoFalhas]
-    E3[Manutencao]
+subgraph "Motor de Regras Configurável"
+    E(Avaliação de Regras)
+    E1[Regras de Alerta]
+    E2[Regras de Alarme]
 end
 
 subgraph "Serviços Externos"
-    G[ExportacaoDadosPWBI]
-    H((Power BI))
+    G[Power BI]
+    H(Node-RED / Broker MQTT)
 end
 
-%% Fluxo Principal com numeração
-A -- "1. Configura" --&gt; B
-B -- "2. Inicia" --&gt; C
+%% Fluxo Principal
+A -- "1. Inicia Pipeline com Configs" --&gt; B
+B -- "2. Lança Tarefa" --&gt; C
 C -- "3. Busca Dados" --&gt; D
-D -- Implementado por --&gt; D1 &amp; D2
+D -- " " --&gt; D1 &amp; D2
 D -- "4. Retorna Dados" --&gt; C
-C -- "5. Processa" --&gt; E
-E -- Utiliza --&gt; E1 &amp; E2 &amp; E3
-C -- "7. Notifica Eventos" --&gt; F
-F -- "8. Atualiza UI" --&gt; A
-C -- "6. Envia para" --&gt; G
-G -- "API" --&gt; H
+C -- "5. Avalia Regras" --&gt; E
+E -- "Utiliza" --&gt; E1 &amp; E2
+E -- "6a. Dispara Alerta Crítico" --&gt; H
+E -- "6b. Gera Alarme Proativo" --&gt; H &amp; F
+C -- "7. Envia Dados" --&gt; G
 
-%% Estilos para clareza
+%% Estilos
 style C fill:#ffdead,stroke:#333,stroke-width:4px
 style A fill:#e6e6fa,stroke:#333,stroke-width:2px
 style H fill:#90ee90,stroke:#333,stroke-width:2px
+style G fill:#add8e6,stroke:#333,stroke-width:2px
 </code></pre>
 
 

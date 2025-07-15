@@ -1,4 +1,4 @@
-# Classe: IDataSource
+# Classe: `IDataSource`
 
 **Pacote:** `com.gsmart.resources`
 
@@ -22,7 +22,7 @@ Busca o conjunto de dados mais recente da fonte.
 A implementação deste método deve lidar com toda a lógica de comunicação,  
 como realizar requisições HTTP ou executar consultas a um banco de dados.
 
-- **`@return`**: Um objeto `JsonObject` contendo os dados de telemetria ou os  
+- **Retorna:** Um objeto `JsonObject` contendo os dados de telemetria ou os  
 registos obtidos. O formato deve ser consistente para o processamento.
 - **`@throws`**: Se ocorrer qualquer erro durante a comunicação ou a  
 coleta dos dados (ex: falha de rede, erro de autenticação).
@@ -37,6 +37,6 @@ Retorna um nome descritivo e legível para a fonte de dados.
 Este nome é utilizado na interface do utilizador para identificar a tarefa  
 de monitoramento e em logs para facilitar a depuração.
 
-- **`@return`**: Uma `String` com o nome da fonte (ex: "ThingsBoard" ou "Banco de Dados").
+- **Retorna:** Uma `String` com o nome da fonte (ex: "ThingsBoard" ou "Banco de Dados").
 
 

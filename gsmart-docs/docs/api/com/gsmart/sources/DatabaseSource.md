@@ -1,4 +1,4 @@
-# Classe: DatabaseSource
+# Classe: `DatabaseSource`
 
 **Pacote:** `com.gsmart.sources`
 
@@ -11,11 +11,17 @@ Esta classe é projetada para buscar o registo mais recente de uma tabela espec�
 simulando uma fonte de dados de telemetria. Ela lida com a conexão, execução de  
 queries e formatação dos resultados para o formato JSON esperado pela pipeline.
 
-- **`@see`**: com.gsmart.resources.IDataSource
-- **`@see`**: java.sql.Connection
+- **Ver Também:** com.gsmart.resources.IDataSource
+- **Ver Também:** java.sql.Connection
 
 
 ## Métodos da Classe
+
+---
+
+### `private Connection getConnection() throws SQLException`
+
+*Nenhuma documentação de método fornecida.*
 
 ---
 
@@ -23,7 +29,7 @@ queries e formatação dos resultados para o formato JSON esperado pela pipeline
 
 Tenta estabelecer uma conexão com o banco de dados para validar a URL e as credenciais.
 
-- **`@return`**: `true` se a conexão for bem-sucedida e válida, `false` caso contrário.
+- **Retorna:** `true` se a conexão for bem-sucedida e válida, `false` caso contrário.
 
 
 ---
@@ -32,7 +38,7 @@ Tenta estabelecer uma conexão com o banco de dados para validar a URL e as cred
 
 Busca e retorna uma lista com os nomes de todas as tabelas visíveis no schema 'public'.
 
-- **`@return`**: Uma lista de nomes de tabelas.
+- **Retorna:** Uma lista de nomes de tabelas.
 - **`@throws`**: se ocorrer um erro de acesso ao banco de dados durante a busca.
 
 
@@ -44,7 +50,7 @@ Busca o registro mais recente (ordenado por 'timestamp' descendente) da tabela c
 Constrói e retorna um objeto JSON formatado de maneira similar à API do ThingsBoard  
 para manter a compatibilidade com o resto da pipeline.
 
-- **`@return`**: Um JsonObject contendo os dados do registro mais recente.
+- **Retorna:** Um JsonObject contendo os dados do registro mais recente.
 - **`@throws`**: se a busca no banco de dados falhar ou se a configuração estiver incompleta.
 
 
@@ -55,16 +61,22 @@ para manter a compatibilidade com o resto da pipeline.
 Retorna uma lista com os nomes de todas as colunas de uma tabela específica.
 
 - **Parâmetro:** `tableName` - O nome da tabela cujas colunas serão listadas.
-- **`@return`**: Uma lista contendo os nomes das colunas.
+- **Retorna:** Uma lista contendo os nomes das colunas.
 - **`@throws`**: se a tabela não for encontrada ou se ocorrer um erro de acesso ao banco.
 
+
+---
+
+### `public String getSourceName()`
+
+*Nenhuma documentação de método fornecida.*
 
 ---
 
 ### `public void testConnectionAndThrow() throws SQLException`
 
 Testa a conexão com o banco de dados e lança uma exceção em caso de falha.  
-Diferente de #testConnection(), este método é projetado para interromper o fluxo  
+Diferente de `#testConnection()`, este método é projetado para interromper o fluxo  
 caso a conexão não possa ser estabelecida, propagando a exceção.
 
 - **`@throws`**: se a conexão falhar ou não for válida.

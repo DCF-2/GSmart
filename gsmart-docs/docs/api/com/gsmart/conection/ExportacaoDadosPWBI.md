@@ -1,4 +1,4 @@
-# Classe: ExportacaoDadosPWBI
+# Classe: `ExportacaoDadosPWBI`
 
 **Pacote:** `com.gsmart.conection`
 

@@ -1,23 +1,30 @@
-// Localização: src/main/java/com/gsmart/GSmartGui.java
+// Localização: src/com/gsmart/GSmartGui.java
 package com.gsmart;
 
-import com.gsmart.config.ConfigManager;
-import com.gsmart.config.LogicConfig;
-import com.gsmart.config.MetricConfig;
-import com.gsmart.config.PipelineConfiguration;
+// Imports de configuração e lógica
+import com.gsmart.Gui.InsightRuleTableModel;
+import com.gsmart.Gui.windows.*;
+import com.gsmart.config.*;
+
+// Imports de Alertas e insights
+import com.gsmart.Gui.AlertRuleTableModel;
+import com.gsmart.Gui.MetricTableModel;
+import com.gsmart.Gui.SystemMetricCellRenderer;
+
+
+
+// Imports do pipeline e recursos
 import com.gsmart.pipeline.PipelineManager;
 import com.gsmart.resources.IDataSource;
 import com.gsmart.sources.*;
-import com.gsmart.windows.LogViewerWindow;
-import com.gsmart.windows.ReconnectionLogViewer;
-import com.gsmart.windows.TaskManagerWindow;
+
+// Imports das janelas auxiliares
+
+// Imports de bibliotecas externas e do Java
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.WindowAdapter;
@@ -30,16 +37,24 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
- * Classe principal da interface grafica (GUI) da aplicacao GSmart.
+ * Classe principal da interface gráfica (GUI) e ponto de controlo central da aplicação GSmart.
  *
- * Esta janela serve como o painel de controlo central, permitindo ao utilizador
- * configurar e gerir os pipelines de dados. A classe e responsavel por toda a
- * interacao com o utilizador e por orquestrar as operacoes de backend.
+ * Esta janela orquestra toda a interação com o utilizador, permitindo a configuração
+ * e gestão completa dos pipelines de dados. As suas principais responsabilidades incluem:
+ * <ul>
+ * <li>Configurar a fonte de dados (ThingsBoard ou Base de Dados).</li>
+ * <li>Gerir a seleção e transformação de métricas a serem processadas.</li>
+ * <li>Permitir a criação e edição de Regras de Alerta (notificações críticas).</li>
+ * <li>Permitir a criação e edição de Regras de Alarme (insights inteligentes).</li>
+ * <li>Iniciar, parar e monitorizar as tarefas de pipeline através do {@link PipelineManager}.</li>
+ * </ul>
  *
  * @see com.gsmart.pipeline.PipelineManager
  */
 public class GSmartGui extends JFrame {
     private static final Logger logger = LoggerFactory.getLogger(GSmartGui.class);
+
+    // --- Componentes da UI (Pipeline) ---
     private final JComboBox<String> sourceSelector;
     private final JButton startButton;
     private final JButton stopAllButton;
@@ -62,35 +77,59 @@ public class GSmartGui extends JFrame {
     private final JTable metricsTable;
     private final MetricTableModel tableModel;
     private final JPanel sourceConfigCardPanel;
+
+    // --- Componentes da UI (Alertas) ---
+    private JTable alertRulesTable;
+    private AlertRuleTableModel alertRuleTableModel;
+    private List<AlertRule> alertRules;// A nossa lista principal de regras
+
+    // --- Componentes da UI (Insights) ---
+    private JTable insightRulesTable;
+    private InsightRuleTableModel insightRuleTableModel;
+    private List<InsightRule> insightRules;
+
+
+    // --- Classes de Gestão e Janelas ---
     private final LogViewerWindow globalLogViewer;
     private final PipelineManager pipelineManager;
     private final ConfigManager configManager;
     private TaskManagerWindow taskManagerWindow;
     private ReconnectionLogViewer reconnectionLogViewer;
-    private final JCheckBox runLogicCheckBox;
+
+    // --- Outros ---
     private final OkHttpClient sharedOkHttpClient;
-    private LogicConfig logicConfig;
 
     /**
-     * Construtor da classe GSmartGui.
+     * Construtor da janela principal da aplicação GSmart.
      *
-     * @param logViewer A instancia da janela de log geral.
-     * @param pipelineManager O gestor central de pipelines.
+     * Inicializa todos os componentes da interface gráfica, configura os painéis,
+     * tabelas e listeners de eventos, e carrega as configurações da sessão anterior.
+     *
+     * @param logViewer A instância partilhada do visualizador de logs gerais.
+     * @param pipelineManager O gestor central que orquestra todas as tarefas de pipeline.
      */
     public GSmartGui(LogViewerWindow logViewer, PipelineManager pipelineManager) {
+        // --- Inicialização de Variáveis ---
         this.globalLogViewer = logViewer;
         this.pipelineManager = pipelineManager;
         this.configManager = new ConfigManager();
         this.pipelineManager.setParentComponent(this);
         this.pipelineManager.setGlobalLogViewer(this.globalLogViewer);
         this.sharedOkHttpClient = new OkHttpClient();
+        this.alertRules = new ArrayList<>(); // Inicializa a lista de regras
+        this.insightRules = new ArrayList<>();
 
-        setTitle("GSmart - Configurador de Pipeline v4.4");
+        // --- Configuração da Janela Principal ---
+        setTitle("GSmart - Configurador de Pipeline e Alertas v5.0");
         setSize(850, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // --- Painéis de Configuração ---
+        // =================================================================
+        //  PAINEL DE CONFIGURAÇÃO DA PIPELINE (Separador 1)
+        // =================================================================
+
+        // --- Painel Superior (Fonte de Dados e Destino) ---
         JPanel topConfigurationPanel = new JPanel();
         topConfigurationPanel.setLayout(new BoxLayout(topConfigurationPanel, BoxLayout.Y_AXIS));
         JPanel sourceSelectionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -126,6 +165,7 @@ public class GSmartGui extends JFrame {
         gbcDb.gridx = 1; gbcDb.gridy = 2; gbcDb.gridwidth = 3; gbcDb.weightx = 1.0; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbPasswordField = new JPasswordField(""); databaseConfigPanel.add(dbPasswordField, gbcDb);
         gbcDb.gridx = 0; gbcDb.gridy = 3; gbcDb.gridwidth = 1; databaseConfigPanel.add(new JLabel("Tabela:"), gbcDb);
         gbcDb.gridx = 1; gbcDb.gridy = 3; gbcDb.gridwidth = 3; gbcDb.weightx = 1.0; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbTableSelector = new JComboBox<>(); dbTableSelector.setEnabled(false); databaseConfigPanel.add(dbTableSelector, gbcDb);
+
         sourceConfigCardPanel.add(thingsboardConfigPanel, "Thingsboard API");
         sourceConfigCardPanel.add(databaseConfigPanel, "Banco de Dados Espelho");
         JPanel loadKeysPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -155,32 +195,24 @@ public class GSmartGui extends JFrame {
         JScrollPane keysScrollPane = new JScrollPane(metricsTable);
         keysScrollPane.setBorder(BorderFactory.createTitledBorder("Selecionar, Mapear e Transformar Métricas"));
 
-        // --- Painéis de Ação Inferior ---
+        // --- Painel de Ações da Pipeline ---
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 15));
         startButton = new JButton("Iniciar Pipeline");
         startButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        runLogicCheckBox = new JCheckBox("Executar Lógica de Negócio");
-        runLogicCheckBox.setToolTipText("Lógica de negócio temporariamente desativada.");
-        runLogicCheckBox.setEnabled(false);
         actionPanel.add(startButton);
-        actionPanel.add(runLogicCheckBox);
+
 
         JPanel adminPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         monitoringButton = new JButton("Central de Monitoramento");
         stopAllButton = new JButton("Parar Monitoramento");
         stopAllButton.setForeground(Color.RED);
-
         JPopupMenu logsPopupMenu = new JPopupMenu();
         JMenuItem generalLogItem = new JMenuItem("Log Geral");
         JMenuItem reconexLogItem = new JMenuItem("Log de Reconexão");
         logsPopupMenu.add(generalLogItem);
         logsPopupMenu.add(reconexLogItem);
-
         JButton logsButton = new JButton("Ver Logs");
-        logsButton.addActionListener(e -> {
-            logsPopupMenu.show(logsButton, 0, logsButton.getHeight());
-        });
-
+        logsButton.addActionListener(e -> logsPopupMenu.show(logsButton, 0, logsButton.getHeight()));
         adminPanel.add(monitoringButton);
         adminPanel.add(stopAllButton);
         adminPanel.add(logsButton);
@@ -190,11 +222,79 @@ public class GSmartGui extends JFrame {
         bottomPanel.add(actionPanel, BorderLayout.WEST);
         bottomPanel.add(adminPanel, BorderLayout.CENTER);
 
-        setLayout(new BorderLayout(5, 5));
-        add(topConfigurationPanel, BorderLayout.NORTH);
-        add(keysScrollPane, BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.SOUTH);
+        // --- Montagem do Painel do Separador 1 ---
+        JPanel pipelineConfigPanel = new JPanel(new BorderLayout(5, 5));
+        pipelineConfigPanel.add(topConfigurationPanel, BorderLayout.NORTH);
+        pipelineConfigPanel.add(keysScrollPane, BorderLayout.CENTER);
+        pipelineConfigPanel.add(bottomPanel, BorderLayout.SOUTH);
 
+        // =================================================================
+        //  PAINEL DE REGRAS DE ALERTA (Separador 2)
+        // =================================================================
+
+        JPanel alertRulesPanel = new JPanel(new BorderLayout(5, 5));
+        alertRulesPanel.setBorder(BorderFactory.createTitledBorder("Configurador de Alertas Customizados"));
+
+        alertRuleTableModel = new AlertRuleTableModel();
+        alertRuleTableModel.setRules(this.alertRules);
+        alertRulesTable = new JTable(alertRuleTableModel);
+        alertRulesTable.setFillsViewportHeight(true);
+        alertRulesTable.getColumnModel().getColumn(0).setMaxWidth(50);
+
+        JScrollPane rulesScrollPane = new JScrollPane(alertRulesTable);
+        alertRulesPanel.add(rulesScrollPane, BorderLayout.CENTER);
+
+        JPanel ruleButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton addRuleButton = new JButton("Adicionar Regra");
+        JButton editRuleButton = new JButton("Editar Regra");
+        JButton removeRuleButton = new JButton("Remover Regra");
+        ruleButtonsPanel.add(addRuleButton);
+        ruleButtonsPanel.add(editRuleButton);
+        ruleButtonsPanel.add(removeRuleButton);
+        alertRulesPanel.add(ruleButtonsPanel, BorderLayout.SOUTH);
+
+        // =================================================================
+        //  PAINEL DE REGRAS DE INSIGHT (Separador 3)
+        // =================================================================
+        JPanel insightRulesPanel = new JPanel(new BorderLayout(5, 5));
+        insightRulesPanel.setBorder(BorderFactory.createTitledBorder("Configurador de Alarmes Inteligentes"));
+
+        insightRuleTableModel = new InsightRuleTableModel();
+        insightRuleTableModel.setRules(this.insightRules);
+        insightRulesTable = new JTable(insightRuleTableModel);
+        insightRulesTable.setFillsViewportHeight(true);
+        insightRulesTable.getColumnModel().getColumn(0).setMaxWidth(50);
+
+        JScrollPane insightScrollPane = new JScrollPane(insightRulesTable);
+        insightRulesPanel.add(insightScrollPane, BorderLayout.CENTER);
+
+        JPanel insightButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton addInsightButton = new JButton("Adicionar Regra de Alarme");
+        JButton editInsightButton = new JButton("Editar Regra de Alarme");
+        JButton removeInsightButton = new JButton("Remover Regra de Alarme");
+        insightButtonsPanel.add(addInsightButton);
+        insightButtonsPanel.add(editInsightButton);
+        insightButtonsPanel.add(removeInsightButton);
+        insightRulesPanel.add(insightButtonsPanel, BorderLayout.SOUTH);
+
+        // =================================================================
+        //  MONTAGEM FINAL COM SEPARADORES
+        // =================================================================
+
+        JTabbedPane mainTabbedPane = new JTabbedPane();
+        mainTabbedPane.addTab("Configuração da Pipeline", pipelineConfigPanel);
+        mainTabbedPane.addTab("Regras de Alerta", alertRulesPanel);
+        mainTabbedPane.addTab("Regras de Alarmes", insightRulesPanel); // Adiciona o novo separador
+
+
+        // Adiciona o painel de separadores à janela principal
+        this.setContentPane(mainTabbedPane);
+
+        // =================================================================
+        //  LISTENERS DE EVENTOS
+        // =================================================================
+
+        // Listeners da Pipeline
         sourceSelector.addItemListener(e -> toggleSourceFields());
         tbConnectButton.addActionListener(e -> connectToThingsboard());
         dbConnectButton.addActionListener(e -> connectToDatabase());
@@ -206,6 +306,112 @@ public class GSmartGui extends JFrame {
         generalLogItem.addActionListener(e -> this.globalLogViewer.setVisible(true));
         reconexLogItem.addActionListener(e -> showReconnectionLog());
 
+        // --- Listeners das Regras de Alerta ---
+
+        addRuleButton.addActionListener(e -> {
+            // Pega a lista de métricas disponíveis da outra tabela
+            List<String> availableMetrics = tableModel.getSelectedMetrics().stream()
+                    .map(MetricConfig::getOriginalName)
+                    .collect(Collectors.toList());
+
+            if (availableMetrics.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor, carregue e selecione as métricas no separador 'Configuração da Pipeline' primeiro.", "Métricas não encontradas", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            AlertRuleDialog dialog = new AlertRuleDialog(this, "Adicionar Nova Regra de Alerta", availableMetrics);
+            dialog.setVisible(true);
+
+            AlertRule newRule = dialog.getAlertRule();
+            if (newRule != null) {
+                alertRuleTableModel.addRule(newRule);
+            }
+        });
+
+        editRuleButton.addActionListener(e -> {
+            int selectedRow = alertRulesTable.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Por favor, selecione uma regra na tabela para editar.", "Nenhuma Regra Selecionada", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            AlertRule ruleToEdit = alertRuleTableModel.getRuleAt(selectedRow);
+            List<String> availableMetrics = tableModel.getSelectedMetrics().stream()
+                    .map(MetricConfig::getOriginalName)
+                    .collect(Collectors.toList());
+
+            AlertRuleDialog dialog = new AlertRuleDialog(this, "Editar Regra de Alerta", availableMetrics);
+            dialog.setAlertRule(ruleToEdit); // Pré-preenche o formulário
+            dialog.setVisible(true);
+
+            AlertRule updatedRule = dialog.getAlertRule();
+            if (updatedRule != null) {
+                alertRuleTableModel.updateRule(selectedRow, updatedRule);
+            }
+        });
+
+        removeRuleButton.addActionListener(e -> {
+            int selectedRow = alertRulesTable.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Por favor, selecione uma regra na tabela para remover.", "Nenhuma Regra Selecionada", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int confirm = JOptionPane.showConfirmDialog(this, "Tem a certeza que deseja remover a regra selecionada?", "Confirmar Remoção", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (confirm == JOptionPane.YES_OPTION) {
+                alertRuleTableModel.removeRule(selectedRow);
+            }
+        });
+
+        // --- Listeners das Regras de Insight ---
+        addInsightButton.addActionListener(e -> {
+            List<String> availableMetrics = tableModel.getSelectedMetrics().stream()
+                    .map(MetricConfig::getOriginalName)
+                    .collect(Collectors.toList());
+            if (availableMetrics.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Por favor, carregue e selecione as métricas no separador 'Configuração da Pipeline' primeiro.", "Métricas não encontradas", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            InsightRuleDialog dialog = new InsightRuleDialog(this, "Adicionar Nova Regra de Insight", availableMetrics);
+            dialog.setVisible(true);
+            InsightRule newRule = dialog.getInsightRule();
+            if (newRule != null) {
+                insightRuleTableModel.addRule(newRule);
+            }
+        });
+
+        editInsightButton.addActionListener(e -> {
+            int selectedRow = insightRulesTable.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Por favor, selecione uma regra na tabela para editar.", "Nenhuma Regra Selecionada", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            InsightRule ruleToEdit = insightRuleTableModel.getRuleAt(selectedRow);
+            List<String> availableMetrics = tableModel.getSelectedMetrics().stream()
+                    .map(MetricConfig::getOriginalName)
+                    .collect(Collectors.toList());
+            InsightRuleDialog dialog = new InsightRuleDialog(this, "Editar Regra de Insight", availableMetrics);
+            dialog.setInsightRule(ruleToEdit);
+            dialog.setVisible(true);
+            InsightRule updatedRule = dialog.getInsightRule();
+            if (updatedRule != null) {
+                insightRuleTableModel.updateRule(selectedRow, updatedRule);
+            }
+        });
+
+        removeInsightButton.addActionListener(e -> {
+            int selectedRow = insightRulesTable.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(this, "Por favor, selecione uma regra para remover.", "Nenhuma Regra Selecionada", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int confirm = JOptionPane.showConfirmDialog(this, "Tem a certeza que deseja remover a regra selecionada?", "Confirmar Remoção", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (confirm == JOptionPane.YES_OPTION) {
+                insightRuleTableModel.removeRule(selectedRow);
+            }
+        });
+
+        // Listener da Janela
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -213,10 +419,17 @@ public class GSmartGui extends JFrame {
             }
         });
 
+
+        // Carregamento inicial
         toggleSourceFields();
         loadConfiguration();
     }
 
+    /**
+     * Exibe a janela de logs de reconexão.
+     * Se a janela ainda não existir, uma nova é criada. Se já existir,
+     * ela é trazida para a frente e o seu conteúdo é recarregado.
+     */
     private void showReconnectionLog() {
         if (reconnectionLogViewer == null || !reconnectionLogViewer.isDisplayable()) {
             reconnectionLogViewer = new ReconnectionLogViewer();
@@ -226,6 +439,10 @@ public class GSmartGui extends JFrame {
         reconnectionLogViewer.toFront();
     }
 
+    /**
+     * Carrega as configurações da última sessão a partir do ficheiro gsmart.properties.
+     * Isto inclui URLs e a última fonte de dados selecionada, melhorando a experiência do utilizador.
+     */
     private void loadConfiguration() {
         logger.info("Carregando configurações salvas...");
         Properties props = configManager.loadProperties();
@@ -234,9 +451,12 @@ public class GSmartGui extends JFrame {
         dbUserField.setText(props.getProperty("db.user", "postgres"));
         pbiUrlField.setText(props.getProperty("powerbi.url", ""));
         sourceSelector.setSelectedItem(props.getProperty("source.last", "Thingsboard API"));
-        runLogicCheckBox.setSelected(Boolean.parseBoolean(props.getProperty("logic.run", "true")));
     }
 
+    /**
+     * Salva as configurações atuais (URLs, etc.) no ficheiro gsmart.properties.
+     * Este método é chamado automaticamente quando a janela da aplicação é fechada.
+     */
     private void saveConfiguration() {
         logger.info("Salvando configurações antes de fechar...");
         Properties props = new Properties();
@@ -245,15 +465,13 @@ public class GSmartGui extends JFrame {
         props.setProperty("db.user", dbUserField.getText());
         props.setProperty("powerbi.url", pbiUrlField.getText());
         props.setProperty("source.last", (String) sourceSelector.getSelectedItem());
-        props.setProperty("logic.run", String.valueOf(runLogicCheckBox.isSelected()));
         configManager.saveProperties(props);
     }
 
     /**
-     * Valida a configuracao da UI e lanca um novo pipeline.
-     *
-     * Este metodo recolhe as informacoes dos campos da GUI, cria um
-     * objeto de configuracao e o submete ao PipelineManager para execucao.
+     * Orquestra o lançamento de uma nova tarefa de pipeline.
+     * Recolhe todas as configurações da interface (fonte de dados, métricas, regras de alerta e alarme),
+     * cria um objeto {@code PipelineConfiguration} e entrega-o ao {@code PipelineManager} para execução.
      */
     private void launchPipeline() {
         if (metricsTable.isEditing()) {
@@ -271,14 +489,13 @@ public class GSmartGui extends JFrame {
                 return;
             }
 
-            boolean runLogic = runLogicCheckBox.isSelected();
-            if (runLogic && (this.logicConfig == null)) {
-                JOptionPane.showMessageDialog(this, "A caixa 'Executar Lógica de Negócio' está marcada, mas a configuração não foi feita.\nPor favor, carregue as métricas novamente e configure a lógica.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+
 
             IDataSource selectedDataSource = createSelectedDataSource(selectedConfigs.stream().map(MetricConfig::getOriginalName).collect(Collectors.toList()));
-            PipelineConfiguration config = new PipelineConfiguration(selectedDataSource, pbiUrl, selectedConfigs, this.logicConfig, this.globalLogViewer, runLogic);
+            // Obtenha as regras atuais da tabela
+            List<AlertRule> currentAlertRules = alertRuleTableModel.getRules();
+            List<InsightRule> currentInsightRules = insightRuleTableModel.getRules(); // Obtenha as regras de insight
+            PipelineConfiguration config = new PipelineConfiguration(selectedDataSource, pbiUrl, selectedConfigs, this.globalLogViewer, currentAlertRules, currentInsightRules);
             pipelineManager.launchPipeline(config);
             JOptionPane.showMessageDialog(this, "Pipeline para '" + selectedDataSource.getSourceName() + "' iniciada em segundo plano.\nAbra a 'Central de Monitoramento' para visualizar.", "Pipeline Iniciada", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
@@ -287,10 +504,19 @@ public class GSmartGui extends JFrame {
         }
     }
 
+    /**
+     * Delega ao PipelineManager a tarefa de parar todas as pipelines em execução,
+     * geralmente após uma confirmação do utilizador.
+     */
     private void stopAllPipelines() {
         pipelineManager.stopAllPipelines();
     }
 
+    /**
+     * Exibe a "Central de Monitoramento".
+     * Se a janela ainda não existir, uma nova é criada. Se já existir,
+     * é simplesmente trazida para a frente.
+     */
     private void showTaskManager() {
         if (taskManagerWindow == null || !taskManagerWindow.isDisplayable()) {
             taskManagerWindow = new TaskManagerWindow(this.pipelineManager);
@@ -300,6 +526,10 @@ public class GSmartGui extends JFrame {
         taskManagerWindow.toFront();
     }
 
+    /**
+     * Alterna a visibilidade dos painéis de configuração de fonte de dados (ThingsBoard ou Base de Dados)
+     * com base na seleção do utilizador no JComboBox principal.
+     */
     private void toggleSourceFields() {
         CardLayout cl = (CardLayout) (sourceConfigCardPanel.getLayout());
         String selectedSource = (String) sourceSelector.getSelectedItem();
@@ -308,6 +538,11 @@ public class GSmartGui extends JFrame {
         }
     }
 
+    /**
+     * Obtém e valida a URL do servidor ThingsBoard a partir do campo de texto correspondente.
+     * Lança uma IllegalStateException se o campo estiver vazio.
+     * @return A URL do ThingsBoard como uma String.
+     */
     private String getThingsboardUrl() {
         String url = thingsboardUrlField.getText().trim();
         if (url.isEmpty()) {
@@ -318,9 +553,9 @@ public class GSmartGui extends JFrame {
     }
 
     /**
-     * Inicia uma tentativa de conexão com a fonte de dados (ThingsBoard/Banco de Dados)
-     * em uma thread de trabalho em segundo plano usando {@link SwingWorker}.
-     * Atualiza a UI com o status da conexão (sucesso ou falha) sem congelar a aplicação.
+     * Tenta estabelecer uma conexão com o servidor ThingsBoard.
+     * Se bem-sucedido, ativa os seletores de perfil de dispositivo e carrega os perfis disponíveis.
+     * Utiliza um {@code SwingWorker} para não bloquear a interface durante a conexão.
      */
     private void connectToThingsboard() {
         tbStatusLabel.setText("Conectando...");
@@ -357,9 +592,9 @@ public class GSmartGui extends JFrame {
     }
 
     /**
-     * Inicia uma tentativa de conexão com a fonte de dados (ThingsBoard/Banco de Dados)
-     * em uma thread de trabalho em segundo plano usando {@link SwingWorker}.
-     * Atualiza a UI com o status da conexão (sucesso ou falha) sem congelar a aplicação.
+     * Tenta estabelecer uma conexão com a base de dados configurada via JDBC.
+     * Se bem-sucedido, ativa o seletor de tabelas e carrega as tabelas disponíveis.
+     * Utiliza um {@code SwingWorker} para não bloquear a interface durante a conexão.
      */
     private void connectToDatabase() {
         dbStatusLabel.setText("Conectando...");
@@ -396,9 +631,9 @@ public class GSmartGui extends JFrame {
     }
 
     /**
-     * Busca as "chaves" (métricas de telemetria ou colunas de tabela) disponíveis na fonte
-     * de dados atualmente configurada. Utiliza um {@link SwingWorker} para a operação de rede
-     * e, em caso de sucesso, preenche a tabela de métricas com os resultados.
+     * Carrega as chaves de telemetria (ThingsBoard) ou os nomes das colunas (Base de Dados)
+     * da fonte de dados selecionada e popula a tabela de métricas na interface.
+     * Utiliza um {@code SwingWorker} para executar a operação em segundo plano.
      */
     private void loadAvailableKeys() {
         loadKeysButton.setEnabled(false);
@@ -449,6 +684,11 @@ public class GSmartGui extends JFrame {
         }
     }
 
+    /**
+     * Processa o resultado do SwingWorker que busca as métricas/colunas.
+     * Popula a tabela de métricas com os dados recebidos ou exibe uma mensagem de erro.
+     * @param worker O SwingWorker que completou a sua execução.
+     */
     private void handleKeysLoaded(SwingWorker<List<String>, Void> worker) {
         try {
             List<String> keys = worker.get();
@@ -458,14 +698,15 @@ public class GSmartGui extends JFrame {
                 return;
             }
 
-            runLogicCheckBox.setSelected(false);
-            this.logicConfig = null;
-            logger.info("Lógica de negócio temporariamente desativada por padrão.");
+
+
+
 
             List<MetricConfig> configs = keys.stream().map(MetricConfig::new).collect(Collectors.toList());
             configs.add(0, new MetricConfig("OrigemDados", true, true));
             configs.add(0, new MetricConfig("HdDev", true, true));
             configs.add(0, new MetricConfig("timestamp", true, true));
+            configs.add(0, new MetricConfig("AlertaCritico", true, true));
             tableModel.setMetrics(configs);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Falha ao carregar as métricas/colunas:\n" + e.getCause().getMessage(), "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
@@ -474,22 +715,23 @@ public class GSmartGui extends JFrame {
         }
     }
 
+    /**
+     * Restaura o estado do botão "Carregar Métricas", reativando-o e
+     * redefinindo o seu texto para o estado inicial.
+     */
     private void setLoadButtonReady() {
         loadKeysButton.setEnabled(true);
         loadKeysButton.setText("Carregar Métricas da Fonte");
     }
 
     /**
-     * Cria e retorna uma instância concreta de {@link IDataSource} com base na seleção
-     * atual do usuário na interface gráfica.
-     * Este método valida se todas as informações necessárias (URLs, dispositivo, tabela, etc.)
-     * estão presentes antes de instanciar o objeto da fonte de dados.
-     *
-     * @param originalKeys A lista de nomes originais das métricas a serem buscadas.
-     * @return Uma instância de IDataSource pronta para ser usada pela pipeline.
-     * @throws Exception se a conexão com a fonte não puder ser estabelecida ou se a configuração estiver incompleta.
+     * Cria e retorna uma instância da fonte de dados (IDataSource) apropriada
+     * com base na seleção do utilizador na interface.
+     * @param originalKeys A lista de métricas/colunas que a fonte de dados deve buscar.
+     * @return Uma instância de ThingsBoardSource ou DatabaseSource.
+     * @throws Exception Se a conexão com a fonte de dados falhar ou a configuração for inválida.
      */
-    private IDataSource createSelectedDataSource(List<String> originalKeys) throws Exception { // Adiciona "throws Exception"
+    private IDataSource createSelectedDataSource(List<String> originalKeys) throws Exception {
         String selectedSource = (String) sourceSelector.getSelectedItem();
         if ("Thingsboard API".equals(selectedSource)) {
             String tbUrl = getThingsboardUrl();
@@ -498,7 +740,7 @@ public class GSmartGui extends JFrame {
                 throw new IllegalStateException("Nenhum dispositivo do ThingsBoard foi selecionado.");
             }
             ThingsBoardSource tbSource = new ThingsBoardSource(tbUrl, selectedDevice.id(), originalKeys, sharedOkHttpClient);
-            tbSource.testConnectionAndThrow(); // Testa a conexão; lança exceção se falhar
+            tbSource.testConnectionAndThrow();
             return tbSource;
 
         } else if ("Banco de Dados Espelho".equals(selectedSource)) {
@@ -510,18 +752,29 @@ public class GSmartGui extends JFrame {
                 throw new IllegalStateException("Nenhuma tabela do banco de dados foi selecionada.");
             }
             DatabaseSource dbSource = new DatabaseSource(dbUrl, dbUser, dbPassword, dbTable, originalKeys);
-            dbSource.testConnectionAndThrow(); // Testa a conexão; lança exceção se falhar
+            dbSource.testConnectionAndThrow();
             return dbSource;
         }
         throw new IllegalStateException("Nenhuma fonte de dados válida foi selecionada.");
     }
 
+    /**
+     * Exibe um diálogo de seleção (JOptionPane) com uma lista de opções.
+     * @param options A lista de strings a serem exibidas no dropdown.
+     * @param title O título da janela de diálogo.
+     * @param message A mensagem a ser exibida ao utilizador.
+     * @return A string selecionada pelo utilizador ou null se o diálogo for cancelado.
+     */
     private String showDropdownDialog(List<String> options, String title, String message) {
         if (options == null || options.isEmpty()) return null;
         Object[] possibilities = options.toArray();
         return (String) JOptionPane.showInputDialog(this, message, title, JOptionPane.PLAIN_MESSAGE, null, possibilities, options.get(0));
     }
 
+    /**
+     * Carrega a lista de Perfis de Dispositivo do servidor ThingsBoard e popula
+     * o JComboBox correspondente.
+     */
     private void loadDeviceProfiles() {
         Object previouslySelected = deviceProfileSelector.getSelectedItem();
         tbConnectButton.setEnabled(false);
@@ -556,6 +809,10 @@ public class GSmartGui extends JFrame {
         }.execute();
     }
 
+    /**
+     * Carrega a lista de Dispositivos associados a um Perfil de Dispositivo específico
+     * do servidor ThingsBoard e popula o JComboBox correspondente.
+     */
     private void loadDevicesByProfile() {
         DeviceProfile selectedProfile = (DeviceProfile) deviceProfileSelector.getSelectedItem();
         if (selectedProfile == null) {
@@ -582,107 +839,5 @@ public class GSmartGui extends JFrame {
                 }
             }
         }.execute();
-    }
-}
-// As classes internas MetricTableModel e SystemMetricCellRenderer permanecem aqui, sem alterações.
-
-/**
- * Modelo de dados (TableModel) para a JTable que exibe as métricas.
- *
- * Esta classe interna gerencia a lista de objetos {@code MetricConfig}, controlando
- * quais dados são exibidos na tabela e como eles podem ser editados pelo utilizador
- * (seleção, alias e expressões).
- * @see javax.swing.table.AbstractTableModel
- * @see com.gsmart.config.MetricConfig
- */
-class MetricTableModel extends AbstractTableModel {
-    private final String[] columnNames = {"Enviar", "Nome Original", "Enviar Como (Alias)", "Função/Expressão (usar 'valor')"};
-    private List<MetricConfig> metrics = new ArrayList<>();
-
-    public List<MetricConfig> getSelectedMetrics() {
-        return metrics.stream().filter(MetricConfig::isSelected).collect(Collectors.toList());
-    }
-    public void setMetrics(List<MetricConfig> metrics) {
-        this.metrics = new ArrayList<>(metrics);
-        fireTableDataChanged();
-    }
-    public void clearMetrics() {
-        this.metrics.clear();
-        fireTableDataChanged();
-    }
-    @Override public int getRowCount() { return metrics.size(); }
-    @Override public int getColumnCount() { return columnNames.length; }
-    @Override public String getColumnName(int column) { return columnNames[column]; }
-    @Override public Class<?> getColumnClass(int columnIndex) {
-        if (columnIndex == 0) return Boolean.class;
-        return String.class;
-    }
-    @Override public boolean isCellEditable(int rowIndex, int columnIndex) {
-        if (columnIndex == 0) {
-            MetricConfig metric = metrics.get(rowIndex);
-            return !metric.isSystemMetric();
-        }
-        return columnIndex == 2 || columnIndex == 3;
-    }
-    public MetricConfig getMetricAt(int row) {
-        if (row >= 0 && row < metrics.size()) {
-            return metrics.get(row);
-        }
-        return null;
-    }
-    @Override public Object getValueAt(int rowIndex, int columnIndex) {
-        MetricConfig metric = metrics.get(rowIndex);
-        return switch (columnIndex) {
-            case 0 -> metric.isSelected();
-            case 1 -> metric.getOriginalName();
-            case 2 -> metric.getAlias();
-            case 3 -> metric.getExpression();
-            default -> null;
-        };
-    }
-    @Override public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        MetricConfig metric = metrics.get(rowIndex);
-        switch (columnIndex) {
-            case 0 -> metric.setSelected((Boolean) aValue);
-            case 2 -> metric.setAlias((String) aValue);
-            case 3 -> metric.setExpression((String) aValue);
-        }
-        fireTableCellUpdated(rowIndex, columnIndex);
-    }
-}
-
-/**
- * Renderizador de células customizado para a tabela de métricas.
- *
- * A sua principal função é alterar a aparência (fonte e cor) das métricas
- * que são consideradas "de sistema" (como timestamp), diferenciando-as
- * visualmente das métricas normais para uma melhor legibilidade.
- * @see javax.swing.table.DefaultTableCellRenderer
- */
-class SystemMetricCellRenderer extends DefaultTableCellRenderer {
-    private final Font defaultFont = new Font("Segoe UI", Font.PLAIN, 12);
-    private final Font systemFont = new Font("Segoe UI", Font.ITALIC, 12);
-
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
-        MetricTableModel model = (MetricTableModel) table.getModel();
-        MetricConfig metric = model.getMetricAt(row);
-
-        if (metric != null && metric.isSystemMetric()) {
-            setFont(systemFont);
-            setForeground(Color.BLUE);
-        } else {
-            setFont(defaultFont);
-            setForeground(table.getForeground());
-        }
-
-        if (column == 0) {
-            setHorizontalAlignment(SwingConstants.CENTER);
-        } else {
-            setHorizontalAlignment(SwingConstants.LEFT);
-        }
-        return this;
     }
 }

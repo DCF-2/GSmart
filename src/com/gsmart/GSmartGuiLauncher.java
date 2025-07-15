@@ -1,7 +1,7 @@
 // Localização: src/main/java/com/gsmart/GSmartGuiLauncher.java
 package com.gsmart;
 
-import com.gsmart.windows.LoginWindow;
+import com.gsmart.Gui.windows.LoginWindow;
 
 import javax.swing.SwingUtilities;
 

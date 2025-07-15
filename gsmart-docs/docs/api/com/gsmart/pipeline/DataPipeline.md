@@ -1,22 +1,17 @@
-# Classe: DataPipeline
+# Classe: `DataPipeline`
 
 **Pacote:** `com.gsmart.pipeline`
 
 ## Descrição Geral
 
-Representa a lógica de execução de um único pipeline de dados.  
+Classe utilitária estática que atua como o motor de regras de negócio.  
   
-Esta classe opera como um "worker" que roda em sua própria thread e é responsável  
-por todo o fluxo de trabalho de um monitoramento contínuo. Suas principais  
-responsabilidades incluem a conexão com a fonte de dados, a coleta periódica,  
-o processamento e o envio dos dados para o destino final.  
-  
-Ela também implementa uma lógica robusta de tratamento de falhas e reconexão  
-automática para garantir a resiliência do sistema.
+A sua responsabilidade é analisar um conjunto de métricas de um ciclo de processamento  
+e gerar "insights" ou alertas humanamente legíveis com base em limiares pré-definidos.  
+As regras avaliam custos, diagnósticos de manutenção e previsões de falhas,  
+comunicando os resultados através do `GSmartListener`.
 
-- **`@see`**: com.gsmart.pipeline.PipelineManager
-- **`@see`**: com.gsmart.resources.IDataSource
-- **`@see`**: com.gsmart.resources.GSmartListener
+- **Ver Também:** com.gsmart.resources.GSmartListener
 
 
 ## Métodos da Classe
@@ -25,27 +20,36 @@ automática para garantir a resiliência do sistema.
 
 ### `public void triggerManualReconnect()`
 
-Sinaliza para a thread da pipeline que uma reconexão manual e imediata deve ser tentada.  
-  
-Este método interrompe o estado de espera (`sleep`) da thread para forçar uma verificação  
-imediata do gatilho de reconexão, sendo útil para ações iniciadas pelo usuário.
+*Nenhuma documentação de método fornecida.*
 
 ---
 
 ### `public void requestStop()`
 
-Solicita que a pipeline pare sua execução de forma graciosa.  
-  
-A flag de parada será verificada no final do ciclo atual ou durante um loop de reconexão,  
-garantindo que a thread termine de forma segura sem interromper uma operação no meio.
+*Nenhuma documentação de método fornecida.*
 
 ---
 
 ### `public void run()`
 
-Ponto de entrada principal para a execução da pipeline na sua thread.  
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `private void enviarAlertaParaNodeRED(String mensagem)`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `private void enviarInsightParaNodeRED(String mensagem, String tipo)`
+
+Envia uma mensagem de alarme para o endpoint /insight do Node-RED.  
   
-Contém o loop de vida da pipeline, que consiste em um bloco de operação normal  
-(coleta, processamento, envio) e um bloco de tratamento de falhas e reconexão.  
-O loop só termina quando o método `requestStop()` é chamado.
+Este método formata um payload JSON contendo a mensagem e o tipo do alarme,  
+e realiza uma requisição POST para um tópico MQTT diferente dos alertas críticos.
+
+- **Parâmetro:** `mensagem` - O texto do alarme a ser enviado.
+- **Parâmetro:** `tipo` - A categoria do alarme (ex: "CUSTO", "EFICIÊNCIA").
+
 

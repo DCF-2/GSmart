@@ -9,7 +9,7 @@
       
       
       
-        <link rel="prev" href="../../controller/PrevisaoFalhas/">
+        <link rel="prev" href="../../controller/CalculoDeCusto/">
       
       
         <link rel="next" href="../PipelineManager/">
@@ -347,7 +347,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../MetricTableModel/" class="md-nav__link">
+      <a href="../../MetricTableModel.md" class="md-nav__link">
         
   
   
@@ -370,7 +370,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../SystemMetricCellRenderer/" class="md-nav__link">
+      <a href="../../SystemMetricCellRenderer.md" class="md-nav__link">
         
   
   
@@ -715,7 +715,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../controller/GeradorDeInsights/" class="md-nav__link">
+      <a href="../../controller/GeradorDeInsights.md" class="md-nav__link">
         
   
   
@@ -738,7 +738,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../controller/Manutencao/" class="md-nav__link">
+      <a href="../../controller/Manutencao.md" class="md-nav__link">
         
   
   
@@ -761,7 +761,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../controller/PrevisaoFalhas/" class="md-nav__link">
+      <a href="../../controller/PrevisaoFalhas.md" class="md-nav__link">
         
   
   
@@ -901,27 +901,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#public-void-triggermanualreconnect" class="md-nav__link">
+  <a href="#private-void-enviarinsightparanoderedstring-mensagem-string-tipo" class="md-nav__link">
     <span class="md-ellipsis">
-      public void triggerManualReconnect()
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#public-void-requeststop" class="md-nav__link">
-    <span class="md-ellipsis">
-      public void requestStop()
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#public-void-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      public void run()
+      private void enviarInsightParaNodeRED(String mensagem, String tipo)
     </span>
   </a>
   
@@ -1270,7 +1252,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/LogViewerWindow/" class="md-nav__link">
+      <a href="../../windows/LogViewerWindow.md" class="md-nav__link">
         
   
   
@@ -1293,7 +1275,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/LoginWindow/" class="md-nav__link">
+      <a href="../../windows/LoginWindow.md" class="md-nav__link">
         
   
   
@@ -1316,7 +1298,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/MonitoringWindow/" class="md-nav__link">
+      <a href="../../windows/MonitoringWindow.md" class="md-nav__link">
         
   
   
@@ -1339,7 +1321,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/ReconnectionLogViewer/" class="md-nav__link">
+      <a href="../../windows/ReconnectionLogViewer.md" class="md-nav__link">
         
   
   
@@ -1362,7 +1344,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/TaskManagerWindow/" class="md-nav__link">
+      <a href="../../windows/TaskManagerWindow.md" class="md-nav__link">
         
   
   
@@ -1385,7 +1367,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/TaskManagerWindow.ButtonColumnRenderer/" class="md-nav__link">
+      <a href="../../windows/TaskManagerWindow.ButtonColumnRenderer.md" class="md-nav__link">
         
   
   
@@ -1408,7 +1390,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../windows/TaskManagerWindow.StatusCellRenderer/" class="md-nav__link">
+      <a href="../../windows/TaskManagerWindow.StatusCellRenderer.md" class="md-nav__link">
         
   
   
@@ -1485,27 +1467,9 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#public-void-triggermanualreconnect" class="md-nav__link">
+  <a href="#private-void-enviarinsightparanoderedstring-mensagem-string-tipo" class="md-nav__link">
     <span class="md-ellipsis">
-      public void triggerManualReconnect()
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#public-void-requeststop" class="md-nav__link">
-    <span class="md-ellipsis">
-      public void requestStop()
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#public-void-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      public void run()
+      private void enviarInsightParaNodeRED(String mensagem, String tipo)
     </span>
   </a>
   
@@ -1535,35 +1499,24 @@
 <h1 id="classe-datapipeline">Classe: DataPipeline</h1>
 <p><strong>Pacote:</strong> <code>com.gsmart.pipeline</code></p>
 <h2 id="descricao-geral">Descrição Geral</h2>
-<p>Representa a lógica de execução de um único pipeline de dados.</p>
-<p>Esta classe opera como um "worker" que roda em sua própria thread e é responsável</p>
-<p>por todo o fluxo de trabalho de um monitoramento contínuo. Suas principais</p>
-<p>responsabilidades incluem a conexão com a fonte de dados, a coleta periódica,</p>
-<p>o processamento e o envio dos dados para o destino final.</p>
-<p>Ela também implementa uma lógica robusta de tratamento de falhas e reconexão</p>
-<p>automática para garantir a resiliência do sistema.</p>
+<p>Classe utilitária estática que atua como o motor de regras de negócio.</p>
+<p>A sua responsabilidade é analisar um conjunto de métricas de um ciclo de processamento</p>
+<p>e gerar "insights" ou alertas humanamente legíveis com base em limiares pré-definidos.</p>
+<p>As regras avaliam custos, diagnósticos de manutenção e previsões de falhas,</p>
+<p>comunicando os resultados através do <code>GSmartListener</code>.</p>
 <ul>
-<li><strong><code>@see</code></strong>: com.gsmart.pipeline.PipelineManager</li>
-<li><strong><code>@see</code></strong>: com.gsmart.resources.IDataSource</li>
 <li><strong><code>@see</code></strong>: com.gsmart.resources.GSmartListener</li>
 </ul>
 <h2 id="metodos-da-classe">Métodos da Classe</h2>
 <hr />
-<h3 id="public-void-triggermanualreconnect"><code>public void triggerManualReconnect()</code></h3>
-<p>Sinaliza para a thread da pipeline que uma reconexão manual e imediata deve ser tentada.</p>
-<p>Este método interrompe o estado de espera (<code>sleep</code>) da thread para forçar uma verificação</p>
-<p>imediata do gatilho de reconexão, sendo útil para ações iniciadas pelo usuário.</p>
-<hr />
-<h3 id="public-void-requeststop"><code>public void requestStop()</code></h3>
-<p>Solicita que a pipeline pare sua execução de forma graciosa.</p>
-<p>A flag de parada será verificada no final do ciclo atual ou durante um loop de reconexão,</p>
-<p>garantindo que a thread termine de forma segura sem interromper uma operação no meio.</p>
-<hr />
-<h3 id="public-void-run"><code>public void run()</code></h3>
-<p>Ponto de entrada principal para a execução da pipeline na sua thread.</p>
-<p>Contém o loop de vida da pipeline, que consiste em um bloco de operação normal</p>
-<p>(coleta, processamento, envio) e um bloco de tratamento de falhas e reconexão.</p>
-<p>O loop só termina quando o método <code>requestStop()</code> é chamado.</p>
+<h3 id="private-void-enviarinsightparanoderedstring-mensagem-string-tipo"><code>private void enviarInsightParaNodeRED(String mensagem, String tipo)</code></h3>
+<p>Envia uma mensagem de alarme para o endpoint /insight do Node-RED.</p>
+<p>Este método formata um payload JSON contendo a mensagem e o tipo do alarme,</p>
+<p>e realiza uma requisição POST para um tópico MQTT diferente dos alertas críticos.</p>
+<ul>
+<li><strong>Parâmetro:</strong> <code>mensagem</code> - O texto do alarme a ser enviado.</li>
+<li><strong>Parâmetro:</strong> <code>tipo</code> - A categoria do alarme (ex: "CUSTO", "EFICIÊNCIA").</li>
+</ul>
 
 
 
