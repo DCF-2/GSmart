@@ -21,9 +21,12 @@ public class InsightRuleDialog extends JDialog {
     private JComboBox<ConditionType> conditionComboBox;
     private JTextField thresholdValueField;
     private JTextArea messageToSendArea;
-    private JTextField insightTypeField; // Novo campo para o tipo de insight
+    private JTextField insightTypeField;
+    private JCheckBox sendToTelegramCheckBox;
+    private JSpinner cooldownSpinner;
     private JButton saveButton;
     private JButton cancelButton;
+
 
     private InsightRule insightRule;
 
@@ -48,6 +51,9 @@ public class InsightRuleDialog extends JDialog {
         messageToSendArea = new JTextArea(5, 20);
         messageToSendArea.setLineWrap(true);
         messageToSendArea.setWrapStyleWord(true);
+        sendToTelegramCheckBox = new JCheckBox("Enviar via Telegram", true);
+        cooldownSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
+
         saveButton = new JButton("Salvar");
         cancelButton = new JButton("Cancelar");
     }
@@ -82,11 +88,20 @@ public class InsightRuleDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 5; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Gerar insight:"), gbc);
         gbc.gridx = 1; gbc.fill = GridBagConstraints.BOTH; gbc.weighty = 1.0; add(new JScrollPane(messageToSendArea), gbc);
 
+        // --- COOLDOWN E DESTINOS ---
+        JPanel optionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        optionsPanel.add(new JLabel("Reenviar apenas após:"));
+        optionsPanel.add(cooldownSpinner);
+        optionsPanel.add(new JLabel("segs."));
+        optionsPanel.add(sendToTelegramCheckBox);
+        gbc.gridx = 1; gbc.gridy = 6; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0;
+        add(optionsPanel, gbc);
+
         // Linha 7: Botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(cancelButton);
         buttonPanel.add(saveButton);
-        gbc.gridx = 1; gbc.gridy = 6; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0; add(buttonPanel, gbc);
+        gbc.gridx = 1; gbc.gridy = 7; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0; add(buttonPanel, gbc);
     }
 
     private void onSave() {
@@ -119,6 +134,8 @@ public class InsightRuleDialog extends JDialog {
             this.insightRule.setMessageToSend(messageToSendArea.getText().trim());
             this.insightRule.setInsightType(insightTypeField.getText().trim().toUpperCase());
         }
+        this.insightRule.setCooldownSeconds((Integer) cooldownSpinner.getValue());
+        this.insightRule.setSendToTelegram(sendToTelegramCheckBox.isSelected());
         dispose();
     }
 
@@ -130,6 +147,8 @@ public class InsightRuleDialog extends JDialog {
         thresholdValueField.setText(String.valueOf(rule.getThresholdValue()));
         messageToSendArea.setText(rule.getMessageToSend());
         insightTypeField.setText(rule.getInsightType());
+        cooldownSpinner.setValue(rule.getCooldownSeconds());
+        sendToTelegramCheckBox.setSelected(rule.isSendToTelegram());
     }
 
     public InsightRule getInsightRule() {

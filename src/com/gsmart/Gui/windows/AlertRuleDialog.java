@@ -24,6 +24,9 @@ public class AlertRuleDialog extends JDialog {
     private JComboBox<ConditionType> conditionComboBox;
     private JTextField thresholdValueField;
     private JTextArea messageToSendArea;
+    private JCheckBox sendToMqttCheckBox;
+    private JCheckBox sendToTelegramCheckBox;
+    private JSpinner cooldownSpinner;
     private JButton saveButton;
     private JButton cancelButton;
 
@@ -49,6 +52,10 @@ public class AlertRuleDialog extends JDialog {
         messageToSendArea = new JTextArea(5, 20);
         messageToSendArea.setLineWrap(true);
         messageToSendArea.setWrapStyleWord(true);
+        sendToMqttCheckBox = new JCheckBox("Enviar via MQTT", true);
+        sendToTelegramCheckBox = new JCheckBox("Enviar via Telegram", true);
+        cooldownSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
+
         saveButton = new JButton("Salvar");
         cancelButton = new JButton("Cancelar");
     }
@@ -112,12 +119,29 @@ public class AlertRuleDialog extends JDialog {
         gbc.weighty = 1.0;
         add(new JScrollPane(messageToSendArea), gbc);
 
+        // --- CooldownSeconds ---
+        JPanel cooldownPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        cooldownPanel.add(new JLabel("Reenviar alerta apenas após:"));
+        cooldownPanel.add(cooldownSpinner);
+        cooldownPanel.add(new JLabel(" segundos"));
+        gbc.gridx = 1; gbc.gridy = 5; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0;
+        gbc.insets = new Insets(10, 5, 0, 5); // Adiciona um espaço extra em cima
+        add(cooldownPanel, gbc);
+        gbc.insets = new Insets(5, 5, 5, 5); // Restaura o espaçamento normal
+
+        // --- Mqtt ou Telegram (DESTINOS) ---
+        JPanel destinationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        destinationPanel.add(sendToMqttCheckBox);
+        destinationPanel.add(sendToTelegramCheckBox);
+        gbc.gridx = 1; gbc.gridy = 6; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0;
+        add(destinationPanel, gbc);
+
         // Linha 6: Botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(cancelButton);
         buttonPanel.add(saveButton);
         gbc.gridx = 1;
-        gbc.gridy = 5;
+        gbc.gridy = 7;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weighty = 0;
         add(buttonPanel, gbc);
@@ -144,7 +168,9 @@ public class AlertRuleDialog extends JDialog {
                     (String) metricComboBox.getSelectedItem(),
                     (ConditionType) conditionComboBox.getSelectedItem(),
                     threshold,
-                    messageToSendArea.getText().trim()
+                    messageToSendArea.getText().trim(),
+                    sendToMqttCheckBox.isSelected(),
+                    sendToTelegramCheckBox.isSelected()
             );
         } else {
             this.alertRule.setRuleName(ruleNameField.getText().trim());
@@ -152,8 +178,12 @@ public class AlertRuleDialog extends JDialog {
             this.alertRule.setCondition((ConditionType) conditionComboBox.getSelectedItem());
             this.alertRule.setThresholdValue(threshold);
             this.alertRule.setMessageToSend(messageToSendArea.getText().trim());
+            this.alertRule.setSendToMqtt(sendToMqttCheckBox.isSelected());
+            this.alertRule.setSendToTelegram(sendToTelegramCheckBox.isSelected());
         }
 
+        // Define o valor do cooldown, tanto para regras novas como para editadas.
+        this.alertRule.setCooldownSeconds((Integer) cooldownSpinner.getValue());
         dispose(); // Fecha a janela
     }
 
@@ -165,9 +195,12 @@ public class AlertRuleDialog extends JDialog {
         conditionComboBox.setSelectedItem(rule.getCondition());
         thresholdValueField.setText(String.valueOf(rule.getThresholdValue()));
         messageToSendArea.setText(rule.getMessageToSend());
+        sendToMqttCheckBox.setSelected(rule.isSendToMqtt());
+        sendToTelegramCheckBox.setSelected(rule.isSendToTelegram());
+        cooldownSpinner.setValue(rule.getCooldownSeconds());
     }
 
-    // Método para obter a regra salva
+    // Metodo para obter a regra salva
     public AlertRule getAlertRule() {
         return alertRule;
     }

@@ -48,6 +48,11 @@ public class DataPipeline {
     private final GSmartListener listener;
     private final List<AlertRule> alertRules;
     private final List<InsightRule> insightRules;
+    private final String mqttBrokerUrl;
+    private final String telegramToken;
+    private final String telegramChatId;
+    private final Map<String, Long> alertCooldowns;
+    private final Map<String, Long> alarmCooldowns;
     private final OkHttpClient httpClient;
     private volatile boolean stopRequested = false;
     private final AtomicBoolean manualReconnectTrigger = new AtomicBoolean(false);
@@ -61,14 +66,21 @@ public class DataPipeline {
      * @param listener O canal de comunicação com a GUI.
      * @param alertRules A lista de regras de alerta a serem avaliadas.
      * @param insightRules A lista de regras de alarme a serem avaliadas.
+     * @param telegramChatId O id do seu chat no telegram.
+     * @param telegramToken O token do seu chatboot do telegram.
      */
-    public DataPipeline(IDataSource dataSource, String powerBiPushUrl, List<MetricConfig> metricConfigs, GSmartListener listener, List<AlertRule> alertRules, List<InsightRule> insightRules) {
+    public DataPipeline(IDataSource dataSource, String powerBiPushUrl, List<MetricConfig> metricConfigs, GSmartListener listener, List<AlertRule> alertRules, List<InsightRule> insightRules, String telegramToken, String telegramChatId, String mqttBrokerUrl) {
         this.dataSource = dataSource;
         this.powerBiPushUrl = powerBiPushUrl;
         this.metricConfigs = metricConfigs;
         this.listener = listener;
         this.alertRules = alertRules;
-        this.insightRules = insightRules; // Adicione a atribuição para as novas regras
+        this.insightRules = insightRules;
+        this.mqttBrokerUrl = mqttBrokerUrl;
+        this.telegramToken = telegramToken;
+        this.telegramChatId = telegramChatId;
+        this.alertCooldowns = new HashMap<>();
+        this.alarmCooldowns = new HashMap<>();
         this.httpClient = new OkHttpClient();
     }
 
@@ -140,9 +152,11 @@ public class DataPipeline {
                     }
                 }
 
-                logger.debug("[MOTOR DE REGRAS] A iniciar avaliação de {} regras.", alertRules != null ? alertRules.size() : 0);
+                logger.debug("[MOTOR DE REGRAS] A iniciar avaliação de {} regras de alerta.", alertRules != null ? alertRules.size() : 0);
                 boolean alertaCriticoDisparado = false;
                 if (alertRules != null && !alertRules.isEmpty()) {
+                    long currentTime = System.currentTimeMillis();
+
                     for (AlertRule rule : alertRules) {
                         logger.debug("--- Avaliando regra: '{}'", rule.getRuleName());
                         if (!rule.isEnabled()) {
@@ -168,17 +182,35 @@ public class DataPipeline {
                             logger.debug("   - Resultado da condição: {}", condicaoSatisfeita);
 
                             if (condicaoSatisfeita) {
-                                logger.info("   - CONDIÇÃO SATISFEITA! A disparar alerta.");
-                                enviarAlertaParaNodeRED(rule.getMessageToSend());
-                                alertaCriticoDisparado = true;
+                                long lastSentTime = alertCooldowns.getOrDefault(rule.getId(), 0L);
+                                long cooldownMillis = rule.getCooldownSeconds() * 1000L;
+
+                                if ((currentTime - lastSentTime) > cooldownMillis) {
+                                    logger.info("   - CONDIÇÃO SATISFEITA! Cooldown permite o envio. Disparando alerta.");
+                                    alertaCriticoDisparado = true;
+
+                                    if (rule.isSendToMqtt()) {
+                                        publicarAlertaMqtt(rule.getMessageToSend());
+                                    }
+                                    if (rule.isSendToTelegram()) {
+                                        com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, rule.getMessageToSend());
+                                    }
+
+                                    alertCooldowns.put(rule.getId(), currentTime);
+                                } else {
+                                    logger.info("   - CONDIÇÃO SATISFEITA! Mas o alerta para a regra '{}' está em cooldown. O envio foi ignorado.", rule.getRuleName());
+                                }
                             }
                         } else {
                             logger.warn("   - A métrica '{}' para a regra '{}' não foi encontrada nos dados atuais.", metricToWatch, rule.getRuleName());
                         }
                     }
                 }
-                logger.debug("[MOTOR DE INSIGHTS] A iniciar avaliação de {} regras de insight.", insightRules != null ? insightRules.size() : 0);
+
+                logger.debug("[MOTOR DE ALARMES] A iniciar avaliação de {} regras de alarme.", insightRules != null ? insightRules.size() : 0);
                 if (insightRules != null && !insightRules.isEmpty()) {
+                    long currentTime = System.currentTimeMillis(); // Obtenha o tempo atual uma vez
+
                     for (InsightRule rule : insightRules) {
                         if (!rule.isEnabled()) continue;
 
@@ -192,13 +224,30 @@ public class DataPipeline {
                             }
 
                             if (condicaoSatisfeita) {
-                                logger.info("   - INSIGHT GERADO! '{}'", rule.getRuleName());
-                                // Envia para a GUI
-                                if (listener != null) {
-                                    listener.onInsight(rule.getMessageToSend(), rule.getInsightType());
+                                long lastSentTime = alarmCooldowns.getOrDefault(rule.getId(), 0L);
+                                long cooldownMillis = rule.getCooldownSeconds() * 1000L;
+
+                                if ((currentTime - lastSentTime) > cooldownMillis) {
+                                    logger.info("   - ALARME GERADO! '{}'", rule.getRuleName());
+
+                                    // Envia para a GUI (sempre)
+                                    if (listener != null) {
+                                        listener.onInsight(rule.getMessageToSend(), rule.getInsightType());
+                                    }
+
+                                    // Envia para o MQTT (sempre)
+                                    publicarAlarmeMqtt(rule.getMessageToSend(), rule.getInsightType());
+
+                                    // Envia para o Telegram (se a opção estiver marcada)
+                                    if (rule.isSendToTelegram()) {
+                                        com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, rule.getMessageToSend());
+                                    }
+
+                                    // Atualiza o timestamp do último envio para esta regra de alarme.
+                                    alarmCooldowns.put(rule.getId(), currentTime);
+                                } else {
+                                    logger.info("   - CONDIÇÃO DE ALARME SATISFEITA! Mas a regra '{}' está em cooldown. O envio foi ignorado.", rule.getRuleName());
                                 }
-                                // Envia para o MQTT
-                                enviarInsightParaNodeRED(rule.getMessageToSend(), rule.getInsightType());
                             }
                         }
                     }
@@ -259,84 +308,27 @@ public class DataPipeline {
             listener.onStatusUpdate(TaskStatus.FINISHED);
         }
     }
-
-
-    private void enviarAlertaParaNodeRED(String mensagem) {
-        try {
-            logger.info("Enviando alerta para o Node-RED: {}", mensagem);
-
-            JsonObject jsonPayload = new JsonObject();
-            jsonPayload.addProperty("alerta_msg", mensagem);
-
-            RequestBody body = RequestBody.create(jsonPayload.toString(), MediaType.get("application/json; charset=utf-8"));
-
-            Request request = new Request.Builder()
-                    .url("http://10.5.0.11:1880/alerta") // Restaurado para http
-                    .post(body)
-                    .build();
-
-            httpClient.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    logger.warn("Falha ao enviar alerta para o Node-RED.", e);
-                }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    if (!response.isSuccessful()) {
-                        logger.warn("Falha ao enviar alerta para o Node-RED. Código: {}", response.code());
-                    } else {
-                        logger.info("Alerta enviado com sucesso para o Node-RED.");
-                    }
-                    response.close();
-                }
-            });
-        } catch (Exception e) {
-            logger.error("Erro ao tentar construir o pedido de alerta para o Node-RED.", e);
-        }
-    }
     /**
-     * Envia uma mensagem de alarme para o endpoint /insight do Node-RED.
-     *
-     * Este método formata um payload JSON contendo a mensagem e o tipo do alarme,
-     * e realiza uma requisição POST para um tópico MQTT diferente dos alertas críticos.
-     *
-     * @param mensagem O texto do alarme a ser enviado.
-     * @param tipo A categoria do alarme (ex: "CUSTO", "EFICIÊNCIA").
+     * Publica uma mensagem de alerta crítico no tópico MQTT 'gsmart/alerta'.
+     * Utiliza o {@link com.gsmart.services.MqttService} para a comunicação direta com o broker.
+     * @param mensagem O conteúdo da mensagem de alerta a ser publicada.
      */
-    private void enviarInsightParaNodeRED(String mensagem, String tipo) {
-        try {
-            logger.info("Enviando insight para o Node-RED: [Tipo: {}] {}", tipo, mensagem);
-
-            JsonObject jsonPayload = new JsonObject();
-            jsonPayload.addProperty("insight_msg", mensagem);
-            jsonPayload.addProperty("insight_type", tipo);
-
-            RequestBody body = RequestBody.create(jsonPayload.toString(), MediaType.get("application/json; charset=utf-8"));
-
-            // Usando um tópico MQTT diferente para insights
-            Request request = new Request.Builder()
-                    .url("http://10.5.0.11:1880/insight") // Novo endpoint: /insight
-                    .post(body)
-                    .build();
-
-            httpClient.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    logger.warn("Falha ao enviar insight para o Node-RED.", e);
-                }
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()) {
-                        logger.info("Insight enviado com sucesso para o Node-RED.");
-                    } else {
-                        logger.warn("Falha ao enviar insight para o Node-RED. Código: {}", response.code());
-                    }
-                    response.close();
-                }
-            });
-        } catch (Exception e) {
-            logger.error("Erro ao tentar construir o pedido de insight para o Node-RED.", e);
-        }
+    private void publicarAlertaMqtt(String mensagem) {
+        com.gsmart.services.MqttService.publish(this.mqttBrokerUrl, "gsmart/alerta", mensagem);
     }
+
+    /**
+     * Publica uma mensagem de alarme (insight) num subtópico MQTT dinâmico.
+     * O tópico é formatado como 'gsmart/alarme/{tipo}', permitindo uma filtragem fácil
+     * por parte dos clientes MQTT.
+     * @param mensagem O conteúdo do alarme a ser publicado.
+     * @param tipo A categoria do alarme (ex: "CUSTO", "MANUTENCAO"), que definirá o subtópico.
+     */
+    private void publicarAlarmeMqtt(String mensagem, String tipo) {
+        // Publicamos o alarme num subtópico para melhor organização
+        String topic = "gsmart/alarme/" + tipo.toLowerCase();
+        com.gsmart.services.MqttService.publish(this.mqttBrokerUrl, topic, mensagem);
+    }
+
+
 }

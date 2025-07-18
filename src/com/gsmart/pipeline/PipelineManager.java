@@ -154,7 +154,7 @@ public class PipelineManager {
         };
 
 
-        DataPipeline pipeline = new DataPipeline(config.dataSource(), config.powerBiUrl(), config.metricConfigs(), listener, config.alertRules(), config.insightRules());
+        DataPipeline pipeline = new DataPipeline(config.dataSource(), config.powerBiUrl(), config.metricConfigs(), listener, config.alertRules(), config.insightRules(), config.telegramToken(), config.telegramChatId(), config.mqttBrokerUrl());
 
         Thread pipelineThread = new Thread(() -> {
             try {

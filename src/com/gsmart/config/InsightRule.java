@@ -18,9 +18,11 @@ public class InsightRule implements Serializable {
     private String metricToWatch;
     private ConditionType condition;
     private double thresholdValue;
-    private String messageToSend; // A mensagem inteligente a ser gerada
-    private String insightType;   // Categoria do insight (ex: CUSTO, EFICIÊNCIA)
+    private String messageToSend;
+    private String insightType;
     private boolean enabled;
+    private boolean sendToTelegram;
+    private int cooldownSeconds;
 
     /**
      * Construtor para uma nova regra de Alarme.
@@ -41,6 +43,8 @@ public class InsightRule implements Serializable {
         this.messageToSend = messageToSend;
         this.insightType = insightType;
         this.enabled = true;
+        this.sendToTelegram = true;
+        this.cooldownSeconds = 0;
     }
 
     // --- Getters e Setters ---
@@ -60,4 +64,8 @@ public class InsightRule implements Serializable {
     public void setInsightType(String insightType) { this.insightType = insightType; }
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
+    public boolean isSendToTelegram() {return sendToTelegram;}
+    public void setSendToTelegram(boolean sendToTelegram) {this.sendToTelegram = sendToTelegram;}
+    public int getCooldownSeconds() {return cooldownSeconds;}
+    public void setCooldownSeconds(int cooldownSeconds) {this.cooldownSeconds = cooldownSeconds;}
 }

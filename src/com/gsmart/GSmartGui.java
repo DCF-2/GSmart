@@ -61,6 +61,9 @@ public class GSmartGui extends JFrame {
     private final JButton monitoringButton;
     private final JButton loadKeysButton;
     private final JTextField pbiUrlField;
+    private final JTextField mqttBrokerUrlField;
+    private final JTextField telegramTokenField;
+    private final JTextField telegramChatIdField;
     private final JPanel thingsboardConfigPanel;
     private final JTextField thingsboardUrlField;
     private final JButton tbConnectButton;
@@ -176,10 +179,27 @@ public class GSmartGui extends JFrame {
         destinationPanel.add(new JLabel("URL de Push do Power BI:"));
         pbiUrlField = new JTextField(45);
         destinationPanel.add(pbiUrlField);
+
+        destinationPanel.add(new JLabel("URL do Broker MQTT:"));
+        mqttBrokerUrlField = new JTextField("tcp://localhost:1883");
+        destinationPanel.add(mqttBrokerUrlField);
+
+        JPanel telegramPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        telegramPanel.setBorder(BorderFactory.createTitledBorder("Configurar Notificações do Telegram"));
+        telegramPanel.add(new JLabel("Token do Bot:"));
+        telegramTokenField = new JTextField(30);
+        telegramPanel.add(telegramTokenField);
+        telegramPanel.add(new JLabel("Chat ID:"));
+        telegramChatIdField = new JTextField(15);
+        telegramPanel.add(telegramChatIdField);
+
+
+        //painel principal de configuração
         topConfigurationPanel.add(sourceSelectionPanel);
         topConfigurationPanel.add(sourceConfigCardPanel);
         topConfigurationPanel.add(loadKeysPanel);
         topConfigurationPanel.add(destinationPanel);
+        topConfigurationPanel.add(telegramPanel);
 
         // --- Tabela de Métricas ---
         tableModel = new MetricTableModel();
@@ -450,7 +470,11 @@ public class GSmartGui extends JFrame {
         dbUrlField.setText(props.getProperty("db.url", "jdbc:postgresql://localhost:5432/seu_banco"));
         dbUserField.setText(props.getProperty("db.user", "postgres"));
         pbiUrlField.setText(props.getProperty("powerbi.url", ""));
+        mqttBrokerUrlField.setText(props.getProperty("mqtt.broker.url", "tcp://localhost:1883"));
         sourceSelector.setSelectedItem(props.getProperty("source.last", "Thingsboard API"));
+        sourceSelector.setSelectedItem(props.getProperty("source.last", "Thingsboard API"));
+        telegramTokenField.setText(props.getProperty("telegram.token", ""));
+        telegramChatIdField.setText(props.getProperty("telegram.chat_id", ""));
     }
 
     /**
@@ -465,6 +489,10 @@ public class GSmartGui extends JFrame {
         props.setProperty("db.user", dbUserField.getText());
         props.setProperty("powerbi.url", pbiUrlField.getText());
         props.setProperty("source.last", (String) sourceSelector.getSelectedItem());
+        props.setProperty("mqtt.broker.url", mqttBrokerUrlField.getText());
+        props.setProperty("source.last", (String) sourceSelector.getSelectedItem());
+        props.setProperty("telegram.token", telegramTokenField.getText());
+        props.setProperty("telegram.chat_id", telegramChatIdField.getText());
         configManager.saveProperties(props);
     }
 
@@ -494,8 +522,11 @@ public class GSmartGui extends JFrame {
             IDataSource selectedDataSource = createSelectedDataSource(selectedConfigs.stream().map(MetricConfig::getOriginalName).collect(Collectors.toList()));
             // Obtenha as regras atuais da tabela
             List<AlertRule> currentAlertRules = alertRuleTableModel.getRules();
-            List<InsightRule> currentInsightRules = insightRuleTableModel.getRules(); // Obtenha as regras de insight
-            PipelineConfiguration config = new PipelineConfiguration(selectedDataSource, pbiUrl, selectedConfigs, this.globalLogViewer, currentAlertRules, currentInsightRules);
+            List<InsightRule> currentInsightRules = insightRuleTableModel.getRules();
+            String mqttBrokerUrl = mqttBrokerUrlField.getText().trim();
+            String telegramToken = telegramTokenField.getText().trim();
+            String telegramChatId = telegramChatIdField.getText().trim();// Obtenha as regras de insight
+            PipelineConfiguration config = new PipelineConfiguration(selectedDataSource, pbiUrl, selectedConfigs, this.globalLogViewer, currentAlertRules, currentInsightRules, telegramToken, telegramChatId, mqttBrokerUrl);
             pipelineManager.launchPipeline(config);
             JOptionPane.showMessageDialog(this, "Pipeline para '" + selectedDataSource.getSourceName() + "' iniciada em segundo plano.\nAbra a 'Central de Monitoramento' para visualizar.", "Pipeline Iniciada", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {

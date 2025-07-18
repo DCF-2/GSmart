@@ -16,7 +16,7 @@ import java.util.List;
  * @see javax.swing.table.AbstractTableModel
  */
 public class InsightRuleTableModel extends AbstractTableModel {
-    private final String[] columnNames = {"Ativa", "Nome da Regra", "Métrica", "Condição", "Valor", "Tipo de Insight", "Mensagem Gerada"};
+    private final String[] columnNames = {"Ativa", "Nome da Regra", "Métrica Monitorada", "Condição", "Valor", "Cooldown (s)", "Telegram", "Tipo de Alarme", "Mensagem Gerada"};
     private List<InsightRule> rules;
 
     public InsightRuleTableModel() {
@@ -62,13 +62,13 @@ public class InsightRuleTableModel extends AbstractTableModel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (columnIndex == 0) return Boolean.class;
+        if (columnIndex == 0 || columnIndex == 6) return Boolean.class;
         return String.class;
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex == 0;
+        return columnIndex == 0 || columnIndex == 6;
     }
 
     @Override
@@ -80,8 +80,10 @@ public class InsightRuleTableModel extends AbstractTableModel {
             case 2: return rule.getMetricToWatch();
             case 3: return rule.getCondition().toString();
             case 4: return String.valueOf(rule.getThresholdValue());
-            case 5: return rule.getInsightType();
-            case 6: return rule.getMessageToSend();
+            case 5: return String.valueOf(rule.getCooldownSeconds());
+            case 6: return rule.isSendToTelegram();
+            case 7: return rule.getInsightType();
+            case 8: return rule.getMessageToSend();
             default: return null;
         }
     }
@@ -90,7 +92,16 @@ public class InsightRuleTableModel extends AbstractTableModel {
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
             InsightRule rule = rules.get(rowIndex);
-            rule.setEnabled((Boolean) aValue);
+            // --- SUBSTITUA O CONTEÚDO DO MÉTODO POR ESTE ---
+            switch (columnIndex) {
+                case 0:
+                    rule.setEnabled((Boolean) aValue);
+                    break;
+                // O caso 5 (Cooldown) não é editável diretamente na tabela.
+                case 6:
+                    rule.setSendToTelegram((Boolean) aValue);
+                    break;
+            }
             fireTableCellUpdated(rowIndex, columnIndex);
         }
     }

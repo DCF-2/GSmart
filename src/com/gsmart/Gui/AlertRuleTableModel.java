@@ -17,7 +17,7 @@ import java.util.List;
  * @see javax.swing.table.AbstractTableModel
  */
 public class AlertRuleTableModel extends AbstractTableModel {
-    private final String[] columnNames = {"Ativa", "Nome da Regra", "Métrica Monitorizada", "Condição", "Valor Limiar", "Mensagem de Alerta"};
+    private final String[] columnNames = {"Ativa", "Nome da Regra", "Métrica Monitorada", "Condição", "Valor", "Cooldown (s)", "MQTT", "Telegram"};
     private List<AlertRule> rules;
 
     public AlertRuleTableModel() {
@@ -63,13 +63,13 @@ public class AlertRuleTableModel extends AbstractTableModel {
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        if (columnIndex == 0) return Boolean.class;
+        if (columnIndex == 0 || columnIndex == 6 || columnIndex == 7) return Boolean.class;
         return String.class;
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex == 0;
+        return columnIndex == 0 || columnIndex == 6 || columnIndex == 7; // Ativa, MQTT, Telegram
     }
 
     @Override
@@ -81,17 +81,27 @@ public class AlertRuleTableModel extends AbstractTableModel {
             case 2: return rule.getMetricToWatch();
             case 3: return rule.getCondition().toString();
             case 4: return String.valueOf(rule.getThresholdValue());
-            case 5: return rule.getMessageToSend();
+            case 5: return String.valueOf(rule.getCooldownSeconds());
+            case 6: return rule.isSendToMqtt();
+            case 7: return rule.isSendToTelegram();
             default: return null;
         }
     }
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        if (columnIndex == 0) {
-            AlertRule rule = rules.get(rowIndex);
-            rule.setEnabled((Boolean) aValue);
-            fireTableCellUpdated(rowIndex, columnIndex);
+        AlertRule rule = rules.get(rowIndex);
+        switch (columnIndex) {
+            case 0:
+                rule.setEnabled((Boolean) aValue);
+                break;
+            case 6:
+                rule.setSendToMqtt((Boolean) aValue);
+                break;
+            case 7:
+                rule.setSendToTelegram((Boolean) aValue);
+                break;
         }
+        fireTableCellUpdated(rowIndex, columnIndex);
     }
 }

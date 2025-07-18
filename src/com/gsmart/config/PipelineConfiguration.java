@@ -21,6 +21,10 @@ import java.util.List;
  * @param metricConfigs Uma lista de {@code MetricConfig} que define as métricas a serem processadas.
  * @param alertRules A lista de regras de alerta customizadas a serem avaliadas.
  * @param insightRules  A lista de regras de Insights customizadas a serem avaliadas.
+ * @param mqttBrokerUrl O endereço mqtt que a sua aplicação usara.
+ * @param telegramChatId O id do seu chat no telegram.
+ * @param telegramToken O token do seu chatboot do telegram.
+ * @param logViewer O arquivo de log da aplicação.
  */
 public record PipelineConfiguration(
         IDataSource dataSource,
@@ -28,6 +32,9 @@ public record PipelineConfiguration(
         List<MetricConfig> metricConfigs,
         LogViewerWindow logViewer,
         List<AlertRule> alertRules,
-        List<InsightRule> insightRules
+        List<InsightRule> insightRules,
+        String telegramToken,
+        String telegramChatId,
+        String mqttBrokerUrl
 ) {
 }

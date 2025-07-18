@@ -19,15 +19,22 @@ public class AlertRule implements Serializable {
     private double thresholdValue;
     private String messageToSend;
     private boolean enabled;
+    private boolean sendToMqtt;
+    private boolean sendToTelegram;
+    private int cooldownSeconds;
 
-    public AlertRule(String ruleName, String metricToWatch, ConditionType condition, double thresholdValue, String messageToSend) {
+
+    public AlertRule(String ruleName, String metricToWatch, ConditionType condition, double thresholdValue, String messageToSend, boolean sendToMqtt, boolean sendToTelegram) {
         this.id = UUID.randomUUID().toString();
         this.ruleName = ruleName;
         this.metricToWatch = metricToWatch;
         this.condition = condition;
         this.thresholdValue = thresholdValue;
         this.messageToSend = messageToSend;
-        this.enabled = true; // As regras são ativadas por padrão ao serem criadas
+        this.enabled = true;
+        this.sendToMqtt = sendToMqtt;
+        this.sendToTelegram = sendToTelegram;
+        this.cooldownSeconds = 0;
     }
 
     // Getters e Setters para todos os campos
@@ -82,5 +89,28 @@ public class AlertRule implements Serializable {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+    public boolean isSendToMqtt() {
+        return sendToMqtt;
+    }
+
+    public void setSendToMqtt(boolean sendToMqtt) {
+        this.sendToMqtt = sendToMqtt;
+    }
+
+    public boolean isSendToTelegram() {
+        return sendToTelegram;
+    }
+
+    public void setSendToTelegram(boolean sendToTelegram) {
+        this.sendToTelegram = sendToTelegram;
+    }
+
+    public int getCooldownSeconds() {
+        return cooldownSeconds;
+    }
+
+    public void setCooldownSeconds(int cooldownSeconds){
+        this.cooldownSeconds = cooldownSeconds;
     }
 }
