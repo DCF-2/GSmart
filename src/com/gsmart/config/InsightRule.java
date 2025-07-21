@@ -23,6 +23,8 @@ public class InsightRule implements Serializable {
     private boolean enabled;
     private boolean sendToTelegram;
     private int cooldownSeconds;
+    private double thresholdValueMax;
+
 
     /**
      * Construtor para uma nova regra de Alarme.
@@ -68,4 +70,6 @@ public class InsightRule implements Serializable {
     public void setSendToTelegram(boolean sendToTelegram) {this.sendToTelegram = sendToTelegram;}
     public int getCooldownSeconds() {return cooldownSeconds;}
     public void setCooldownSeconds(int cooldownSeconds) {this.cooldownSeconds = cooldownSeconds;}
+    public double getThresholdValueMax() {return thresholdValueMax;}
+    public void setThresholdValueMax(double thresholdValueMax) {this.thresholdValueMax = thresholdValueMax;}
 }

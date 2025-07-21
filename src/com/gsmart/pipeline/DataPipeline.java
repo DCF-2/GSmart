@@ -110,7 +110,8 @@ public class DataPipeline {
                 }
 
                 ZonedDateTime horaAtualBrasil = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
-                // logger.info("--- Iniciando novo ciclo de processamento em {} ---", horaAtualBrasil.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)); // Comentado para simplificar
+                String mensagemAlertaPBI = "";
+                String mensagemAlarmePBI = "";
                 logger.info("--- Iniciando novo ciclo de processamento às {} ---", horaAtualBrasil.toLocalTime());
 
                 logger.info("[ETAPA 1/3] Buscando dados da fonte...");
@@ -178,6 +179,7 @@ public class DataPipeline {
                                 case GREATER_THAN: condicaoSatisfeita = valorAtual > valorLimiar; break;
                                 case LESS_THAN: condicaoSatisfeita = valorAtual < valorLimiar; break;
                                 case EQUALS: condicaoSatisfeita = valorAtual == valorLimiar; break;
+                                case BETWEEN: condicaoSatisfeita = valorAtual > rule.getThresholdValue() && valorAtual < rule.getThresholdValueMax(); break;
                             }
 
                             logger.debug("   - Resultado da condição: {}", condicaoSatisfeita);
@@ -196,6 +198,7 @@ public class DataPipeline {
                                     if (rule.isSendToTelegram()) {
                                         com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, rule.getMessageToSend());
                                     }
+                                    mensagemAlertaPBI = rule.getMessageToSend();
 
                                     alertCooldowns.put(rule.getId(), currentTime);
                                 } else {
@@ -222,6 +225,7 @@ public class DataPipeline {
                                 case GREATER_THAN: condicaoSatisfeita = valorAtual > rule.getThresholdValue(); break;
                                 case LESS_THAN: condicaoSatisfeita = valorAtual < rule.getThresholdValue(); break;
                                 case EQUALS: condicaoSatisfeita = valorAtual == rule.getThresholdValue(); break;
+                                case BETWEEN: condicaoSatisfeita = valorAtual > rule.getThresholdValue() && valorAtual < rule.getThresholdValueMax(); break;
                             }
 
                             if (condicaoSatisfeita) {
@@ -243,7 +247,7 @@ public class DataPipeline {
                                     if (rule.isSendToTelegram()) {
                                         com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, rule.getMessageToSend());
                                     }
-
+                                    mensagemAlarmePBI = rule.getMessageToSend();
                                     // Atualiza o timestamp do último envio para esta regra de alarme.
                                     alarmCooldowns.put(rule.getId(), currentTime);
                                 } else {
@@ -257,7 +261,8 @@ public class DataPipeline {
 
                 pbiPayload.addProperty("AlertaCritico", alertaCriticoDisparado ? 1 : 0);
                 pbiPayload.addProperty("timestamp", Instant.now().minus(3, ChronoUnit.HOURS).toString());
-                // pbiPayload.addProperty("HdDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("HH:mm:ss - dd/MM/yyyy")));
+                pbiPayload.addProperty("UltimoAlerta", mensagemAlertaPBI);
+                pbiPayload.addProperty("UltimoAlarme", mensagemAlarmePBI);
                 pbiPayload.addProperty("HoraDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
                 pbiPayload.addProperty("DataDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                 pbiPayload.addProperty("OrigemDados", dataSource.getSourceName());

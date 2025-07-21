@@ -477,9 +477,10 @@ public class GSmartGui extends JFrame {
         pbiUrlField.setText(props.getProperty("powerbi.url", ""));
         mqttBrokerUrlField.setText(props.getProperty("mqtt.broker.url", "tcp://localhost:1883"));
         sourceSelector.setSelectedItem(props.getProperty("source.last", "Thingsboard API"));
-        sourceSelector.setSelectedItem(props.getProperty("source.last", "Thingsboard API"));
         telegramTokenField.setText(props.getProperty("telegram.token", ""));
         telegramChatIdField.setText(props.getProperty("telegram.chat_id", ""));
+        alertRuleTableModel.setRules(configManager.loadAlertRules());
+        insightRuleTableModel.setRules(configManager.loadInsightRules());
     }
 
     /**
@@ -495,10 +496,10 @@ public class GSmartGui extends JFrame {
         props.setProperty("powerbi.url", pbiUrlField.getText());
         props.setProperty("source.last", (String) sourceSelector.getSelectedItem());
         props.setProperty("mqtt.broker.url", mqttBrokerUrlField.getText());
-        props.setProperty("source.last", (String) sourceSelector.getSelectedItem());
         props.setProperty("telegram.token", telegramTokenField.getText());
         props.setProperty("telegram.chat_id", telegramChatIdField.getText());
         configManager.saveProperties(props);
+        configManager.saveRules(alertRuleTableModel.getRules(), insightRuleTableModel.getRules());
     }
 
     /**
@@ -740,9 +741,10 @@ public class GSmartGui extends JFrame {
 
             List<MetricConfig> configs = keys.stream().map(MetricConfig::new).collect(Collectors.toList());
             configs.add(0, new MetricConfig("OrigemDados", true, true));
-            //configs.add(0, new MetricConfig("HdDev", true, true));
             configs.add(0, new MetricConfig("HoraDev", true, true));
             configs.add(0, new MetricConfig("DataDev", true, true));
+            configs.add(0,new MetricConfig("UltimoAlerta", true, true));
+            configs.add(0,new MetricConfig("UltimoAlarme", true, true));
             configs.add(0, new MetricConfig("timestamp", true, true));
             configs.add(0, new MetricConfig("AlertaCritico", true, true));
             tableModel.setMetrics(configs);

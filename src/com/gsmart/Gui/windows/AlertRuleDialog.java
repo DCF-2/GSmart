@@ -1,4 +1,3 @@
-// Localização: src/com/gsmart/gui/AlertRuleDialog.java
 package com.gsmart.Gui.windows;
 
 import com.gsmart.config.AlertRule;
@@ -7,15 +6,11 @@ import com.gsmart.resources.ConditionType;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-import java.util.stream.Collectors;
-
 
 /**
  * Uma janela de diálogo (JDialog) para criar ou editar uma {@code AlertRule}.
- *
  * Fornece um formulário para que o utilizador possa configurar todos os
  * parâmetros de uma regra de alerta crítico de forma intuitiva.
- *
  * @see com.gsmart.config.AlertRule
  */
 public class AlertRuleDialog extends JDialog {
@@ -27,20 +22,28 @@ public class AlertRuleDialog extends JDialog {
     private JCheckBox sendToMqttCheckBox;
     private JCheckBox sendToTelegramCheckBox;
     private JSpinner cooldownSpinner;
+
+    // --- NOVOS CAMPOS PARA A CONDIÇÃO "ENTRE" ---
+    private JTextField thresholdMaxValueField;
+    private JLabel andLabel; // O texto "e"
+
     private JButton saveButton;
     private JButton cancelButton;
-
     private AlertRule alertRule;
 
     public AlertRuleDialog(Frame owner, String title, List<String> availableMetrics) {
-        super(owner, title, true); // true para ser uma janela modal
+        super(owner, title, true);
         initComponents(availableMetrics);
         setupLayout();
+
+        // --- ADICIONA O LISTENER E CHAMA-O UMA VEZ PARA CONFIGURAR O ESTADO INICIAL ---
+        conditionComboBox.addActionListener(e -> toggleBetweenFields());
+        toggleBetweenFields();
 
         cancelButton.addActionListener(e -> dispose());
         saveButton.addActionListener(e -> onSave());
 
-        setSize(450, 350);
+        setSize(500, 400); // Aumentar um pouco a largura
         setLocationRelativeTo(owner);
     }
 
@@ -56,6 +59,10 @@ public class AlertRuleDialog extends JDialog {
         sendToTelegramCheckBox = new JCheckBox("Enviar via Telegram", true);
         cooldownSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
 
+        // --- INICIALIZA OS NOVOS COMPONENTES ---
+        thresholdMaxValueField = new JTextField(10);
+        andLabel = new JLabel(" e ");
+
         saveButton = new JButton("Salvar");
         cancelButton = new JButton("Cancelar");
     }
@@ -67,101 +74,84 @@ public class AlertRuleDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
 
         // Linha 1: Nome da Regra
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        add(new JLabel("Nome da Regra:"), gbc);
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        add(ruleNameField, gbc);
+        gbc.gridx = 0; gbc.gridy = 0; add(new JLabel("Nome da Regra:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; add(ruleNameField, gbc);
 
         // Linha 2: Métrica
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weightx = 0;
-        add(new JLabel("Se a métrica:"), gbc);
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        add(metricComboBox, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Se a métrica:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; add(metricComboBox, gbc);
 
         // Linha 3: Condição
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weightx = 0;
-        add(new JLabel("For:"), gbc);
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        add(conditionComboBox, gbc);
+        gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Estiver:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; add(conditionComboBox, gbc);
 
-        // Linha 4: Valor Limiar
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weightx = 0;
-        add(new JLabel("O valor de:"), gbc);
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        add(thresholdValueField, gbc);
+        // Linha 4: Valor Limiar (CORRIGIDO)
+        gbc.gridx = 0; gbc.gridy = 3; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("O valor de:"), gbc);
+        JPanel valuePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        valuePanel.add(thresholdValueField);
+        valuePanel.add(andLabel);
+        valuePanel.add(thresholdMaxValueField);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; add(valuePanel, gbc);
 
         // Linha 5: Mensagem
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weightx = 0;
-        add(new JLabel("Enviar alerta:"), gbc);
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0;
-        add(new JScrollPane(messageToSendArea), gbc);
+        gbc.gridx = 0; gbc.gridy = 4; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Enviar alerta:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.BOTH; gbc.weighty = 1.0; add(new JScrollPane(messageToSendArea), gbc);
 
-        // --- CooldownSeconds ---
+        // Cooldown
         JPanel cooldownPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         cooldownPanel.add(new JLabel("Reenviar alerta apenas após:"));
         cooldownPanel.add(cooldownSpinner);
         cooldownPanel.add(new JLabel(" segundos"));
         gbc.gridx = 1; gbc.gridy = 5; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0;
-        gbc.insets = new Insets(10, 5, 0, 5); // Adiciona um espaço extra em cima
+        gbc.insets = new Insets(10, 5, 0, 5);
         add(cooldownPanel, gbc);
-        gbc.insets = new Insets(5, 5, 5, 5); // Restaura o espaçamento normal
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-        // --- Mqtt ou Telegram (DESTINOS) ---
+        // Destinos
         JPanel destinationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         destinationPanel.add(sendToMqttCheckBox);
         destinationPanel.add(sendToTelegramCheckBox);
-        gbc.gridx = 1; gbc.gridy = 6; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0;
+        gbc.gridx = 1; gbc.gridy = 6;
         add(destinationPanel, gbc);
 
-        // Linha 6: Botões
+        // Botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(cancelButton);
         buttonPanel.add(saveButton);
-        gbc.gridx = 1;
-        gbc.gridy = 7;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weighty = 0;
+        gbc.gridx = 1; gbc.gridy = 7;
         add(buttonPanel, gbc);
     }
 
+    /**
+     * Mostra ou esconde o segundo campo de valor com base na condição selecionada.
+     */
+    private void toggleBetweenFields() {
+        boolean isBetween = conditionComboBox.getSelectedItem() == ConditionType.BETWEEN;
+        andLabel.setVisible(isBetween);
+        thresholdMaxValueField.setVisible(isBetween);
+    }
+
     private void onSave() {
-        // Validação dos campos
         if (ruleNameField.getText().trim().isEmpty() || thresholdValueField.getText().trim().isEmpty() || messageToSendArea.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Por favor, preencha todos os campos.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        double threshold;
+
+        double threshold, thresholdMax = 0;
         try {
             threshold = Double.parseDouble(thresholdValueField.getText().trim());
+            if (conditionComboBox.getSelectedItem() == ConditionType.BETWEEN) {
+                if (thresholdMaxValueField.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Por favor, preencha o segundo valor para a condição 'Entre'.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                thresholdMax = Double.parseDouble(thresholdMaxValueField.getText().trim());
+            }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "O valor limiar deve ser um número válido.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Os valores de limiar devem ser números válidos.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Se estamos a editar, atualizamos o objeto existente. Se não, criamos um novo.
         if (this.alertRule == null) {
             this.alertRule = new AlertRule(
                     ruleNameField.getText().trim(),
@@ -182,12 +172,11 @@ public class AlertRuleDialog extends JDialog {
             this.alertRule.setSendToTelegram(sendToTelegramCheckBox.isSelected());
         }
 
-        // Define o valor do cooldown, tanto para regras novas como para editadas.
+        this.alertRule.setThresholdValueMax(thresholdMax);
         this.alertRule.setCooldownSeconds((Integer) cooldownSpinner.getValue());
-        dispose(); // Fecha a janela
+        dispose();
     }
 
-    // Método para preencher a janela com os dados de uma regra existente (para edição)
     public void setAlertRule(AlertRule rule) {
         this.alertRule = rule;
         ruleNameField.setText(rule.getRuleName());
@@ -198,9 +187,14 @@ public class AlertRuleDialog extends JDialog {
         sendToMqttCheckBox.setSelected(rule.isSendToMqtt());
         sendToTelegramCheckBox.setSelected(rule.isSendToTelegram());
         cooldownSpinner.setValue(rule.getCooldownSeconds());
+
+        // CORRIGIDO: Define o valor do segundo campo
+        thresholdMaxValueField.setText(String.valueOf(rule.getThresholdValueMax()));
+
+        // Garante que o estado da UI está correto ao abrir
+        toggleBetweenFields();
     }
 
-    // Metodo para obter a regra salva
     public AlertRule getAlertRule() {
         return alertRule;
     }

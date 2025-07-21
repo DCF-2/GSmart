@@ -9,10 +9,8 @@ import java.util.List;
 
 /**
  * Uma janela de diálogo (JDialog) para criar ou editar uma {@code InsightRule}.
- *
  * Fornece um formulário para que o utilizador possa configurar todos os
  * parâmetros de uma regra de alarme de forma intuitiva.
- *
  * @see com.gsmart.config.InsightRule
  */
 public class InsightRuleDialog extends JDialog {
@@ -24,10 +22,13 @@ public class InsightRuleDialog extends JDialog {
     private JTextField insightTypeField;
     private JCheckBox sendToTelegramCheckBox;
     private JSpinner cooldownSpinner;
+
+    // --- NOVOS CAMPOS PARA A CONDIÇÃO "ENTRE" ---
+    private JTextField thresholdMaxValueField;
+    private JLabel andLabel;
+
     private JButton saveButton;
     private JButton cancelButton;
-
-
     private InsightRule insightRule;
 
     public InsightRuleDialog(Frame owner, String title, List<String> availableMetrics) {
@@ -35,10 +36,14 @@ public class InsightRuleDialog extends JDialog {
         initComponents(availableMetrics);
         setupLayout();
 
+        // --- ADICIONA O LISTENER E CHAMA-O UMA VEZ PARA CONFIGURAR O ESTADO INICIAL ---
+        conditionComboBox.addActionListener(e -> toggleBetweenFields());
+        toggleBetweenFields();
+
         cancelButton.addActionListener(e -> dispose());
         saveButton.addActionListener(e -> onSave());
 
-        setSize(450, 400); // Aumentar um pouco a altura
+        setSize(500, 450); // Aumentar a largura e altura
         setLocationRelativeTo(owner);
     }
 
@@ -47,12 +52,16 @@ public class InsightRuleDialog extends JDialog {
         metricComboBox = new JComboBox<>(availableMetrics.toArray(new String[0]));
         conditionComboBox = new JComboBox<>(ConditionType.values());
         thresholdValueField = new JTextField(10);
-        insightTypeField = new JTextField("INFO", 15); // Valor padrão "INFO"
+        insightTypeField = new JTextField("INFO", 15);
         messageToSendArea = new JTextArea(5, 20);
         messageToSendArea.setLineWrap(true);
         messageToSendArea.setWrapStyleWord(true);
         sendToTelegramCheckBox = new JCheckBox("Enviar via Telegram", true);
         cooldownSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
+
+        // --- INICIALIZA OS NOVOS COMPONENTES ---
+        thresholdMaxValueField = new JTextField(10);
+        andLabel = new JLabel(" e ");
 
         saveButton = new JButton("Salvar");
         cancelButton = new JButton("Cancelar");
@@ -73,22 +82,26 @@ public class InsightRuleDialog extends JDialog {
         gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; add(metricComboBox, gbc);
 
         // Linha 3: Condição
-        gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("For:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Estiver:"), gbc);
         gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; add(conditionComboBox, gbc);
 
-        // Linha 4: Valor Limiar
+        // Linha 4: Valor Limiar (CORRIGIDO)
         gbc.gridx = 0; gbc.gridy = 3; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("O valor de:"), gbc);
-        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; add(thresholdValueField, gbc);
+        JPanel valuePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        valuePanel.add(thresholdValueField);
+        valuePanel.add(andLabel);
+        valuePanel.add(thresholdMaxValueField);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; add(valuePanel, gbc);
 
         // Linha 5: Tipo de Insight
-        gbc.gridx = 0; gbc.gridy = 4; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Tipo de Insight:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 4; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Tipo de Alarme:"), gbc);
         gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; add(insightTypeField, gbc);
 
         // Linha 6: Mensagem
-        gbc.gridx = 0; gbc.gridy = 5; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Gerar insight:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 5; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Gerar alarme:"), gbc);
         gbc.gridx = 1; gbc.fill = GridBagConstraints.BOTH; gbc.weighty = 1.0; add(new JScrollPane(messageToSendArea), gbc);
 
-        // --- COOLDOWN E DESTINOS ---
+        // Cooldown e Destinos
         JPanel optionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         optionsPanel.add(new JLabel("Reenviar apenas após:"));
         optionsPanel.add(cooldownSpinner);
@@ -97,11 +110,21 @@ public class InsightRuleDialog extends JDialog {
         gbc.gridx = 1; gbc.gridy = 6; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0;
         add(optionsPanel, gbc);
 
-        // Linha 7: Botões
+        // Botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(cancelButton);
         buttonPanel.add(saveButton);
-        gbc.gridx = 1; gbc.gridy = 7; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0; add(buttonPanel, gbc);
+        gbc.gridx = 1; gbc.gridy = 7;
+        add(buttonPanel, gbc);
+    }
+
+    /**
+     * Mostra ou esconde o segundo campo de valor com base na condição selecionada.
+     */
+    private void toggleBetweenFields() {
+        boolean isBetween = conditionComboBox.getSelectedItem() == ConditionType.BETWEEN;
+        andLabel.setVisible(isBetween);
+        thresholdMaxValueField.setVisible(isBetween);
     }
 
     private void onSave() {
@@ -109,11 +132,19 @@ public class InsightRuleDialog extends JDialog {
             JOptionPane.showMessageDialog(this, "Por favor, preencha todos os campos.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        double threshold;
+
+        double threshold, thresholdMax = 0;
         try {
             threshold = Double.parseDouble(thresholdValueField.getText().trim());
+            if (conditionComboBox.getSelectedItem() == ConditionType.BETWEEN) {
+                if (thresholdMaxValueField.getText().trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Por favor, preencha o segundo valor para a condição 'Entre'.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                thresholdMax = Double.parseDouble(thresholdMaxValueField.getText().trim());
+            }
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "O valor limiar deve ser um número válido.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Os valores de limiar devem ser números válidos.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -134,6 +165,8 @@ public class InsightRuleDialog extends JDialog {
             this.insightRule.setMessageToSend(messageToSendArea.getText().trim());
             this.insightRule.setInsightType(insightTypeField.getText().trim().toUpperCase());
         }
+
+        this.insightRule.setThresholdValueMax(thresholdMax);
         this.insightRule.setCooldownSeconds((Integer) cooldownSpinner.getValue());
         this.insightRule.setSendToTelegram(sendToTelegramCheckBox.isSelected());
         dispose();
@@ -149,6 +182,12 @@ public class InsightRuleDialog extends JDialog {
         insightTypeField.setText(rule.getInsightType());
         cooldownSpinner.setValue(rule.getCooldownSeconds());
         sendToTelegramCheckBox.setSelected(rule.isSendToTelegram());
+
+        // CORRIGIDO: Define o valor do segundo campo
+        thresholdMaxValueField.setText(String.valueOf(rule.getThresholdValueMax()));
+
+        // Garante que o estado da UI está correto ao abrir
+        toggleBetweenFields();
     }
 
     public InsightRule getInsightRule() {

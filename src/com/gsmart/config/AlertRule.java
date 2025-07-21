@@ -22,6 +22,7 @@ public class AlertRule implements Serializable {
     private boolean sendToMqtt;
     private boolean sendToTelegram;
     private int cooldownSeconds;
+    private double thresholdValueMax;
 
 
     public AlertRule(String ruleName, String metricToWatch, ConditionType condition, double thresholdValue, String messageToSend, boolean sendToMqtt, boolean sendToTelegram) {
@@ -113,4 +114,8 @@ public class AlertRule implements Serializable {
     public void setCooldownSeconds(int cooldownSeconds){
         this.cooldownSeconds = cooldownSeconds;
     }
+
+    public double getThresholdValueMax() {return thresholdValueMax;}
+
+    public void setThresholdValueMax(double thresholdValueMax) {this.thresholdValueMax = thresholdValueMax;}
 }

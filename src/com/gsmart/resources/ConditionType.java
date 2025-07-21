@@ -7,7 +7,8 @@ package com.gsmart.resources;
 public enum ConditionType {
     GREATER_THAN("Maior que (>)"),
     LESS_THAN("Menor que (<)"),
-    EQUALS("Igual a (==)");
+    EQUALS("Igual a (==)"),
+    BETWEEN("Entre (x..y)");
 
     private final String displayName;
 

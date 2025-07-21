@@ -4,11 +4,9 @@ package com.gsmart.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -56,4 +54,58 @@ public class ConfigManager {
             logger.error("Falha ao salvar o arquivo de configuração '{}'.", CONFIG_FILE, e);
         }
     }
+    private static final String ALERT_RULES_FILE = "alerts.ser";
+    private static final String INSIGHT_RULES_FILE = "insights.ser";
+
+    /**
+     * Salva as listas de regras de Alerta e Alarme em ficheiros serializados.
+     * @param alertRules A lista de regras de alerta a ser guardada.
+     * @param insightRules A lista de regras de alarme a ser guardada.
+     */
+    public void saveRules(List<AlertRule> alertRules, List<InsightRule> insightRules) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(ALERT_RULES_FILE))) {
+            oos.writeObject(alertRules);
+            logger.info("Regras de alerta salvas com sucesso em '{}'.", ALERT_RULES_FILE);
+        } catch (IOException e) {
+            logger.error("Falha ao salvar o ficheiro de regras de alerta.", e);
+        }
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(INSIGHT_RULES_FILE))) {
+            oos.writeObject(insightRules);
+            logger.info("Regras de alarme salvas com sucesso em '{}'.", INSIGHT_RULES_FILE);
+        } catch (IOException e) {
+            logger.error("Falha ao salvar o ficheiro de regras de alarme.", e);
+        }
+    }
+
+    /**
+     * Carrega a lista de regras de Alerta a partir de um ficheiro serializado.
+     * @return Uma lista de AlertRule. Se o ficheiro não for encontrado, retorna uma lista vazia.
+     */
+    public List<AlertRule> loadAlertRules() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(ALERT_RULES_FILE))) {
+            List<AlertRule> rules = (List<AlertRule>) ois.readObject();
+            logger.info("Regras de alerta carregadas com sucesso de '{}'.", ALERT_RULES_FILE);
+            return rules;
+        } catch (IOException | ClassNotFoundException e) {
+            logger.warn("Ficheiro de regras de alerta não encontrado ou inválido. A iniciar com uma lista vazia.");
+            return new ArrayList<>(); // Retorna uma lista vazia se houver erro ou o ficheiro não existir
+        }
+    }
+
+    /**
+     * Carrega a lista de regras de Alarme a partir de um ficheiro serializado.
+     * @return Uma lista de InsightRule. Se o ficheiro não for encontrado, retorna uma lista vazia.
+     */
+    public List<InsightRule> loadInsightRules() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(INSIGHT_RULES_FILE))) {
+            List<InsightRule> rules = (List<InsightRule>) ois.readObject();
+            logger.info("Regras de alarme carregadas com sucesso de '{}'.", INSIGHT_RULES_FILE);
+            return rules;
+        } catch (IOException | ClassNotFoundException e) {
+            logger.warn("Ficheiro de regras de alarme não encontrado ou inválido. A iniciar com uma lista vazia.");
+            return new ArrayList<>(); // Retorna uma lista vazia se houver erro ou o ficheiro não existir
+        }
+    }
+
 }
