@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -118,9 +119,13 @@ public class GSmartGui extends JFrame {
         this.configManager = new ConfigManager();
         this.pipelineManager.setParentComponent(this);
         this.pipelineManager.setGlobalLogViewer(this.globalLogViewer);
-        this.sharedOkHttpClient = new OkHttpClient();
         this.alertRules = new ArrayList<>(); // Inicializa a lista de regras
         this.insightRules = new ArrayList<>();
+        this.sharedOkHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS) // Define o timeout de conexão para 30 segundos
+                .writeTimeout(30, TimeUnit.SECONDS)   // Define o timeout de escrita para 30 segundos
+                .readTimeout(30, TimeUnit.SECONDS)    // Define o timeout de leitura para 30 segundos
+                .build();
 
         // --- Configuração da Janela Principal ---
         setTitle("GSmart - Configurador de Pipeline e Alertas v5.0");
@@ -735,7 +740,9 @@ public class GSmartGui extends JFrame {
 
             List<MetricConfig> configs = keys.stream().map(MetricConfig::new).collect(Collectors.toList());
             configs.add(0, new MetricConfig("OrigemDados", true, true));
-            configs.add(0, new MetricConfig("HdDev", true, true));
+            //configs.add(0, new MetricConfig("HdDev", true, true));
+            configs.add(0, new MetricConfig("HoraDev", true, true));
+            configs.add(0, new MetricConfig("DataDev", true, true));
             configs.add(0, new MetricConfig("timestamp", true, true));
             configs.add(0, new MetricConfig("AlertaCritico", true, true));
             tableModel.setMetrics(configs);
