@@ -112,6 +112,7 @@ public class DataPipeline {
                 ZonedDateTime horaAtualBrasil = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
                 String mensagemAlertaPBI = "";
                 String mensagemAlarmePBI = "";
+                String timestampPrefix = horaAtualBrasil.format(DateTimeFormatter.ofPattern("'['dd/MM/yyyy HH:mm:ss']' "));
                 logger.info("--- Iniciando novo ciclo de processamento às {} ---", horaAtualBrasil.toLocalTime());
 
                 logger.info("[ETAPA 1/3] Buscando dados da fonte...");
@@ -192,13 +193,15 @@ public class DataPipeline {
                                     logger.info("   - CONDIÇÃO SATISFEITA! Cooldown permite o envio. Disparando alerta.");
                                     alertaCriticoDisparado = true;
 
+                                    String mensagemComTimestamp = timestampPrefix + rule.getMessageToSend();
+
                                     if (rule.isSendToMqtt()) {
-                                        publicarAlertaMqtt(rule.getMessageToSend());
+                                        publicarAlertaMqtt(mensagemComTimestamp);
                                     }
                                     if (rule.isSendToTelegram()) {
-                                        com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, rule.getMessageToSend());
+                                        com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagemComTimestamp);
                                     }
-                                    mensagemAlertaPBI = rule.getMessageToSend();
+                                    mensagemAlertaPBI = mensagemComTimestamp;
 
                                     alertCooldowns.put(rule.getId(), currentTime);
                                 } else {
@@ -235,19 +238,16 @@ public class DataPipeline {
                                 if ((currentTime - lastSentTime) > cooldownMillis) {
                                     logger.info("   - ALARME GERADO! '{}'", rule.getRuleName());
 
+                                    String mensagemComTimestamp = timestampPrefix + rule.getMessageToSend();
                                     // Envia para a GUI (sempre)
                                     if (listener != null) {
-                                        listener.onInsight(rule.getMessageToSend(), rule.getInsightType());
+                                        listener.onInsight(mensagemComTimestamp, rule.getInsightType());
                                     }
-
-                                    // Envia para o MQTT (sempre)
-                                    publicarAlarmeMqtt(rule.getMessageToSend(), rule.getInsightType());
-
-                                    // Envia para o Telegram (se a opção estiver marcada)
+                                    publicarAlarmeMqtt(mensagemComTimestamp, rule.getInsightType());
                                     if (rule.isSendToTelegram()) {
-                                        com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, rule.getMessageToSend());
+                                        com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagemComTimestamp);
                                     }
-                                    mensagemAlarmePBI = rule.getMessageToSend();
+                                    mensagemAlarmePBI = mensagemComTimestamp;
                                     // Atualiza o timestamp do último envio para esta regra de alarme.
                                     alarmCooldowns.put(rule.getId(), currentTime);
                                 } else {
