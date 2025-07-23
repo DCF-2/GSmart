@@ -21,7 +21,6 @@ public class AlertRule implements Serializable {
     private boolean enabled;
     private boolean sendToMqtt;
     private boolean sendToTelegram;
-    private int cooldownSeconds;
     private double thresholdValueMax;
 
 
@@ -35,7 +34,6 @@ public class AlertRule implements Serializable {
         this.enabled = true;
         this.sendToMqtt = sendToMqtt;
         this.sendToTelegram = sendToTelegram;
-        this.cooldownSeconds = 0;
     }
 
     // Getters e Setters para todos os campos
@@ -105,14 +103,6 @@ public class AlertRule implements Serializable {
 
     public void setSendToTelegram(boolean sendToTelegram) {
         this.sendToTelegram = sendToTelegram;
-    }
-
-    public int getCooldownSeconds() {
-        return cooldownSeconds;
-    }
-
-    public void setCooldownSeconds(int cooldownSeconds){
-        this.cooldownSeconds = cooldownSeconds;
     }
 
     public double getThresholdValueMax() {return thresholdValueMax;}

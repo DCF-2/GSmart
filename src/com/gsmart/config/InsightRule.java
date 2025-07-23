@@ -22,7 +22,7 @@ public class InsightRule implements Serializable {
     private String insightType;
     private boolean enabled;
     private boolean sendToTelegram;
-    private int cooldownSeconds;
+    private boolean sendToMqtt;
     private double thresholdValueMax;
 
 
@@ -45,8 +45,8 @@ public class InsightRule implements Serializable {
         this.messageToSend = messageToSend;
         this.insightType = insightType;
         this.enabled = true;
+        this.sendToMqtt = true;
         this.sendToTelegram = true;
-        this.cooldownSeconds = 0;
     }
 
     // --- Getters e Setters ---
@@ -68,8 +68,10 @@ public class InsightRule implements Serializable {
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
     public boolean isSendToTelegram() {return sendToTelegram;}
     public void setSendToTelegram(boolean sendToTelegram) {this.sendToTelegram = sendToTelegram;}
-    public int getCooldownSeconds() {return cooldownSeconds;}
-    public void setCooldownSeconds(int cooldownSeconds) {this.cooldownSeconds = cooldownSeconds;}
+    public boolean isSendToMqtt() {
+        return sendToMqtt;
+    }
+    public void setSendToMqtt(boolean sendToMqtt) {this.sendToMqtt = sendToMqtt;}
     public double getThresholdValueMax() {return thresholdValueMax;}
     public void setThresholdValueMax(double thresholdValueMax) {this.thresholdValueMax = thresholdValueMax;}
 }

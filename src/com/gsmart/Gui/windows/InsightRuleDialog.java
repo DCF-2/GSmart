@@ -21,7 +21,9 @@ public class InsightRuleDialog extends JDialog {
     private JTextArea messageToSendArea;
     private JTextField insightTypeField;
     private JCheckBox sendToTelegramCheckBox;
-    private JSpinner cooldownSpinner;
+    private JCheckBox sendToMqttCheckBox;
+
+
 
     // --- NOVOS CAMPOS PARA A CONDIÇÃO "ENTRE" ---
     private JTextField thresholdMaxValueField;
@@ -40,6 +42,7 @@ public class InsightRuleDialog extends JDialog {
         conditionComboBox.addActionListener(e -> toggleBetweenFields());
         toggleBetweenFields();
 
+
         cancelButton.addActionListener(e -> dispose());
         saveButton.addActionListener(e -> onSave());
 
@@ -56,8 +59,9 @@ public class InsightRuleDialog extends JDialog {
         messageToSendArea = new JTextArea(5, 20);
         messageToSendArea.setLineWrap(true);
         messageToSendArea.setWrapStyleWord(true);
+        sendToMqttCheckBox = new JCheckBox("Enviar via MQTT", true);
         sendToTelegramCheckBox = new JCheckBox("Enviar via Telegram", true);
-        cooldownSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
+
 
         // --- INICIALIZA OS NOVOS COMPONENTES ---
         thresholdMaxValueField = new JTextField(10);
@@ -98,17 +102,15 @@ public class InsightRuleDialog extends JDialog {
         gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0; add(insightTypeField, gbc);
 
         // Linha 6: Mensagem
-        gbc.gridx = 0; gbc.gridy = 5; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Gerar alarme:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 6; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Gerar alarme:"), gbc);
         gbc.gridx = 1; gbc.fill = GridBagConstraints.BOTH; gbc.weighty = 1.0; add(new JScrollPane(messageToSendArea), gbc);
 
-        // Cooldown e Destinos
-        JPanel optionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        optionsPanel.add(new JLabel("Reenviar apenas após:"));
-        optionsPanel.add(cooldownSpinner);
-        optionsPanel.add(new JLabel("segs."));
-        optionsPanel.add(sendToTelegramCheckBox);
-        gbc.gridx = 1; gbc.gridy = 6; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0;
-        add(optionsPanel, gbc);
+        //Destinos
+        JPanel destinationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        destinationPanel.add(sendToMqttCheckBox);
+        destinationPanel.add(sendToTelegramCheckBox);
+        gbc.gridx = 1; gbc.gridy = 5;
+        add(destinationPanel, gbc);
 
         // Botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -167,7 +169,8 @@ public class InsightRuleDialog extends JDialog {
         }
 
         this.insightRule.setThresholdValueMax(thresholdMax);
-        this.insightRule.setCooldownSeconds((Integer) cooldownSpinner.getValue());
+        sendToMqttCheckBox.isSelected();
+        this.insightRule.setSendToMqtt(sendToMqttCheckBox.isSelected());
         this.insightRule.setSendToTelegram(sendToTelegramCheckBox.isSelected());
         dispose();
     }
@@ -180,7 +183,7 @@ public class InsightRuleDialog extends JDialog {
         thresholdValueField.setText(String.valueOf(rule.getThresholdValue()));
         messageToSendArea.setText(rule.getMessageToSend());
         insightTypeField.setText(rule.getInsightType());
-        cooldownSpinner.setValue(rule.getCooldownSeconds());
+        sendToMqttCheckBox.setSelected(rule.isSendToMqtt());
         sendToTelegramCheckBox.setSelected(rule.isSendToTelegram());
 
         // CORRIGIDO: Define o valor do segundo campo

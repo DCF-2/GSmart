@@ -51,8 +51,8 @@ public class DataPipeline {
     private final String mqttBrokerUrl;
     private final String telegramToken;
     private final String telegramChatId;
-    private final Map<String, Long> alertCooldowns;
-    private final Map<String, Long> alarmCooldowns;
+    private String lastTriggeredAlertId = null; // Guarda o ID do último ALERTA despoletado.
+    private String lastTriggeredAlarmId = null; // Guarda o ID do último ALARME despoletado.
     private final OkHttpClient httpClient;
     private volatile boolean stopRequested = false;
     private final AtomicBoolean manualReconnectTrigger = new AtomicBoolean(false);
@@ -79,8 +79,6 @@ public class DataPipeline {
         this.mqttBrokerUrl = mqttBrokerUrl;
         this.telegramToken = telegramToken;
         this.telegramChatId = telegramChatId;
-        this.alertCooldowns = new HashMap<>();
-        this.alarmCooldowns = new HashMap<>();
         this.httpClient = new OkHttpClient();
     }
 
@@ -158,7 +156,6 @@ public class DataPipeline {
                 logger.debug("[MOTOR DE REGRAS] A iniciar avaliação de {} regras de alerta.", alertRules != null ? alertRules.size() : 0);
                 boolean alertaCriticoDisparado = false;
                 if (alertRules != null && !alertRules.isEmpty()) {
-                    long currentTime = System.currentTimeMillis();
 
                     for (AlertRule rule : alertRules) {
                         logger.debug("--- Avaliando regra: '{}'", rule.getRuleName());
@@ -186,11 +183,9 @@ public class DataPipeline {
                             logger.debug("   - Resultado da condição: {}", condicaoSatisfeita);
 
                             if (condicaoSatisfeita) {
-                                long lastSentTime = alertCooldowns.getOrDefault(rule.getId(), 0L);
-                                long cooldownMillis = rule.getCooldownSeconds() * 1000L;
-
-                                if ((currentTime - lastSentTime) > cooldownMillis) {
-                                    logger.info("   - CONDIÇÃO SATISFEITA! Cooldown permite o envio. Disparando alerta.");
+                                if (!rule.getId().equals(this.lastTriggeredAlertId)) {
+                                    logger.info("   - NOVO ESTADO DE ALERTA DETETADO! Regra: '{}'. Disparando notificação.", rule.getRuleName());
+                                    this.lastTriggeredAlertId= rule.getId(); // Atualiza o estado de alarme para esta regra.
                                     alertaCriticoDisparado = true;
 
                                     String mensagemComTimestamp = timestampPrefix + rule.getMessageToSend();
@@ -202,10 +197,8 @@ public class DataPipeline {
                                         com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagemComTimestamp);
                                     }
                                     mensagemAlertaPBI = mensagemComTimestamp;
-
-                                    alertCooldowns.put(rule.getId(), currentTime);
                                 } else {
-                                    logger.info("   - CONDIÇÃO SATISFEITA! Mas o alerta para a regra '{}' está em cooldown. O envio foi ignorado.", rule.getRuleName());
+                                    logger.debug("   - CONDIÇÃO DE ALERTA SATISFEITA, MAS O ESTADO É O MESMO ('{}'). Nenhuma notificação enviada.", rule.getRuleName());
                                 }
                             }
                         } else {
@@ -216,8 +209,6 @@ public class DataPipeline {
 
                 logger.debug("[MOTOR DE ALARMES] A iniciar avaliação de {} regras de alarme.", insightRules != null ? insightRules.size() : 0);
                 if (insightRules != null && !insightRules.isEmpty()) {
-                    long currentTime = System.currentTimeMillis(); // Obtenha o tempo atual uma vez
-
                     for (InsightRule rule : insightRules) {
                         if (!rule.isEnabled()) continue;
 
@@ -232,14 +223,13 @@ public class DataPipeline {
                             }
 
                             if (condicaoSatisfeita) {
-                                long lastSentTime = alarmCooldowns.getOrDefault(rule.getId(), 0L);
-                                long cooldownMillis = rule.getCooldownSeconds() * 1000L;
-
-                                if ((currentTime - lastSentTime) > cooldownMillis) {
-                                    logger.info("   - ALARME GERADO! '{}'", rule.getRuleName());
+                                // Apenas dispara o alarme se o estado MUDOU (ou seja, a regra atual é diferente da última)
+                                if (!rule.getId().equals(this.lastTriggeredAlarmId)) {
+                                    logger.info("   - NOVO ESTADO DE ALARME DETETADO! Regra: '{}'. Disparando notificação.", rule.getRuleName());
+                                    this.lastTriggeredAlarmId = rule.getId(); // Atualiza o estado para esta regra.
 
                                     String mensagemComTimestamp = timestampPrefix + rule.getMessageToSend();
-                                    // Envia para a GUI (sempre)
+
                                     if (listener != null) {
                                         listener.onInsight(mensagemComTimestamp, rule.getInsightType());
                                     }
@@ -248,10 +238,8 @@ public class DataPipeline {
                                         com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagemComTimestamp);
                                     }
                                     mensagemAlarmePBI = mensagemComTimestamp;
-                                    // Atualiza o timestamp do último envio para esta regra de alarme.
-                                    alarmCooldowns.put(rule.getId(), currentTime);
                                 } else {
-                                    logger.info("   - CONDIÇÃO DE ALARME SATISFEITA! Mas a regra '{}' está em cooldown. O envio foi ignorado.", rule.getRuleName());
+                                    logger.debug("   - CONDIÇÃO DE ALARME SATISFEITA, MAS O ESTADO É O MESMO ('{}'). Nenhuma notificação enviada.", rule.getRuleName());
                                 }
                             }
                         }

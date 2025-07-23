@@ -102,6 +102,7 @@ public class GSmartGui extends JFrame {
 
     // --- Outros ---
     private final OkHttpClient sharedOkHttpClient;
+    private final String currentUserRole;
 
     /**
      * Construtor da janela principal da aplicação GSmart.
@@ -112,14 +113,15 @@ public class GSmartGui extends JFrame {
      * @param logViewer A instância partilhada do visualizador de logs gerais.
      * @param pipelineManager O gestor central que orquestra todas as tarefas de pipeline.
      */
-    public GSmartGui(LogViewerWindow logViewer, PipelineManager pipelineManager) {
+    public GSmartGui(LogViewerWindow logViewer, PipelineManager pipelineManager, String userRole) {
         // --- Inicialização de Variáveis ---
         this.globalLogViewer = logViewer;
         this.pipelineManager = pipelineManager;
         this.configManager = new ConfigManager();
         this.pipelineManager.setParentComponent(this);
+        this.currentUserRole = userRole;
         this.pipelineManager.setGlobalLogViewer(this.globalLogViewer);
-        this.alertRules = new ArrayList<>(); // Inicializa a lista de regras
+        this.alertRules = new ArrayList<>();
         this.insightRules = new ArrayList<>();
         this.sharedOkHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS) // Define o timeout de conexão para 30 segundos
@@ -448,6 +450,7 @@ public class GSmartGui extends JFrame {
         // Carregamento inicial
         toggleSourceFields();
         loadConfiguration();
+        applyRolePermissions(ruleButtonsPanel, insightButtonsPanel);
     }
 
     /**
@@ -879,5 +882,36 @@ public class GSmartGui extends JFrame {
                 }
             }
         }.execute();
+    }
+    /**
+     * Aplica permissões à interface com base no perfil do utilizador.
+     * Desativa funcionalidades de edição e criação para perfis que não sejam "ADMINISTRATOR".
+     */
+    private void applyRolePermissions(JPanel ruleButtonsPanel, JPanel insightButtonsPanel) {
+        setTitle(getTitle() + " (Utilizador: " + this.currentUserRole + ")");
+
+        boolean isAdmin = "ADMINISTRATOR".equals(this.currentUserRole);
+
+        // Se não for admin, desativa a edição/criação de regras
+        if (!isAdmin) {
+            logger.info("Utilizador não é administrador. A desativar funcionalidades de edição.");
+
+            // Desativa os botões de gestão de regras de alerta
+            for (Component comp : ruleButtonsPanel.getComponents()) {
+                if (comp instanceof JButton button && !button.getText().toLowerCase().contains("ver")) {
+                    button.setEnabled(false);
+                }
+            }
+            // Desativa os botões de gestão de regras de alarme
+            for (Component comp : insightButtonsPanel.getComponents()) {
+                if (comp instanceof JButton button && !button.getText().toLowerCase().contains("ver")) {
+                    button.setEnabled(false);
+                }
+            }
+
+            // Impede a edição direta nas tabelas de regras (se aplicável no futuro)
+            alertRulesTable.setEnabled(false);
+            insightRulesTable.setEnabled(false);
+        }
     }
 }

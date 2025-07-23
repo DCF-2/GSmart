@@ -21,7 +21,6 @@ public class AlertRuleDialog extends JDialog {
     private JTextArea messageToSendArea;
     private JCheckBox sendToMqttCheckBox;
     private JCheckBox sendToTelegramCheckBox;
-    private JSpinner cooldownSpinner;
 
     // --- NOVOS CAMPOS PARA A CONDIÇÃO "ENTRE" ---
     private JTextField thresholdMaxValueField;
@@ -57,7 +56,7 @@ public class AlertRuleDialog extends JDialog {
         messageToSendArea.setWrapStyleWord(true);
         sendToMqttCheckBox = new JCheckBox("Enviar via MQTT", true);
         sendToTelegramCheckBox = new JCheckBox("Enviar via Telegram", true);
-        cooldownSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
+
 
         // --- INICIALIZA OS NOVOS COMPONENTES ---
         thresholdMaxValueField = new JTextField(10);
@@ -97,28 +96,19 @@ public class AlertRuleDialog extends JDialog {
         gbc.gridx = 0; gbc.gridy = 4; gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0; add(new JLabel("Enviar alerta:"), gbc);
         gbc.gridx = 1; gbc.fill = GridBagConstraints.BOTH; gbc.weighty = 1.0; add(new JScrollPane(messageToSendArea), gbc);
 
-        // Cooldown
-        JPanel cooldownPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        cooldownPanel.add(new JLabel("Reenviar alerta apenas após:"));
-        cooldownPanel.add(cooldownSpinner);
-        cooldownPanel.add(new JLabel(" segundos"));
-        gbc.gridx = 1; gbc.gridy = 5; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weighty = 0;
-        gbc.insets = new Insets(10, 5, 0, 5);
-        add(cooldownPanel, gbc);
-        gbc.insets = new Insets(5, 5, 5, 5);
 
         // Destinos
         JPanel destinationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         destinationPanel.add(sendToMqttCheckBox);
         destinationPanel.add(sendToTelegramCheckBox);
-        gbc.gridx = 1; gbc.gridy = 6;
+        gbc.gridx = 1; gbc.gridy = 5;
         add(destinationPanel, gbc);
 
         // Botões
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(cancelButton);
         buttonPanel.add(saveButton);
-        gbc.gridx = 1; gbc.gridy = 7;
+        gbc.gridx = 1; gbc.gridy = 6;
         add(buttonPanel, gbc);
     }
 
@@ -173,7 +163,6 @@ public class AlertRuleDialog extends JDialog {
         }
 
         this.alertRule.setThresholdValueMax(thresholdMax);
-        this.alertRule.setCooldownSeconds((Integer) cooldownSpinner.getValue());
         dispose();
     }
 
@@ -186,7 +175,6 @@ public class AlertRuleDialog extends JDialog {
         messageToSendArea.setText(rule.getMessageToSend());
         sendToMqttCheckBox.setSelected(rule.isSendToMqtt());
         sendToTelegramCheckBox.setSelected(rule.isSendToTelegram());
-        cooldownSpinner.setValue(rule.getCooldownSeconds());
 
         // CORRIGIDO: Define o valor do segundo campo
         thresholdMaxValueField.setText(String.valueOf(rule.getThresholdValueMax()));

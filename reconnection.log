@@ -8,3 +8,6 @@
 2025-07-15 13:19:45 - CONEXÃO RESTABELECIDA - Pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
 2025-07-15 13:45:48 - CONEXÃO PERDIDA - Pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
 2025-07-15 15:06:42 - CONEXÃO PERDIDA - Pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+2025-07-23 15:36:26 - CONEXÃO PERDIDA - Pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+2025-07-23 15:37:01 - TENTATIVA DE RECONEXÃO FALHOU - Pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+2025-07-23 15:37:15 - TENTATIVA DE RECONEXÃO FALHOU - Pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)

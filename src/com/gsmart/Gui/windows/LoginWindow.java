@@ -2,6 +2,7 @@
 package com.gsmart.Gui.windows;
 
 import com.gsmart.GSmartGui;
+import com.gsmart.db.DatabaseManager;
 import com.gsmart.pipeline.PipelineManager;
 
 import javax.swing.*;
@@ -21,9 +22,8 @@ import java.awt.event.ActionEvent;
 public class LoginWindow extends JFrame {
 
     // --- CREDENCIAIS FIXAS ---
-    // Em uma aplicação real, isso viria de um banco de dados ou serviço de autenticação.
-    private static final String USUARIO_VALIDO = "admin";
-    private static final String SENHA_VALIDA = "admin";
+    //private static final String USUARIO_VALIDO = "admin";
+    //private static final String SENHA_VALIDA = "admin";
 
     private final JTextField userField;
     private final JPasswordField passField;
@@ -71,25 +71,43 @@ public class LoginWindow extends JFrame {
         getRootPane().setDefaultButton(loginButton);
     }
 
+    /**
+     * Valida o login usando o DatabaseManager e abre a aplicação principal se for bem-sucedido.
+     */
     private void performLogin(ActionEvent e) {
-        String user = userField.getText();
+        String user = userField.getText().trim();
         String password = new String(passField.getPassword());
 
-        if (USUARIO_VALIDO.equals(user) && SENHA_VALIDA.equals(password)) {
-            // Sucesso! Fecha a janela de login e abre a principal.
+        if (user.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                    "Utilizador e senha não podem estar vazios.",
+                    "Erro de Validação",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // --- 2. USAR O NOSSO NOVO MTODO DE VALIDAÇÃO ---
+        String userRole = DatabaseManager.validateLogin(user, password);
+
+        if (userRole != null) {
+            // Sucesso! Fecha a janela de login e abre a principal, passando o perfil do utilizador.
             dispose(); // Libera os recursos desta janela
-            showMainApplication();
+            showMainApplication(userRole);
         } else {
             // Falha
             JOptionPane.showMessageDialog(this,
-                    "Usuário ou senha inválidos.",
+                    "Utilizador ou senha inválidos.",
                     "Erro de Autenticação",
                     JOptionPane.ERROR_MESSAGE);
             passField.setText(""); // Limpa o campo de senha
         }
     }
 
-    private void showMainApplication() {
+    /**
+     * Inicializa e exibe a janela principal da aplicação, passando o perfil do utilizador.
+     * @param userRole O perfil do utilizador que fez o login (ex: "ADMINISTRATOR").
+     */
+    private void showMainApplication(String userRole) {
         // Usa o mesmo metodo do Launcher para garantir consistência
         SwingUtilities.invokeLater(() -> {
             LogViewerWindow globalLogViewer = new LogViewerWindow();
@@ -97,7 +115,8 @@ public class LoginWindow extends JFrame {
 
             PipelineManager pipelineManager = new PipelineManager();
 
-            GSmartGui gui = new GSmartGui(globalLogViewer, pipelineManager);
+            // --- 3. PASSAR O PERFIL PARA A GSmartGui ---
+            GSmartGui gui = new GSmartGui(globalLogViewer, pipelineManager, userRole);
             gui.setVisible(true);
         });
     }
