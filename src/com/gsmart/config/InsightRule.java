@@ -47,6 +47,7 @@ public class InsightRule implements Serializable {
         this.enabled = true;
         this.sendToMqtt = true;
         this.sendToTelegram = true;
+        this.thresholdValueMax = 0;
     }
 
     // --- Getters e Setters ---

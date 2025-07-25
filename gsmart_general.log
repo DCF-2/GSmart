@@ -32652,3 +32652,475 @@ java.lang.InterruptedException: null
 15:58:46.389 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
 15:58:46.394 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
 15:58:46.396 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+16:11:08.321 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+16:11:08.499 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+16:11:27.975 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador 'admin' autenticado com sucesso com o perfil 'ADMINISTRATOR'.
+16:11:30.084 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Carregando configurações salvas...
+16:11:30.088 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Arquivo de configuração 'gsmart.properties' carregado com sucesso.
+16:11:30.213 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta carregadas com sucesso de 'alerts.ser'.
+16:11:30.231 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme carregadas com sucesso de 'insights.ser'.
+16:11:50.534 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Novo utilizador 'Davi' com perfil 'OPERATOR' adicionado com sucesso.
+16:11:59.999 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Salvando configurações antes de fechar...
+16:12:00.001 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
+16:12:00.006 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
+16:12:00.010 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+16:12:11.548 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+16:12:11.674 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+16:12:21.776 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador 'Davi' autenticado com sucesso com o perfil 'OPERATOR'.
+16:12:24.104 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Carregando configurações salvas...
+16:12:24.108 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Arquivo de configuração 'gsmart.properties' carregado com sucesso.
+16:12:24.185 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta carregadas com sucesso de 'alerts.ser'.
+16:12:24.195 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme carregadas com sucesso de 'insights.ser'.
+16:12:24.197 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Utilizador não é administrador. A desativar funcionalidades de edição.
+16:12:30.602 [SwingWorker-pool-1-thread-1] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+16:12:31.799 [SwingWorker-pool-1-thread-1] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+16:12:31.859 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+16:12:32.195 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+16:12:32.195 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Buscando perfis de dispositivo...
+16:12:32.489 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Encontrados 2 perfis de dispositivo.
+16:12:32.536 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+16:12:32.826 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+16:12:32.826 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Buscando dispositivos para o perfil ID: fad253d0-e880-11ee-8358-1f8b80ee0580
+16:12:33.246 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Encontrados 7 dispositivos.
+16:12:38.938 [SwingWorker-pool-1-thread-4] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+16:12:39.181 [SwingWorker-pool-1-thread-4] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+16:12:44.505 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Salvando configurações antes de fechar...
+16:12:44.508 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
+16:12:44.513 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
+16:12:44.516 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+16:12:56.032 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+16:12:56.128 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+16:13:05.168 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador 'Davi' autenticado com sucesso com o perfil 'OPERATOR'.
+16:13:07.354 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Carregando configurações salvas...
+16:13:07.356 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Arquivo de configuração 'gsmart.properties' carregado com sucesso.
+16:13:07.438 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta carregadas com sucesso de 'alerts.ser'.
+16:13:07.450 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme carregadas com sucesso de 'insights.ser'.
+16:13:07.451 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Utilizador não é administrador. A desativar funcionalidades de edição.
+16:14:08.786 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Salvando configurações antes de fechar...
+16:14:08.788 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
+16:14:08.794 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
+16:14:08.796 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+16:14:20.089 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+16:14:20.192 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+16:14:27.845 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador 'admin' autenticado com sucesso com o perfil 'ADMINISTRATOR'.
+16:14:30.075 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Carregando configurações salvas...
+16:14:30.077 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Arquivo de configuração 'gsmart.properties' carregado com sucesso.
+16:14:30.182 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta carregadas com sucesso de 'alerts.ser'.
+16:14:30.205 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme carregadas com sucesso de 'insights.ser'.
+16:14:50.299 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador com ID 2 removido com sucesso.
+16:14:54.102 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Salvando configurações antes de fechar...
+16:14:54.105 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
+16:14:54.111 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
+16:14:54.113 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+16:15:04.252 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+16:15:04.343 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+16:15:12.586 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador 'admin' autenticado com sucesso com o perfil 'ADMINISTRATOR'.
+16:15:14.589 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Carregando configurações salvas...
+16:15:14.591 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Arquivo de configuração 'gsmart.properties' carregado com sucesso.
+16:15:14.679 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta carregadas com sucesso de 'alerts.ser'.
+16:15:14.687 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme carregadas com sucesso de 'insights.ser'.
+16:15:17.335 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Salvando configurações antes de fechar...
+16:15:17.337 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
+16:15:17.340 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
+16:15:17.342 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+16:15:26.534 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+16:15:26.620 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+16:15:38.023 [AWT-EventQueue-0] WARN  com.gsmart.db.DatabaseManager - Tentativa de login falhada para o utilizador: Davi
+16:15:53.220 [AWT-EventQueue-0] WARN  com.gsmart.db.DatabaseManager - Tentativa de login falhada para o utilizador: Davi
+16:19:36.109 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador 'admin' autenticado com sucesso com o perfil 'ADMINISTRATOR'.
+16:19:37.918 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Carregando configurações salvas...
+16:19:37.920 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Arquivo de configuração 'gsmart.properties' carregado com sucesso.
+16:19:38.033 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta carregadas com sucesso de 'alerts.ser'.
+16:19:38.049 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme carregadas com sucesso de 'insights.ser'.
+16:37:07.680 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Salvando configurações antes de fechar...
+16:37:07.709 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
+16:37:07.734 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
+16:37:07.738 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+17:25:06.628 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+17:25:06.746 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+17:25:26.912 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador 'admin' autenticado com sucesso com o perfil 'ADMINISTRATOR'.
+17:25:29.204 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Carregando configurações salvas...
+17:25:29.206 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Arquivo de configuração 'gsmart.properties' carregado com sucesso.
+17:25:29.326 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta carregadas com sucesso de 'alerts.ser'.
+17:25:29.340 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme carregadas com sucesso de 'insights.ser'.
+17:25:52.815 [SwingWorker-pool-1-thread-1] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+17:25:53.869 [SwingWorker-pool-1-thread-1] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+17:25:53.919 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+17:25:54.140 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+17:25:54.141 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Buscando perfis de dispositivo...
+17:25:54.236 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Encontrados 2 perfis de dispositivo.
+17:25:54.282 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+17:25:54.503 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+17:25:54.503 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Buscando dispositivos para o perfil ID: fad253d0-e880-11ee-8358-1f8b80ee0580
+17:25:54.573 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Encontrados 7 dispositivos.
+17:25:54.681 [SwingWorker-pool-1-thread-4] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+17:25:54.915 [SwingWorker-pool-1-thread-4] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+17:27:45.801 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+17:27:46.116 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+17:27:46.126 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Recebida ordem para lançar pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+17:27:46.155 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' iniciada em segundo plano.
+17:27:46.156 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - 🚀 INICIANDO PIPELINE COM FONTE: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) 🚀
+17:27:46.160 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:27:46.159667500 ---
+17:27:46.160 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:27:46.324 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'teste'. Disparando notificação.
+17:27:46.652 [Thread-0] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:27:47.002 [Thread-0] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:27:47.005 [Thread-0] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:27:46] teste
+17:27:47.018 [Thread-0] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:27:47.027 [Thread-0] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:27:47.027 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste'. Disparando notificação.
+17:27:47.028 [Thread-0] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:27:47.347 [Thread-0] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:27:47.348 [Thread-0] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:27:46] teste 3
+17:27:47.353 [Thread-0] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:27:47.360 [Thread-0] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:27:53.791 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:27:53.791654200 ---
+17:27:53.791 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:27:53.849 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'teste'. Disparando notificação.
+17:27:53.849 [Thread-0] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:27:54.159 [Thread-0] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:27:54.159 [Thread-0] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:27:53] teste
+17:27:54.160 [Thread-0] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:27:54.163 [Thread-0] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:27:54.163 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste'. Disparando notificação.
+17:27:54.164 [Thread-0] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:27:54.475 [Thread-0] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:27:54.475 [Thread-0] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:27:53] teste 3
+17:27:54.477 [Thread-0] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:27:54.479 [Thread-0] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:27:59.812 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:27:59.812657200 ---
+17:27:59.812 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:27:59.868 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'teste'. Disparando notificação.
+17:27:59.869 [Thread-0] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:00.181 [Thread-0] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:00.181 [Thread-0] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:27:59] teste
+17:28:00.183 [Thread-0] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:00.184 [Thread-0] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:00.185 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste'. Disparando notificação.
+17:28:00.185 [Thread-0] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:00.500 [Thread-0] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:00.500 [Thread-0] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:27:59] teste 3
+17:28:00.502 [Thread-0] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:00.504 [Thread-0] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:05.809 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:28:05.809669300 ---
+17:28:05.810 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:28:05.873 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'teste'. Disparando notificação.
+17:28:05.873 [Thread-0] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:06.187 [Thread-0] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:06.187 [Thread-0] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:05] teste
+17:28:06.188 [Thread-0] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:06.190 [Thread-0] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:06.190 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste'. Disparando notificação.
+17:28:06.191 [Thread-0] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:06.500 [Thread-0] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:06.501 [Thread-0] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:05] teste 3
+17:28:06.502 [Thread-0] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:06.504 [Thread-0] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:06.599 [AWT-EventQueue-0] WARN  com.gsmart.pipeline.PipelineManager - Sinal de parada geral enviado pelo usuário para 1 monitores.
+17:28:06.600 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.DataPipeline - Comando de parada processado para a tarefa 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)'.
+17:28:06.780 [Thread-0] WARN  com.gsmart.pipeline.DataPipeline - Sinal de interrupção recebido. Encerrando a pipeline...
+17:28:06.780 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - FIM DO LOOP. Execução da pipeline para ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) finalizada.
+17:28:06.781 [Thread-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline thread para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' foi finalizada.
+17:28:19.968 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+17:28:20.194 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+17:28:20.194 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Recebida ordem para lançar pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+17:28:20.196 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' iniciada em segundo plano.
+17:28:20.197 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - 🚀 INICIANDO PIPELINE COM FONTE: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) 🚀
+17:28:20.197 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:28:20.197661500 ---
+17:28:20.197 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:28:20.258 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'teste'. Disparando notificação.
+17:28:20.259 [Thread-49] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:20.574 [Thread-49] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:20.574 [Thread-49] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:20] teste
+17:28:20.576 [Thread-49] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:20.578 [Thread-49] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:20.578 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste'. Disparando notificação.
+17:28:20.579 [Thread-49] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:20.891 [Thread-49] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:20.891 [Thread-49] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:20] teste 3
+17:28:20.893 [Thread-49] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:20.895 [Thread-49] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:26.271 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:28:26.271658900 ---
+17:28:26.271 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:28:26.328 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'teste'. Disparando notificação.
+17:28:26.328 [Thread-49] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:26.638 [Thread-49] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:26.639 [Thread-49] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:26] teste
+17:28:26.640 [Thread-49] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:26.642 [Thread-49] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:26.642 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste'. Disparando notificação.
+17:28:26.642 [Thread-49] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:26.952 [Thread-49] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:26.952 [Thread-49] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:26] teste 3
+17:28:26.953 [Thread-49] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:26.955 [Thread-49] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:32.281 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:28:32.281664500 ---
+17:28:32.281 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:28:32.375 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'teste'. Disparando notificação.
+17:28:32.375 [Thread-49] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:32.684 [Thread-49] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:32.684 [Thread-49] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:32] teste
+17:28:32.686 [Thread-49] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:32.688 [Thread-49] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:32.688 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste'. Disparando notificação.
+17:28:32.689 [Thread-49] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:33.000 [Thread-49] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:33.000 [Thread-49] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:32] teste 3
+17:28:33.001 [Thread-49] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:33.003 [Thread-49] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:38.308 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:28:38.308673800 ---
+17:28:38.308 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:28:38.365 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'teste'. Disparando notificação.
+17:28:38.366 [Thread-49] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:38.681 [Thread-49] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:38.682 [Thread-49] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:38] teste
+17:28:38.683 [Thread-49] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:38.685 [Thread-49] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:38.685 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste'. Disparando notificação.
+17:28:38.685 [Thread-49] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:38.994 [Thread-49] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:38.994 [Thread-49] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:38] teste 3
+17:28:38.995 [Thread-49] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:38.998 [Thread-49] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:44.284 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:28:44.284664800 ---
+17:28:44.284 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:28:44.340 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'teste'. Disparando notificação.
+17:28:44.341 [Thread-49] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:44.654 [Thread-49] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:44.654 [Thread-49] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:44] teste
+17:28:44.659 [Thread-49] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:44.661 [Thread-49] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:44.662 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste'. Disparando notificação.
+17:28:44.662 [Thread-49] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:28:44.973 [Thread-49] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:28:44.973 [Thread-49] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:28:44] teste 3
+17:28:44.974 [Thread-49] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:28:44.976 [Thread-49] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:28:45.220 [AWT-EventQueue-0] WARN  com.gsmart.pipeline.PipelineManager - Sinal de parada geral enviado pelo usuário para 1 monitores.
+17:28:45.220 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.DataPipeline - Comando de parada processado para a tarefa 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)'.
+17:28:45.371 [Thread-49] WARN  com.gsmart.pipeline.DataPipeline - Sinal de interrupção recebido. Encerrando a pipeline...
+17:28:45.371 [Thread-49] INFO  com.gsmart.pipeline.DataPipeline - FIM DO LOOP. Execução da pipeline para ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) finalizada.
+17:28:45.371 [Thread-49] INFO  com.gsmart.pipeline.PipelineManager - Pipeline thread para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' foi finalizada.
+17:29:45.872 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+17:29:46.156 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+17:29:46.156 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Recebida ordem para lançar pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+17:29:46.160 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' iniciada em segundo plano.
+17:29:46.161 [Thread-110] INFO  com.gsmart.pipeline.DataPipeline - 🚀 INICIANDO PIPELINE COM FONTE: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) 🚀
+17:29:46.162 [Thread-110] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:29:46.162665600 ---
+17:29:46.162 [Thread-110] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:29:46.223 [Thread-110] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'teste'. Disparando notificação.
+17:29:46.224 [Thread-110] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:29:46.536 [Thread-110] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:29:46.536 [Thread-110] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:29:46] teste regra entre
+17:29:46.538 [Thread-110] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:29:46.540 [Thread-110] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:29:52.263 [Thread-110] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:29:52.263671600 ---
+17:29:52.263 [Thread-110] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:29:56.768 [AWT-EventQueue-0] WARN  com.gsmart.pipeline.PipelineManager - Sinal de parada geral enviado pelo usuário para 1 monitores.
+17:29:56.768 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.DataPipeline - Comando de parada processado para a tarefa 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)'.
+17:29:56.769 [Thread-110] WARN  com.gsmart.pipeline.DataPipeline - Sinal de interrupção recebido. Encerrando a pipeline...
+17:29:56.769 [Thread-110] INFO  com.gsmart.pipeline.DataPipeline - FIM DO LOOP. Execução da pipeline para ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) finalizada.
+17:29:56.769 [Thread-110] INFO  com.gsmart.pipeline.PipelineManager - Pipeline thread para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' foi finalizada.
+17:30:14.719 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+17:30:14.988 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+17:30:14.989 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Recebida ordem para lançar pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+17:30:14.991 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' iniciada em segundo plano.
+17:30:14.992 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - 🚀 INICIANDO PIPELINE COM FONTE: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) 🚀
+17:30:14.992 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:30:14.992658900 ---
+17:30:14.992 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:30:20.346 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:30:20.346656100 ---
+17:30:20.346 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:30:25.816 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:30:25.816687700 ---
+17:30:25.816 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:30:31.248 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:30:31.248677900 ---
+17:30:31.248 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:30:36.584 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:30:36.584662500 ---
+17:30:36.584 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:30:41.957 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:30:41.957658100 ---
+17:30:41.957 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:30:44.913 [AWT-EventQueue-0] WARN  com.gsmart.pipeline.PipelineManager - Sinal de parada geral enviado pelo usuário para 1 monitores.
+17:30:44.913 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.DataPipeline - Comando de parada processado para a tarefa 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)'.
+17:30:44.913 [Thread-117] WARN  com.gsmart.pipeline.DataPipeline - Sinal de interrupção recebido. Encerrando a pipeline...
+17:30:44.913 [Thread-117] INFO  com.gsmart.pipeline.DataPipeline - FIM DO LOOP. Execução da pipeline para ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) finalizada.
+17:30:44.913 [Thread-117] INFO  com.gsmart.pipeline.PipelineManager - Pipeline thread para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' foi finalizada.
+17:32:12.086 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+17:32:12.378 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+17:32:12.379 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Recebida ordem para lançar pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+17:32:12.381 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' iniciada em segundo plano.
+17:32:12.382 [Thread-118] INFO  com.gsmart.pipeline.DataPipeline - 🚀 INICIANDO PIPELINE COM FONTE: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) 🚀
+17:32:12.383 [Thread-118] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:32:12.383778800 ---
+17:32:12.383 [Thread-118] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:32:12.442 [Thread-118] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'teste'. Disparando notificação.
+17:32:12.446 [Thread-118] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+17:32:12.760 [Thread-118] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+17:32:12.760 [Thread-118] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [24/07/2025 17:32:12] teste regra entre
+17:32:12.762 [Thread-118] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+17:32:12.765 [Thread-118] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+17:32:18.145 [Thread-118] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:32:18.145775600 ---
+17:32:18.145 [Thread-118] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:32:23.605 [Thread-118] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 17:32:23.605774 ---
+17:32:23.605 [Thread-118] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+17:32:24.611 [AWT-EventQueue-0] WARN  com.gsmart.pipeline.PipelineManager - Sinal de parada geral enviado pelo usuário para 1 monitores.
+17:32:24.612 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.DataPipeline - Comando de parada processado para a tarefa 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)'.
+17:32:24.612 [Thread-118] WARN  com.gsmart.pipeline.DataPipeline - Sinal de interrupção recebido. Encerrando a pipeline...
+17:32:24.612 [Thread-118] INFO  com.gsmart.pipeline.DataPipeline - FIM DO LOOP. Execução da pipeline para ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) finalizada.
+17:32:24.612 [Thread-118] INFO  com.gsmart.pipeline.PipelineManager - Pipeline thread para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' foi finalizada.
+17:32:32.442 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Salvando configurações antes de fechar...
+17:32:32.444 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
+17:32:32.458 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
+17:32:32.460 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+18:09:53.202 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+18:09:53.328 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+18:10:08.849 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador 'admin' autenticado com sucesso com o perfil 'ADMINISTRATOR'.
+18:10:12.297 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Carregando configurações salvas...
+18:10:12.299 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Arquivo de configuração 'gsmart.properties' carregado com sucesso.
+18:10:12.407 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta carregadas com sucesso de 'alerts.ser'.
+18:10:12.410 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme carregadas com sucesso de 'insights.ser'.
+18:12:13.157 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Salvando configurações antes de fechar...
+18:12:13.158 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
+18:12:13.162 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
+18:12:13.166 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+13:42:51.589 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+13:42:51.710 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+13:42:59.899 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador 'admin' autenticado com sucesso com o perfil 'ADMINISTRATOR'.
+13:43:02.172 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Carregando configurações salvas...
+13:43:02.174 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Arquivo de configuração 'gsmart.properties' carregado com sucesso.
+13:43:02.281 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta carregadas com sucesso de 'alerts.ser'.
+13:43:02.284 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme carregadas com sucesso de 'insights.ser'.
+13:43:05.375 [SwingWorker-pool-1-thread-1] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+13:43:06.576 [SwingWorker-pool-1-thread-1] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+13:43:06.623 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+13:43:07.078 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+13:43:07.078 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Buscando perfis de dispositivo...
+13:43:07.257 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Encontrados 2 perfis de dispositivo.
+13:43:07.298 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+13:43:07.556 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+13:43:07.557 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Buscando dispositivos para o perfil ID: fad253d0-e880-11ee-8358-1f8b80ee0580
+13:43:07.639 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Encontrados 7 dispositivos.
+13:43:08.867 [SwingWorker-pool-1-thread-4] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+13:43:09.124 [SwingWorker-pool-1-thread-4] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+14:00:33.943 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+14:00:34.333 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+14:00:34.339 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Recebida ordem para lançar pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+14:00:34.363 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' iniciada em segundo plano.
+14:00:34.364 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - 🚀 INICIANDO PIPELINE COM FONTE: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) 🚀
+14:00:34.366 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:00:34.366113200 ---
+14:00:34.367 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:00:34.563 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste enntre'. Disparando notificação.
+14:00:34.934 [Thread-0] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+14:00:35.285 [Thread-0] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+14:00:35.291 [Thread-0] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [25/07/2025 14:00:34] testando funçao entre.
+14:00:35.306 [Thread-0] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+14:00:35.317 [Thread-0] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+14:00:43.747 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:00:43.747120200 ---
+14:00:43.747 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:00:46.737 [AWT-EventQueue-0] WARN  com.gsmart.pipeline.PipelineManager - Sinal de parada geral enviado pelo usuário para 1 monitores.
+14:00:46.738 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.DataPipeline - Comando de parada processado para a tarefa 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)'.
+14:00:46.739 [Thread-0] WARN  com.gsmart.pipeline.DataPipeline - Sinal de interrupção recebido. Encerrando a pipeline...
+14:00:46.739 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - FIM DO LOOP. Execução da pipeline para ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) finalizada.
+14:00:46.739 [Thread-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline thread para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' foi finalizada.
+14:01:55.909 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+14:01:56.182 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+14:01:56.183 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Recebida ordem para lançar pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+14:01:56.183 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' iniciada em segundo plano.
+14:01:56.185 [Thread-7] INFO  com.gsmart.pipeline.DataPipeline - 🚀 INICIANDO PIPELINE COM FONTE: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) 🚀
+14:01:56.185 [Thread-7] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:01:56.185013 ---
+14:01:56.185 [Thread-7] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:01:56.242 [Thread-7] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALARME DETETADO! Regra: 'Teste entre'. Disparando notificação.
+14:01:56.242 [Thread-7] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+14:01:56.560 [Thread-7] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+14:01:56.560 [Thread-7] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alarme/[teste]': [25/07/2025 14:01:56] Testando funçao entre
+14:01:56.576 [Thread-7] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+14:01:56.579 [Thread-7] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+14:02:02.023 [Thread-7] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:02:02.023005300 ---
+14:02:02.023 [Thread-7] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:02:07.574 [Thread-7] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:02:07.574000200 ---
+14:02:07.574 [Thread-7] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:02:12.994 [Thread-7] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:02:12.994017200 ---
+14:02:12.994 [Thread-7] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:02:17.946 [AWT-EventQueue-0] WARN  com.gsmart.pipeline.PipelineManager - Sinal de parada geral enviado pelo usuário para 1 monitores.
+14:02:17.946 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.DataPipeline - Comando de parada processado para a tarefa 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)'.
+14:02:17.947 [Thread-7] WARN  com.gsmart.pipeline.DataPipeline - Sinal de interrupção recebido. Encerrando a pipeline...
+14:02:17.947 [Thread-7] INFO  com.gsmart.pipeline.DataPipeline - FIM DO LOOP. Execução da pipeline para ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) finalizada.
+14:02:17.947 [Thread-7] INFO  com.gsmart.pipeline.PipelineManager - Pipeline thread para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' foi finalizada.
+14:02:34.918 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Novo utilizador 'Davi' com perfil 'ADMINISTRATOR' adicionado com sucesso.
+14:03:19.234 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+14:03:19.532 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+14:03:19.532 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Recebida ordem para lançar pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+14:03:19.534 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' iniciada em segundo plano.
+14:03:19.535 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - 🚀 INICIANDO PIPELINE COM FONTE: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) 🚀
+14:03:19.535 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:03:19.535054400 ---
+14:03:19.535 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:03:19.590 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste enntre'. Disparando notificação.
+14:03:19.591 [Thread-14] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+14:03:19.902 [Thread-14] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+14:03:19.902 [Thread-14] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [25/07/2025 14:03:19] testando funçao entre.
+14:03:19.904 [Thread-14] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+14:03:19.907 [Thread-14] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+14:03:25.309 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:03:25.309043700 ---
+14:03:25.309 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:03:30.752 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:03:30.752057200 ---
+14:03:30.752 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:03:36.099 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:03:36.099059100 ---
+14:03:36.099 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:03:36.154 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALARME DETETADO! Regra: 'Teste entre'. Disparando notificação.
+14:03:36.155 [Thread-14] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+14:03:36.470 [Thread-14] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+14:03:36.470 [Thread-14] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alarme/[teste]': [25/07/2025 14:03:36] Testando funçao entre
+14:03:36.472 [Thread-14] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+14:03:36.474 [Thread-14] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+14:03:41.836 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:03:41.836048700 ---
+14:03:41.836 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:03:47.225 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:03:47.225043100 ---
+14:03:47.225 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:03:52.843 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:03:52.843045100 ---
+14:03:52.843 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:03:58.314 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:03:58.314321500 ---
+14:03:58.315 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:04:03.736 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:04:03.736055300 ---
+14:04:03.736 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:04:09.220 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:04:09.220041300 ---
+14:04:09.220 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:04:14.598 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:04:14.598038900 ---
+14:04:14.598 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:04:19.975 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:04:19.975054600 ---
+14:04:19.976 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:04:25.358 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:04:25.358038700 ---
+14:04:25.358 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:04:30.802 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:04:30.802046200 ---
+14:04:30.802 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:04:30.950 [AWT-EventQueue-0] WARN  com.gsmart.pipeline.PipelineManager - Sinal de parada geral enviado pelo usuário para 1 monitores.
+14:04:30.950 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.DataPipeline - Comando de parada processado para a tarefa 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)'.
+14:04:31.186 [Thread-14] WARN  com.gsmart.pipeline.DataPipeline - Sinal de interrupção recebido. Encerrando a pipeline...
+14:04:31.186 [Thread-14] INFO  com.gsmart.pipeline.DataPipeline - FIM DO LOOP. Execução da pipeline para ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) finalizada.
+14:04:31.186 [Thread-14] INFO  com.gsmart.pipeline.PipelineManager - Pipeline thread para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' foi finalizada.
+14:04:33.299 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+14:04:33.741 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+14:04:33.741 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Recebida ordem para lançar pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+14:04:33.743 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' iniciada em segundo plano.
+14:04:33.744 [Thread-27] INFO  com.gsmart.pipeline.DataPipeline - 🚀 INICIANDO PIPELINE COM FONTE: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) 🚀
+14:04:33.744 [Thread-27] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:04:33.744046600 ---
+14:04:33.744 [Thread-27] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:04:33.801 [Thread-27] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALERTA DETETADO! Regra: 'Teste enntre'. Disparando notificação.
+14:04:33.801 [Thread-27] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+14:04:34.112 [Thread-27] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+14:04:34.112 [Thread-27] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alerta': [25/07/2025 14:04:33] testando funçao entre (alerta)
+14:04:34.114 [Thread-27] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+14:04:34.116 [Thread-27] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+14:04:34.116 [Thread-27] INFO  com.gsmart.pipeline.DataPipeline -    - NOVO ESTADO DE ALARME DETETADO! Regra: 'Teste entre'. Disparando notificação.
+14:04:34.118 [Thread-27] INFO  com.gsmart.services.MqttService - A conectar ao broker MQTT em tcp://10.5.0.11:1883
+14:04:34.427 [Thread-27] INFO  com.gsmart.services.MqttService - Conectado com sucesso ao broker.
+14:04:34.427 [Thread-27] INFO  com.gsmart.services.MqttService - A publicar mensagem no tópico 'gsmart/alarme/[teste]': [25/07/2025 14:04:33] Testando funçao entre (alarme).
+14:04:34.429 [Thread-27] INFO  com.gsmart.services.MqttService - Mensagem publicada com sucesso.
+14:04:34.430 [Thread-27] INFO  com.gsmart.services.MqttService - Desconectado do broker.
+14:04:39.699 [Thread-27] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:04:39.699044700 ---
+14:04:39.699 [Thread-27] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:04:44.939 [AWT-EventQueue-0] WARN  com.gsmart.pipeline.PipelineManager - Sinal de parada geral enviado pelo usuário para 1 monitores.
+14:04:44.940 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.DataPipeline - Comando de parada processado para a tarefa 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)'.
+14:04:44.940 [Thread-27] WARN  com.gsmart.pipeline.DataPipeline - Sinal de interrupção recebido. Encerrando a pipeline...
+14:04:44.940 [Thread-27] INFO  com.gsmart.pipeline.DataPipeline - FIM DO LOOP. Execução da pipeline para ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) finalizada.
+14:04:44.940 [Thread-27] INFO  com.gsmart.pipeline.PipelineManager - Pipeline thread para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' foi finalizada.
+14:04:47.348 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Salvando configurações antes de fechar...
+14:04:47.349 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
+14:04:47.355 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
+14:04:47.359 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.

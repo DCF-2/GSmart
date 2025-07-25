@@ -103,6 +103,7 @@ public class GSmartGui extends JFrame {
     // --- Outros ---
     private final OkHttpClient sharedOkHttpClient;
     private final String currentUserRole;
+    private final JButton manageUsersButton;
 
     /**
      * Construtor da janela principal da aplicação GSmart.
@@ -230,6 +231,7 @@ public class GSmartGui extends JFrame {
 
 
         JPanel adminPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        manageUsersButton = new JButton("Gerir Utilizadores");
         monitoringButton = new JButton("Central de Monitoramento");
         stopAllButton = new JButton("Parar Monitoramento");
         stopAllButton.setForeground(Color.RED);
@@ -240,6 +242,7 @@ public class GSmartGui extends JFrame {
         logsPopupMenu.add(reconexLogItem);
         JButton logsButton = new JButton("Ver Logs");
         logsButton.addActionListener(e -> logsPopupMenu.show(logsButton, 0, logsButton.getHeight()));
+        adminPanel.add(manageUsersButton);
         adminPanel.add(monitoringButton);
         adminPanel.add(stopAllButton);
         adminPanel.add(logsButton);
@@ -332,6 +335,7 @@ public class GSmartGui extends JFrame {
         monitoringButton.addActionListener(e -> showTaskManager());
         generalLogItem.addActionListener(e -> this.globalLogViewer.setVisible(true));
         reconexLogItem.addActionListener(e -> showReconnectionLog());
+        manageUsersButton.addActionListener(e -> showUserManagementWindow());
 
         // --- Listeners das Regras de Alerta ---
 
@@ -892,6 +896,9 @@ public class GSmartGui extends JFrame {
 
         boolean isAdmin = "ADMINISTRATOR".equals(this.currentUserRole);
 
+        // Controla a visibilidade do botão de gestão de utilizadores
+        manageUsersButton.setVisible(isAdmin);
+
         // Se não for admin, desativa a edição/criação de regras
         if (!isAdmin) {
             logger.info("Utilizador não é administrador. A desativar funcionalidades de edição.");
@@ -913,5 +920,13 @@ public class GSmartGui extends JFrame {
             alertRulesTable.setEnabled(false);
             insightRulesTable.setEnabled(false);
         }
+    }
+
+    /**
+     * Cria e exibe a janela de gestão de utilizadores.
+     */
+    private void showUserManagementWindow() {
+        UserManagementWindow userManagementWindow = new UserManagementWindow(this);
+        userManagementWindow.setVisible(true);
     }
 }

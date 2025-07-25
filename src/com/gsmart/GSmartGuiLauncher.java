@@ -9,7 +9,7 @@ import javax.swing.SwingUtilities;
 /**
  * Ponto de entrada (entry point) principal para a aplicação GSmart.
  *
- * A única responsabilidade desta classe é conter o método {@code main}, que
+ * A única responsabilidade desta classe é conter o metodo {@code main}, que
  * inicializa e exibe a primeira janela da interface gráfica, a {@code LoginWindow},
  * dando início à execução do programa na thread de eventos do Swing (EDT)
  * para garantir a segurança da thread.

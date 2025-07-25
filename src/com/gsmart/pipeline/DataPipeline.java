@@ -177,7 +177,11 @@ public class DataPipeline {
                                 case GREATER_THAN: condicaoSatisfeita = valorAtual > valorLimiar; break;
                                 case LESS_THAN: condicaoSatisfeita = valorAtual < valorLimiar; break;
                                 case EQUALS: condicaoSatisfeita = valorAtual == valorLimiar; break;
-                                case BETWEEN: condicaoSatisfeita = valorAtual > rule.getThresholdValue() && valorAtual < rule.getThresholdValueMax(); break;
+                                case BETWEEN:
+                                    double min = Math.min(rule.getThresholdValue(), rule.getThresholdValueMax());
+                                    double max = Math.max(rule.getThresholdValue(), rule.getThresholdValueMax());
+                                    condicaoSatisfeita = valorAtual >= min && valorAtual <= max;
+                                    break;
                             }
 
                             logger.debug("   - Resultado da condição: {}", condicaoSatisfeita);
@@ -219,7 +223,11 @@ public class DataPipeline {
                                 case GREATER_THAN: condicaoSatisfeita = valorAtual > rule.getThresholdValue(); break;
                                 case LESS_THAN: condicaoSatisfeita = valorAtual < rule.getThresholdValue(); break;
                                 case EQUALS: condicaoSatisfeita = valorAtual == rule.getThresholdValue(); break;
-                                case BETWEEN: condicaoSatisfeita = valorAtual > rule.getThresholdValue() && valorAtual < rule.getThresholdValueMax(); break;
+                                case BETWEEN:
+                                double min = Math.min(rule.getThresholdValue(), rule.getThresholdValueMax());
+                                double max = Math.max(rule.getThresholdValue(), rule.getThresholdValueMax());
+                                condicaoSatisfeita = valorAtual >= min && valorAtual <= max;
+                                break;
                             }
 
                             if (condicaoSatisfeita) {

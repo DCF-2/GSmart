@@ -34,6 +34,7 @@ public class AlertRule implements Serializable {
         this.enabled = true;
         this.sendToMqtt = sendToMqtt;
         this.sendToTelegram = sendToTelegram;
+        this.thresholdValueMax = 0;
     }
 
     // Getters e Setters para todos os campos
