@@ -6,6 +6,7 @@ C:\Users\Desn01\Documents\GSmart\src\com\gsmart\config\JsonHelper.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\config\MetricConfig.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\config\PipelineConfiguration.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\controller\CalculoDeCusto.java
+C:\Users\Desn01\Documents\GSmart\src\com\gsmart\db\DatabaseManager.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\GSmartGui.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\GSmartGuiLauncher.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\Gui\AlertRuleTableModel.java
@@ -20,6 +21,10 @@ C:\Users\Desn01\Documents\GSmart\src\com\gsmart\Gui\windows\LogViewerWindow.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\Gui\windows\MonitoringWindow.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\Gui\windows\ReconnectionLogViewer.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\Gui\windows\TaskManagerWindow.java
+C:\Users\Desn01\Documents\GSmart\src\com\gsmart\Gui\windows\UserDialog.java
+C:\Users\Desn01\Documents\GSmart\src\com\gsmart\Gui\windows\UserManagementWindow.java
+C:\Users\Desn01\Documents\GSmart\src\com\gsmart\Gui\windows\UserTableModel.java
+C:\Users\Desn01\Documents\GSmart\src\com\gsmart\model\User.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\pipeline\DataPipeline.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\pipeline\PipelineManager.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\pipeline\PipelineTask.java
@@ -27,6 +32,8 @@ C:\Users\Desn01\Documents\GSmart\src\com\gsmart\resources\ConditionType.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\resources\GSmartListener.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\resources\IDataSource.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\resources\TaskStatus.java
+C:\Users\Desn01\Documents\GSmart\src\com\gsmart\services\MqttService.java
+C:\Users\Desn01\Documents\GSmart\src\com\gsmart\services\TelegramService.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\sources\DatabaseSource.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\sources\Device.java
 C:\Users\Desn01\Documents\GSmart\src\com\gsmart\sources\DeviceProfile.java
