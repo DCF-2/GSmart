@@ -33124,3 +33124,55 @@ java.lang.InterruptedException: null
 14:04:47.349 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
 14:04:47.355 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
 14:04:47.359 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+14:27:47.446 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+14:27:47.537 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+14:28:07.180 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador 'Davi' autenticado com sucesso com o perfil 'ADMINISTRATOR'.
+14:28:09.035 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Carregando configurações salvas...
+14:28:09.039 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Arquivo de configuração 'gsmart.properties' carregado com sucesso.
+14:28:09.108 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta carregadas com sucesso de 'alerts.ser'.
+14:28:09.119 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme carregadas com sucesso de 'insights.ser'.
+14:28:14.582 [SwingWorker-pool-1-thread-1] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+14:28:15.544 [SwingWorker-pool-1-thread-1] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+14:28:15.588 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+14:28:15.860 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+14:28:15.861 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Buscando perfis de dispositivo...
+14:28:16.090 [SwingWorker-pool-1-thread-2] INFO  c.gsmart.sources.ThingsBoardSource - Encontrados 2 perfis de dispositivo.
+14:28:16.133 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+14:28:16.420 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+14:28:16.420 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Buscando dispositivos para o perfil ID: fad253d0-e880-11ee-8358-1f8b80ee0580
+14:28:16.654 [SwingWorker-pool-1-thread-3] INFO  c.gsmart.sources.ThingsBoardSource - Encontrados 7 dispositivos.
+14:28:29.823 [SwingWorker-pool-1-thread-4] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+14:28:30.120 [SwingWorker-pool-1-thread-4] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+14:29:43.530 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticando no ThingsBoard em http://10.8.0.5:8080...
+14:29:43.905 [AWT-EventQueue-0] INFO  c.gsmart.sources.ThingsBoardSource - Autenticação bem-sucedida!
+14:29:43.911 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Recebida ordem para lançar pipeline: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)
+14:29:43.940 [AWT-EventQueue-0] INFO  c.gsmart.services.CsvExportService - Diretório de exportação criado em: C:\Users\Desn01\Documents\GSmart\GSmart_Exports
+14:29:43.954 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' iniciada em segundo plano.
+14:29:43.955 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - 🚀 INICIANDO PIPELINE COM FONTE: ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) 🚀
+14:29:43.960 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:29:43.959176600 ---
+14:29:43.960 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:29:50.935 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - --- Iniciando novo ciclo de processamento às 14:29:50.935188800 ---
+14:29:50.935 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - [ETAPA 1/3] Buscando dados da fonte...
+14:29:52.134 [AWT-EventQueue-0] WARN  com.gsmart.pipeline.PipelineManager - Sinal de parada geral enviado pelo usuário para 1 monitores.
+14:29:52.135 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.DataPipeline - A exportar 2 registos de telemetria restantes para CSV...
+14:29:52.144 [AWT-EventQueue-0] INFO  c.gsmart.services.CsvExportService - A exportar 2 registos para o ficheiro: telemetria_20250729_142952.csv
+14:29:52.145 [AWT-EventQueue-0] INFO  c.gsmart.services.CsvExportService - Exportação para telemetria_20250729_142952.csv concluída com sucesso.
+14:29:52.146 [AWT-EventQueue-0] INFO  com.gsmart.pipeline.DataPipeline - Comando de parada processado para a tarefa 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)'.
+14:29:52.147 [Thread-0] WARN  com.gsmart.pipeline.DataPipeline - Sinal de interrupção recebido. Encerrando a pipeline...
+14:29:52.147 [Thread-0] INFO  com.gsmart.pipeline.DataPipeline - FIM DO LOOP. Execução da pipeline para ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0) finalizada.
+14:29:52.147 [Thread-0] INFO  com.gsmart.pipeline.PipelineManager - Pipeline thread para 'ThingsBoard (Device: 06e109e0-e8ff-11ee-bb8b-2563c61db9b0)' foi finalizada.
+14:29:53.412 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Salvando configurações antes de fechar...
+14:29:53.414 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
+14:29:53.417 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
+14:29:53.419 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+14:44:18.801 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+14:44:18.890 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+14:44:27.257 [AWT-EventQueue-0] INFO  com.gsmart.db.DatabaseManager - Utilizador 'admin' autenticado com sucesso com o perfil 'ADMINISTRATOR'.
+14:44:30.934 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Carregando configurações salvas...
+14:44:30.937 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Arquivo de configuração 'gsmart.properties' carregado com sucesso.
+14:44:31.141 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta carregadas com sucesso de 'alerts.ser'.
+14:44:31.164 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme carregadas com sucesso de 'insights.ser'.
+14:49:31.933 [AWT-EventQueue-0] INFO  com.gsmart.GSmartGui - Salvando configurações antes de fechar...
+14:49:31.950 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
+14:49:31.956 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
+14:49:31.959 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.

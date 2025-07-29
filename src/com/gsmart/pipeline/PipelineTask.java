@@ -79,7 +79,9 @@ public class PipelineTask {
             // 1. Sinaliza para a pipeline que ela deve parar.
             if (pipeline != null) {
                 pipeline.requestStop();
+                pipeline.exportRemainingData();
             }
+
 
             // 2. Interrompe a thread da pipeline para que ela saia de qualquer estado de 'sleep'
             //    e possa verificar a flag 'stopRequested'.

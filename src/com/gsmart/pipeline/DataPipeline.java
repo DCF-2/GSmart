@@ -10,6 +10,7 @@ import com.gsmart.conection.ExportacaoDadosPWBI;
 import com.gsmart.resources.GSmartListener;
 import com.gsmart.resources.IDataSource;
 import com.gsmart.resources.TaskStatus;
+import com.gsmart.services.CsvExportService;
 import com.gsmart.sources.ThingsBoardSource;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
@@ -23,9 +24,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -51,8 +50,10 @@ public class DataPipeline {
     private final String mqttBrokerUrl;
     private final String telegramToken;
     private final String telegramChatId;
-    private String lastTriggeredAlertId = null; // Guarda o ID do último ALERTA despoletado.
-    private String lastTriggeredAlarmId = null; // Guarda o ID do último ALARME despoletado.
+    private final CsvExportService csvExportService;
+    private final List<Map<String, Object>> telemetryBuffer;
+    private String lastTriggeredAlertId = null;
+    private String lastTriggeredAlarmId = null;
     private final OkHttpClient httpClient;
     private volatile boolean stopRequested = false;
     private final AtomicBoolean manualReconnectTrigger = new AtomicBoolean(false);
@@ -79,6 +80,8 @@ public class DataPipeline {
         this.mqttBrokerUrl = mqttBrokerUrl;
         this.telegramToken = telegramToken;
         this.telegramChatId = telegramChatId;
+        this.csvExportService = new CsvExportService();
+        this.telemetryBuffer = new ArrayList<>();
         this.httpClient = new OkHttpClient();
     }
 
@@ -253,7 +256,20 @@ public class DataPipeline {
                         }
                     }
                 }
-
+                Map<String, Object> dataRow = new LinkedHashMap<>();
+                for (String key : pbiPayload.keySet()) {
+                    JsonElement element = pbiPayload.get(key);
+                    if (element.isJsonPrimitive()) {
+                        if (element.getAsJsonPrimitive().isNumber()) {
+                            dataRow.put(key, element.getAsNumber());
+                        } else if (element.getAsJsonPrimitive().isBoolean()) {
+                            dataRow.put(key, element.getAsBoolean());
+                        } else {
+                            dataRow.put(key, element.getAsString());
+                        }
+                    }
+                }
+                telemetryBuffer.add(dataRow);
 
                 pbiPayload.addProperty("AlertaCritico", alertaCriticoDisparado ? 1 : 0);
                 pbiPayload.addProperty("timestamp", Instant.now().minus(3, ChronoUnit.HOURS).toString());
@@ -306,7 +322,8 @@ public class DataPipeline {
                 }
             }
         }
-
+        // Garante que todos os dados restantes no buffer são salvos antes de a pipeline terminar.
+        exportRemainingData();
         logger.info("FIM DO LOOP. Execução da pipeline para {} finalizada.", dataSource.getSourceName());
         if (listener != null) {
             listener.onStatusUpdate(TaskStatus.FINISHED);
@@ -334,5 +351,16 @@ public class DataPipeline {
         com.gsmart.services.MqttService.publish(this.mqttBrokerUrl, topic, mensagem);
     }
 
+    /**
+     * Exporta todos os dados de telemetria acumulados no buffer de memória para um ficheiro CSV.
+     * Este método é chamado quando a pipeline é parada.
+     */
+    public void exportRemainingData() {
+        if (!telemetryBuffer.isEmpty()) {
+            logger.info("A exportar {} registos de telemetria restantes para CSV...", telemetryBuffer.size());
+            csvExportService.exportData(new ArrayList<>(telemetryBuffer)); // Passa uma cópia do buffer
+            telemetryBuffer.clear(); // Limpa o buffer após a exportação
+        }
+    }
 
 }
