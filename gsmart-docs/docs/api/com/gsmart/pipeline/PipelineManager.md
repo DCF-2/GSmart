@@ -11,7 +11,7 @@ gerir e finalizar os processos de monitorização de dados. Ela faz a ponte
 entre as configurações definidas na `com.gsmart.GSmartGui` e a execução  
 real das `DataPipeline` em threads separadas.  
   
-<h3>Principais Responsabilidades:</h3>  
+<h1>Principais Responsabilidades:</h1>  
 <ul>  
 <li>Lançar novas tarefas de pipeline com base numa `com.gsmart.config.PipelineConfiguration` fornecida pela GUI.</li>  
 <li>Manter e fornecer uma lista atualizada de todas as tarefas em execução.</li>  

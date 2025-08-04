@@ -19,21 +19,18 @@ import java.util.function.Consumer;
 
 /**
  * Orquestrador central para o ciclo de vida de múltiplas tarefas de pipeline ({@link PipelineTask}).
- *
  * Esta classe atua como o "maestro" do sistema, responsável por instanciar,
  * gerir e finalizar os processos de monitorização de dados. Ela faz a ponte
  * entre as configurações definidas na {@link com.gsmart.GSmartGui} e a execução
  * real das {@link DataPipeline} em threads separadas.
- *
- * <h3>Principais Responsabilidades:</h3>
- * <ul>
- * <li>Lançar novas tarefas de pipeline com base numa {@link com.gsmart.config.PipelineConfiguration} fornecida pela GUI.</li>
- * <li>Manter e fornecer uma lista atualizada de todas as tarefas em execução.</li>
- * <li>Gerir a comunicação entre a lógica de fundo ({@code DataPipeline}) e a interface gráfica (GUI), utilizando um {@link com.gsmart.resources.GSmartListener}.</li>
- * <li>Controlar a exibição de janelas de monitorização individuais e diálogos de erro de conexão.</li>
- * <li>Fornecer métodos para reiniciar ou parar tarefas de forma segura.</li>
- * </ul>
- *
+ *<h2>Principais Responsabilidades:</h2>
+ *<ul>
+ *<li>Lançar novas tarefas de pipeline com base numa {@link com.gsmart.config.PipelineConfiguration} fornecida pela GUI.</li>
+ *<li>Manter e fornecer uma lista atualizada de todas as tarefas em execução.</li>
+ *<li>Gerir a comunicação entre a lógica de fundo ({@code DataPipeline}) e a interface gráfica (GUI), utilizando um {@link com.gsmart.resources.GSmartListener}.</li>
+ *<li>Controlar a exibição de janelas de monitorização individuais e diálogos de erro de conexão.</li>
+ *<li>Fornecer métodos para reiniciar ou parar tarefas de forma segura.</li>
+ *</ul>
  * @see com.gsmart.pipeline.PipelineTask
  * @see com.gsmart.pipeline.DataPipeline
  * @see com.gsmart.GSmartGui

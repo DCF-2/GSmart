@@ -5,7 +5,6 @@
 ## Descrição Geral
 
 Uma janela de diálogo (JDialog) para criar ou editar uma `AlertRule`.  
-  
 Fornece um formulário para que o utilizador possa configurar todos os  
 parâmetros de uma regra de alerta crítico de forma intuitiva.
 
@@ -25,6 +24,12 @@ parâmetros de uma regra de alerta crítico de forma intuitiva.
 ### `private void setupLayout()`
 
 *Nenhuma documentação de método fornecida.*
+
+---
+
+### `private void toggleBetweenFields()`
+
+Mostra ou esconde o segundo campo de valor com base na condição selecionada.
 
 ---
 

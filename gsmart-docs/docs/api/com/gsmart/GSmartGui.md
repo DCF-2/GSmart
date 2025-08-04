@@ -162,3 +162,16 @@ o JComboBox correspondente.
 Carrega a lista de Dispositivos associados a um Perfil de Dispositivo específico  
 do servidor ThingsBoard e popula o JComboBox correspondente.
 
+---
+
+### `private void applyRolePermissions(JPanel ruleButtonsPanel, JPanel insightButtonsPanel)`
+
+Aplica permissões à interface com base no perfil do utilizador.  
+Desativa funcionalidades de edição e criação para perfis que não sejam "ADMINISTRATOR".
+
+---
+
+### `private void showUserManagementWindow()`
+
+Cria e exibe a janela de gestão de utilizadores.
+

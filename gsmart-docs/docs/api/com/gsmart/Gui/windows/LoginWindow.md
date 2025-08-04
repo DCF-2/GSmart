@@ -19,11 +19,14 @@ estrutura permite a sua substituição por um mecanismo de autenticação mais r
 
 ### `private void performLogin(ActionEvent e)`
 
-*Nenhuma documentação de método fornecida.*
+Valida o login usando o DatabaseManager e abre a aplicação principal se for bem-sucedido.
 
 ---
 
-### `private void showMainApplication()`
+### `private void showMainApplication(String userRole)`
 
-*Nenhuma documentação de método fornecida.*
+Inicializa e exibe a janela principal da aplicação, passando o perfil do utilizador.
+
+- **Parâmetro:** `userRole` - O perfil do utilizador que fez o login (ex: "ADMINISTRATOR").
+
 

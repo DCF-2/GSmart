@@ -35,3 +35,31 @@ Salva as propriedades no arquivo de configuração.
 - **Parâmetro:** `props` - O objeto Properties contendo as configurações a serem salvas.
 
 
+---
+
+### `public void saveRules(List<AlertRule> alertRules, List<InsightRule> insightRules)`
+
+Salva as listas de regras de Alerta e Alarme em ficheiros serializados.
+
+- **Parâmetro:** `alertRules` - A lista de regras de alerta a ser guardada.
+- **Parâmetro:** `insightRules` - A lista de regras de alarme a ser guardada.
+
+
+---
+
+### `public List<AlertRule> loadAlertRules()`
+
+Carrega a lista de regras de Alerta a partir de um ficheiro serializado.
+
+- **Retorna:** Uma lista de AlertRule. Se o ficheiro não for encontrado, retorna uma lista vazia.
+
+
+---
+
+### `public List<InsightRule> loadInsightRules()`
+
+Carrega a lista de regras de Alarme a partir de um ficheiro serializado.
+
+- **Retorna:** Uma lista de InsightRule. Se o ficheiro não for encontrado, retorna uma lista vazia.
+
+

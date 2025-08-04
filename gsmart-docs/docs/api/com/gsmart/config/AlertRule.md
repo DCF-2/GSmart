@@ -88,3 +88,39 @@ disparar uma notificação.
 
 *Nenhuma documentação de método fornecida.*
 
+---
+
+### `public boolean isSendToMqtt()`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public void setSendToMqtt(boolean sendToMqtt)`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public boolean isSendToTelegram()`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public void setSendToTelegram(boolean sendToTelegram)`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public double getThresholdValueMax()`
+
+*Nenhuma documentação de método fornecida.*
+
+---
+
+### `public void setThresholdValueMax(double thresholdValueMax)`
+
+*Nenhuma documentação de método fornecida.*
+

@@ -36,20 +36,30 @@ comunicando os resultados através do `GSmartListener`.
 
 ---
 
-### `private void enviarAlertaParaNodeRED(String mensagem)`
+### `private void publicarAlertaMqtt(String mensagem)`
 
-*Nenhuma documentação de método fornecida.*
+Publica uma mensagem de alerta crítico no tópico MQTT 'gsmart/alerta'.  
+Utiliza o `com.gsmart.services.MqttService` para a comunicação direta com o broker.
+
+- **Parâmetro:** `mensagem` - O conteúdo da mensagem de alerta a ser publicada.
+
 
 ---
 
-### `private void enviarInsightParaNodeRED(String mensagem, String tipo)`
+### `private void publicarAlarmeMqtt(String mensagem, String tipo)`
 
-Envia uma mensagem de alarme para o endpoint /insight do Node-RED.  
-  
-Este método formata um payload JSON contendo a mensagem e o tipo do alarme,  
-e realiza uma requisição POST para um tópico MQTT diferente dos alertas críticos.
+Publica uma mensagem de alarme (insight) num subtópico MQTT dinâmico.  
+O tópico é formatado como 'gsmart/alarme/{tipo}', permitindo uma filtragem fácil  
+por parte dos clientes MQTT.
 
-- **Parâmetro:** `mensagem` - O texto do alarme a ser enviado.
-- **Parâmetro:** `tipo` - A categoria do alarme (ex: "CUSTO", "EFICIÊNCIA").
+- **Parâmetro:** `mensagem` - O conteúdo do alarme a ser publicado.
+- **Parâmetro:** `tipo` - A categoria do alarme (ex: "CUSTO", "MANUTENCAO"), que definirá o subtópico.
 
+
+---
+
+### `public void exportRemainingData()`
+
+Exporta todos os dados de telemetria acumulados no buffer de memória para um ficheiro CSV.  
+Este método é chamado quando a pipeline é parada.
 

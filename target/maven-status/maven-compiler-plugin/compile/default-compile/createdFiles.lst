@@ -10,6 +10,7 @@ com\gsmart\conection\ExportacaoDadosPWBI.class
 com\gsmart\Gui\windows\ConnectionErrorDialog.class
 com\gsmart\GSmartGui$6.class
 com\gsmart\pipeline\PipelineManager.class
+com\gsmart\services\CsvExportService.class
 com\gsmart\Gui\windows\MonitoringWindow$2.class
 com\gsmart\Gui\MetricTableModel.class
 com\gsmart\sources\DatabaseSource.class
