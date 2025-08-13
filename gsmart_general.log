@@ -53803,3 +53803,5 @@ java.lang.RuntimeException: Falha ao enviar dados para o Power BI. Código: 400 
 18:17:38.710 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Configurações salvas com sucesso no arquivo 'gsmart.properties'.
 18:17:38.713 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alerta salvas com sucesso em 'alerts.ser'.
 18:17:38.717 [AWT-EventQueue-0] INFO  com.gsmart.config.ConfigManager - Regras de alarme salvas com sucesso em 'insights.ser'.
+16:44:06.297 [main] INFO  com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+16:44:06.410 [main] INFO  com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.

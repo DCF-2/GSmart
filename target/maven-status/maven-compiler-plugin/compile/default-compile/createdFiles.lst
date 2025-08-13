@@ -3,6 +3,7 @@ com\gsmart\config\AlertRule.class
 com\gsmart\services\TelegramService$1.class
 com\gsmart\Gui\windows\TaskManagerWindow$TaskManagerTableModel.class
 com\gsmart\pipeline\DataPipeline.class
+com\gsmart\resources\DestinationType.class
 com\gsmart\Gui\windows\AlertRuleDialog.class
 com\gsmart\GSmartGuiLauncher.class
 com\gsmart\services\MqttService.class
@@ -53,6 +54,7 @@ com\gsmart\tools\MarkdownGenerator.class
 com\gsmart\Gui\SystemMetricCellRenderer.class
 com\gsmart\Gui\windows\TaskManagerWindow$StatusCellRenderer.class
 com\gsmart\sources\ThingsBoardSource.class
+com\gsmart\conection\ExportacaoDadosFabric.class
 com\gsmart\resources\GSmartListener.class
 com\gsmart\config\JsonHelper.class
 com\gsmart\config\InsightRule.class
