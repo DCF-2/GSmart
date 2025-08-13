@@ -15,6 +15,7 @@ import com.gsmart.Gui.SystemMetricCellRenderer;
 
 // Imports do pipeline e recursos
 import com.gsmart.pipeline.PipelineManager;
+import com.gsmart.resources.DestinationType;
 import com.gsmart.resources.IDataSource;
 import com.gsmart.sources.*;
 
@@ -61,7 +62,6 @@ public class GSmartGui extends JFrame {
     private final JButton stopAllButton;
     private final JButton monitoringButton;
     private final JButton loadKeysButton;
-    private final JTextField pbiUrlField;
     private final JTextField mqttBrokerUrlField;
     private final JTextField telegramTokenField;
     private final JTextField telegramChatIdField;
@@ -81,6 +81,12 @@ public class GSmartGui extends JFrame {
     private final JTable metricsTable;
     private final MetricTableModel tableModel;
     private final JPanel sourceConfigCardPanel;
+
+    // --- Componentes da UI (Destino AO PWBI/FABRIC) ---
+    private final JComboBox<String> destinationSelector;
+    private final JPanel destinationConfigCardPanel;
+    private final JTextField pbiUrlField;
+    private final JTextField fabricConnectionStringField;
 
     // --- Componentes da UI (Alertas) ---
     private JTable alertRulesTable;
@@ -182,15 +188,38 @@ public class GSmartGui extends JFrame {
         JPanel loadKeysPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         loadKeysButton = new JButton("Carregar Métricas da Fonte");
         loadKeysPanel.add(loadKeysButton);
-        JPanel destinationPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        destinationPanel.setBorder(BorderFactory.createTitledBorder("Configurar Destino dos Dados"));
-        destinationPanel.add(new JLabel("URL de Push do Power BI:"));
-        pbiUrlField = new JTextField(45);
-        destinationPanel.add(pbiUrlField);
 
-        destinationPanel.add(new JLabel("URL do Broker MQTT:"));
-        mqttBrokerUrlField = new JTextField("tcp://localhost:1883");
-        destinationPanel.add(mqttBrokerUrlField);
+        // --- PAINEL DE DESTINO ---
+        JPanel destinationPanel = new JPanel(new BorderLayout(5, 5));
+        destinationPanel.setBorder(BorderFactory.createTitledBorder("Configurar Destino dos Dados"));
+        JPanel destinationSelectionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        destinationSelectionPanel.add(new JLabel("Tipo de Destino:"));
+        String[] destinations = {"Power BI Push URL", "Fabric Eventstream"};
+        destinationSelector = new JComboBox<>(destinations);
+        destinationSelectionPanel.add(destinationSelector);
+        destinationPanel.add(destinationSelectionPanel, BorderLayout.NORTH);
+
+        destinationConfigCardPanel = new JPanel(new CardLayout());
+        pbiUrlField = new JTextField(45);
+        fabricConnectionStringField = new JTextField(45);
+        JPanel pbiPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        pbiPanel.add(new JLabel("URL de Push:"));
+        pbiPanel.add(pbiUrlField);
+        JPanel fabricPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        fabricPanel.add(new JLabel("Connection String:"));
+        fabricPanel.add(fabricConnectionStringField);
+
+        destinationConfigCardPanel.add(pbiPanel, "Power BI Push URL");
+        destinationConfigCardPanel.add(fabricPanel, "Fabric Eventstream");
+        destinationPanel.add(destinationConfigCardPanel, BorderLayout.CENTER);
+
+
+        // --- PAINEL DE SERVIÇOS AUXILIARES ---
+        JPanel auxiliaryServicesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        auxiliaryServicesPanel.setBorder(BorderFactory.createTitledBorder("Configurar Serviços Auxiliares"));
+        auxiliaryServicesPanel.add(new JLabel("URL do Broker MQTT:"));
+        mqttBrokerUrlField = new JTextField("tcp://localhost:1883", 20);
+        auxiliaryServicesPanel.add(mqttBrokerUrlField);
 
         JPanel telegramPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         telegramPanel.setBorder(BorderFactory.createTitledBorder("Configurar Notificações do Telegram"));
@@ -207,6 +236,7 @@ public class GSmartGui extends JFrame {
         topConfigurationPanel.add(sourceConfigCardPanel);
         topConfigurationPanel.add(loadKeysPanel);
         topConfigurationPanel.add(destinationPanel);
+        topConfigurationPanel.add(auxiliaryServicesPanel);
         topConfigurationPanel.add(telegramPanel);
 
         // --- Tabela de Métricas ---
@@ -326,6 +356,7 @@ public class GSmartGui extends JFrame {
 
         // Listeners da Pipeline
         sourceSelector.addItemListener(e -> toggleSourceFields());
+        destinationSelector.addItemListener(e -> toggleDestinationFields());
         tbConnectButton.addActionListener(e -> connectToThingsboard());
         dbConnectButton.addActionListener(e -> connectToDatabase());
         deviceProfileSelector.addItemListener(e -> { if (e.getStateChange() == ItemEvent.SELECTED) loadDevicesByProfile(); });
@@ -453,6 +484,7 @@ public class GSmartGui extends JFrame {
 
         // Carregamento inicial
         toggleSourceFields();
+        toggleDestinationFields();
         loadConfiguration();
         applyRolePermissions(ruleButtonsPanel, insightButtonsPanel);
     }
@@ -479,6 +511,8 @@ public class GSmartGui extends JFrame {
         logger.info("Carregando configurações salvas...");
         Properties props = configManager.loadProperties();
         thingsboardUrlField.setText(props.getProperty("thingsboard.url", "http://10.8.0.5:8080"));
+        destinationSelector.setSelectedItem(props.getProperty("destination.last", "Power BI Push URL"));
+        fabricConnectionStringField.setText(props.getProperty("fabric.connectionstring", ""));
         dbUrlField.setText(props.getProperty("db.url", "jdbc:postgresql://localhost:5432/seu_banco"));
         dbUserField.setText(props.getProperty("db.user", "postgres"));
         pbiUrlField.setText(props.getProperty("powerbi.url", ""));
@@ -502,13 +536,14 @@ public class GSmartGui extends JFrame {
         props.setProperty("db.user", dbUserField.getText());
         props.setProperty("powerbi.url", pbiUrlField.getText());
         props.setProperty("source.last", (String) sourceSelector.getSelectedItem());
+        props.setProperty("destination.last", (String) destinationSelector.getSelectedItem());
+        props.setProperty("fabric.connectionstring", fabricConnectionStringField.getText());
         props.setProperty("mqtt.broker.url", mqttBrokerUrlField.getText());
         props.setProperty("telegram.token", telegramTokenField.getText());
         props.setProperty("telegram.chat_id", telegramChatIdField.getText());
         configManager.saveProperties(props);
         configManager.saveRules(alertRuleTableModel.getRules(), insightRuleTableModel.getRules());
     }
-
     /**
      * Orquestra o lançamento de uma nova tarefa de pipeline.
      * Recolhe todas as configurações da interface (fonte de dados, métricas, regras de alerta e alarme),
@@ -519,27 +554,55 @@ public class GSmartGui extends JFrame {
             metricsTable.getCellEditor().stopCellEditing();
         }
         try {
-            String pbiUrl = pbiUrlField.getText().trim();
-            if (pbiUrl.isEmpty() || !pbiUrl.toLowerCase().startsWith("http")) {
-                JOptionPane.showMessageDialog(this, "Por favor, insira uma URL de Push do Power BI válida (deve começar com http ou https).", "Erro de Configuração", JOptionPane.ERROR_MESSAGE);
-                return;
+            // --- LÓGICA DE DESTINO ATUALIZADA ---
+            String selectedDestination = (String) destinationSelector.getSelectedItem();
+            DestinationType destinationType;
+            String destinationEndpoint;
+
+            if ("Power BI Push URL".equals(selectedDestination)) {
+                destinationType = DestinationType.POWER_BI;
+                destinationEndpoint = pbiUrlField.getText().trim();
+                if (destinationEndpoint.isEmpty() || !destinationEndpoint.toLowerCase().startsWith("http")) {
+                    JOptionPane.showMessageDialog(this, "Por favor, insira uma URL de Push do Power BI válida.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            } else { // Assumimos que é "Fabric Eventstream"
+                destinationType = DestinationType.FABRIC;
+                destinationEndpoint = fabricConnectionStringField.getText().trim();
+                if (destinationEndpoint.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Por favor, insira uma 'Connection String' do Fabric válida.", "Erro de Configuração", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
             }
+            // --- FIM DA LÓGICA DE DESTINO ---
+
             List<MetricConfig> selectedConfigs = tableModel.getSelectedMetrics();
             if (selectedConfigs.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Nenhuma métrica foi selecionada para envio!", "Aviso", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-
-
             IDataSource selectedDataSource = createSelectedDataSource(selectedConfigs.stream().map(MetricConfig::getOriginalName).collect(Collectors.toList()));
-            // Obtenha as regras atuais da tabela
             List<AlertRule> currentAlertRules = alertRuleTableModel.getRules();
             List<InsightRule> currentInsightRules = insightRuleTableModel.getRules();
             String mqttBrokerUrl = mqttBrokerUrlField.getText().trim();
             String telegramToken = telegramTokenField.getText().trim();
-            String telegramChatId = telegramChatIdField.getText().trim();// Obtenha as regras de insight
-            PipelineConfiguration config = new PipelineConfiguration(selectedDataSource, pbiUrl, selectedConfigs, this.globalLogViewer, currentAlertRules, currentInsightRules, telegramToken, telegramChatId, mqttBrokerUrl);
+            String telegramChatId = telegramChatIdField.getText().trim();
+
+            // --- CRIA A CONFIGURAÇÃO ATUALIZADA ---
+            PipelineConfiguration config = new PipelineConfiguration(
+                    selectedDataSource,
+                    destinationType,
+                    destinationEndpoint,
+                    selectedConfigs,
+                    this.globalLogViewer,
+                    currentAlertRules,
+                    currentInsightRules,
+                    telegramToken,
+                    telegramChatId,
+                    mqttBrokerUrl
+            );
+
             pipelineManager.launchPipeline(config);
             JOptionPane.showMessageDialog(this, "Pipeline para '" + selectedDataSource.getSourceName() + "' iniciada em segundo plano.\nAbra a 'Central de Monitoramento' para visualizar.", "Pipeline Iniciada", JOptionPane.INFORMATION_MESSAGE);
         } catch (Exception e) {
@@ -583,6 +646,18 @@ public class GSmartGui extends JFrame {
     }
 
     /**
+     * Alterna a visibilidade dos painéis de configuração de envio de dados (POWER_BI ou MICROSFT_FABRIC)
+     * com base na seleção do utilizador no JComboBox principal.
+     */
+    private void toggleDestinationFields() {
+        CardLayout cl = (CardLayout) (destinationConfigCardPanel.getLayout());
+        String selectedDestination = (String) destinationSelector.getSelectedItem();
+        if (selectedDestination != null) {
+            cl.show(destinationConfigCardPanel, selectedDestination);
+        }
+    }
+
+    /**
      * Obtém e valida a URL do servidor ThingsBoard a partir do campo de texto correspondente.
      * Lança uma IllegalStateException se o campo estiver vazio.
      * @return A URL do ThingsBoard como uma String.
@@ -609,7 +684,7 @@ public class GSmartGui extends JFrame {
             @Override
             protected Boolean doInBackground() {
                 try {
-                    return new ThingsBoardSource(getThingsboardUrl(), null, null, sharedOkHttpClient).testConnection();
+                    return new ThingsBoardSource(getThingsboardUrl(), null, null, null, sharedOkHttpClient).testConnection();
                 } catch (Exception e) {
                     return false;
                 }
@@ -694,7 +769,7 @@ public class GSmartGui extends JFrame {
                 new SwingWorker<List<String>, Void>() {
                     @Override
                     protected List<String> doInBackground() throws Exception {
-                        return new ThingsBoardSource(getThingsboardUrl(), selectedDevice.id(), null, sharedOkHttpClient).getAvailableKeys();
+                        return new ThingsBoardSource(getThingsboardUrl(), selectedDevice.id(), null, null, sharedOkHttpClient).getAvailableKeys();
                     }
                     @Override
                     protected void done() {
@@ -786,7 +861,7 @@ public class GSmartGui extends JFrame {
             if (selectedDevice == null) {
                 throw new IllegalStateException("Nenhum dispositivo do ThingsBoard foi selecionado.");
             }
-            ThingsBoardSource tbSource = new ThingsBoardSource(tbUrl, selectedDevice.id(), originalKeys, sharedOkHttpClient);
+            ThingsBoardSource tbSource = new ThingsBoardSource(tbUrl, selectedDevice.id(), selectedDevice.name(), originalKeys, sharedOkHttpClient);
             tbSource.testConnectionAndThrow();
             return tbSource;
 
@@ -828,7 +903,7 @@ public class GSmartGui extends JFrame {
         new SwingWorker<List<DeviceProfile>, Void>() {
             @Override
             protected List<DeviceProfile> doInBackground() throws Exception {
-                return new ThingsBoardSource(getThingsboardUrl(), null, null, sharedOkHttpClient).getDeviceProfiles();
+                return new ThingsBoardSource(getThingsboardUrl(), null, null, null,  sharedOkHttpClient).getDeviceProfiles();
             }
 
             @Override
@@ -870,7 +945,7 @@ public class GSmartGui extends JFrame {
         new SwingWorker<List<Device>, Void>() {
             @Override
             protected List<Device> doInBackground() throws Exception {
-                return new ThingsBoardSource(getThingsboardUrl(), null, null, sharedOkHttpClient).getDevicesByProfileId(selectedProfile.id());
+                return new ThingsBoardSource(getThingsboardUrl(), null, null, null,  sharedOkHttpClient).getDevicesByProfileId(selectedProfile.id());
             }
 
             @Override

@@ -7,10 +7,13 @@ import com.gsmart.config.AlertRule;
 import com.gsmart.config.InsightRule;
 import com.gsmart.config.MetricConfig;
 import com.gsmart.conection.ExportacaoDadosPWBI;
+import com.gsmart.conection.ExportacaoDadosFabric;
+import com.gsmart.resources.DestinationType;
 import com.gsmart.resources.GSmartListener;
 import com.gsmart.resources.IDataSource;
 import com.gsmart.resources.TaskStatus;
 import com.gsmart.services.CsvExportService;
+import com.gsmart.services.TelegramService;
 import com.gsmart.sources.ThingsBoardSource;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
@@ -27,6 +30,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+
 /**
  * Classe utilitária estática que atua como o motor de regras de negócio.
  *
@@ -42,7 +46,8 @@ public class DataPipeline {
     private static final Logger reconnectionLogger = LoggerFactory.getLogger("ReconnectionLogger");
 
     private final IDataSource dataSource;
-    private final String powerBiPushUrl;
+    private final DestinationType destinationType;
+    private final String destinationEndpoint;
     private final List<MetricConfig> metricConfigs;
     private final GSmartListener listener;
     private final List<AlertRule> alertRules;
@@ -62,7 +67,7 @@ public class DataPipeline {
      * Construtor da DataPipeline.
      *
      * @param dataSource A fonte dos dados.
-     * @param powerBiPushUrl A URL de destino do Power BI.
+     * @param destinationType A URL de destino do Power BI ou MicrosoftFabric.
      * @param metricConfigs A configuração das métricas a serem processadas.
      * @param listener O canal de comunicação com a GUI.
      * @param alertRules A lista de regras de alerta a serem avaliadas.
@@ -70,9 +75,10 @@ public class DataPipeline {
      * @param telegramChatId O id do seu chat no telegram.
      * @param telegramToken O token do seu chatboot do telegram.
      */
-    public DataPipeline(IDataSource dataSource, String powerBiPushUrl, List<MetricConfig> metricConfigs, GSmartListener listener, List<AlertRule> alertRules, List<InsightRule> insightRules, String telegramToken, String telegramChatId, String mqttBrokerUrl) {
+    public DataPipeline(IDataSource dataSource,DestinationType destinationType, String destinationEndpoint,List<MetricConfig> metricConfigs, GSmartListener listener, List<AlertRule> alertRules, List<InsightRule> insightRules, String telegramToken, String telegramChatId, String mqttBrokerUrl) {
         this.dataSource = dataSource;
-        this.powerBiPushUrl = powerBiPushUrl;
+        this.destinationType = destinationType;
+        this.destinationEndpoint = destinationEndpoint;
         this.metricConfigs = metricConfigs;
         this.listener = listener;
         this.alertRules = alertRules;
@@ -201,7 +207,7 @@ public class DataPipeline {
                                         publicarAlertaMqtt(mensagemComTimestamp);
                                     }
                                     if (rule.isSendToTelegram()) {
-                                        com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagemComTimestamp);
+                                        TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagemComTimestamp);
                                     }
                                     mensagemAlertaPBI = mensagemComTimestamp;
                                 } else {
@@ -246,7 +252,7 @@ public class DataPipeline {
                                     }
                                     publicarAlarmeMqtt(mensagemComTimestamp, rule.getInsightType());
                                     if (rule.isSendToTelegram()) {
-                                        com.gsmart.services.TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagemComTimestamp);
+                                        TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagemComTimestamp);
                                     }
                                     mensagemAlarmePBI = mensagemComTimestamp;
                                 } else {
@@ -279,7 +285,11 @@ public class DataPipeline {
                 pbiPayload.addProperty("DataDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
                 pbiPayload.addProperty("OrigemDados", dataSource.getSourceName());
 
-                ExportacaoDadosPWBI.sendDataToPowerBI(pbiPayload, this.powerBiPushUrl);
+                if (this.destinationType == DestinationType.POWER_BI) {
+                    ExportacaoDadosPWBI.sendDataToPowerBI(pbiPayload, this.destinationEndpoint);
+                } else if (this.destinationType == DestinationType.FABRIC) {
+                    ExportacaoDadosFabric.sendDataToFabric(pbiPayload, this.destinationEndpoint);
+                }
                 Thread.sleep(5000);
 
             } catch (InterruptedException e) {

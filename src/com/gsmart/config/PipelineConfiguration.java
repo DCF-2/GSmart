@@ -3,7 +3,9 @@ package com.gsmart.config;
 
 import com.gsmart.resources.IDataSource;
 import com.gsmart.Gui.windows.LogViewerWindow;
+import com.gsmart.resources.DestinationType;
 
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -17,7 +19,8 @@ import java.util.List;
  * uma nova {@code DataPipeline}.
  *
  * @param dataSource A implementação de {@code IDataSource} que servirá como fonte dos dados.
- * @param powerBiUrl A URL de push do Power BI para onde os dados serão enviados.
+ * @param destinationType O tipo de destino para os dados (POWER_BI ou FABRIC).
+ * @param destinationEndpoint A URL (para Power BI) ou a Connection String (para Fabric).
  * @param metricConfigs Uma lista de {@code MetricConfig} que define as métricas a serem processadas.
  * @param alertRules A lista de regras de alerta customizadas a serem avaliadas.
  * @param insightRules  A lista de regras de Insights customizadas a serem avaliadas.
@@ -28,7 +31,8 @@ import java.util.List;
  */
 public record PipelineConfiguration(
         IDataSource dataSource,
-        String powerBiUrl,
+        DestinationType destinationType,
+        String destinationEndpoint,
         List<MetricConfig> metricConfigs,
         LogViewerWindow logViewer,
         List<AlertRule> alertRules,
@@ -36,5 +40,5 @@ public record PipelineConfiguration(
         String telegramToken,
         String telegramChatId,
         String mqttBrokerUrl
-) {
+        ) {
 }

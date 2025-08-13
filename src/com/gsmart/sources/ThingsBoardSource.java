@@ -28,6 +28,7 @@ public class ThingsBoardSource implements IDataSource {
 
     private final String thingsboardUrl;
     private final String deviceId;
+    private String deviceName;
     private final List<String> keysToFetch;
     private final OkHttpClient client;
     private String authToken;
@@ -37,12 +38,14 @@ public class ThingsBoardSource implements IDataSource {
      *
      * @param thingsboardUrl A URL base do servidor ThingsBoard (ex: "http://host:port").
      * @param deviceId O ID do dispositivo específico do qual os dados serão buscados.
+     * @param deviceName O Nome do Dispositivo específico do qual os dados serão buscados.
      * @param keysToFetch Uma lista de chaves de telemetria a serem requisitadas na API.
      * @param client Uma instância partilhada de OkHttpClient para realizar as requisições HTTP.
      */
-    public ThingsBoardSource(String thingsboardUrl, String deviceId, List<String> keysToFetch, OkHttpClient client) {
+    public ThingsBoardSource(String thingsboardUrl, String deviceId, String deviceName,List<String> keysToFetch, OkHttpClient client) {
         this.thingsboardUrl = thingsboardUrl != null && thingsboardUrl.endsWith("/") ? thingsboardUrl.substring(0, thingsboardUrl.length() - 1) : thingsboardUrl;
         this.deviceId = deviceId;
+        this.deviceName = deviceName;
         this.keysToFetch = keysToFetch;
         this.client = client;
     }
@@ -67,6 +70,9 @@ public class ThingsBoardSource implements IDataSource {
 
     @Override
     public String getSourceName() {
+        if (this.deviceName != null && !this.deviceName.isEmpty()) {
+            return this.deviceName; // Retorna o nome do dispositivo
+        }
         if (this.deviceId != null && !this.deviceId.isEmpty()) {
             return "ThingsBoard (Device: " + this.deviceId + ")";
         }
