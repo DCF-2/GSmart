@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSmart - Intelligent Data Processing</title>
+     <!--Icons-->
+    <link rel="icon" type="image/webp" href="img/Gsmart-logo.png">
+    <!--CSS-->
+    <link rel="stylesheet" href="css/style.css">
+    <!--Links Externos-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!--JS-->
+    <script defer src="js/script.js"></script>
+</head>
+<body>
+
+    <div id="preloader">
+        <div class="loader-content">
+            <i class="fas fa-cogs"></i>
+            <p>Loading GSmart...</p>
+        </div>
+    </div>
+
+    <div id="site-content" class="hidden"></div>
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-cogs"></i> <img src="img/Gsmart-logo-removebg-preview.png" alt="GSmart Logo" class="gsmart-logo">
+            </div>
+            <ul class="nav-links">
+                <li><a href="#intro">Introduction</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="Javadoc/index.html" target="_blank">GSmart Docs</a></li>
+                <li><a href="https://documentationcap.netlify.app/" target="_blank">Streaming Docs</a></li>
+                <li><a href="#download" class="nav-button">Download</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="hero-content">
+                <h1>Turn Raw Data into Actionable Intelligence</h1>
+                <p>GSmart is a powerful desktop tool for creating, managing, and monitoring real-time data pipelines, connecting your IoT sources and databases to BI destinations like Power BI and Microsoft Fabric.</p>
+                <a href="#download" class="cta-button">Download Now</a>
+            </div>
+        </section>
+
+        <section id="intro">
+            <h2>Welcome to the Future of Data Integration</h2>
+            <p>In today's data-driven world, the ability to process information quickly and intelligently is paramount. GSmart was built to bridge the gap between complex data sources and insightful business analytics. Our desktop application provides a robust, user-friendly interface to automate your data workflows, allowing you to focus on what truly matters: making informed decisions.</p>
+        </section>
+
+        <section id="features">
+            <h2>Core Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-database"></i>
+                    <h3>Flexible Data Sources</h3>
+                    <p>Easily connect to IoT platforms like ThingsBoard or relational databases (e.g., PostgreSQL) to collect telemetry and records.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-sitemap"></i>
+                    <h3>Intelligent Rule Engine</h3>
+                    <p>Create custom alert and alarm rules. Define conditions and thresholds to monitor metrics and get notified about critical events or business insights.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-chart-bar"></i>
+                    <h3>BI Tool Integration</h3>
+                    <p>Send processed and transformed data directly to dashboards in Power BI or to Eventstreams in Microsoft Fabric, ready for analysis.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-bell"></i>
+                    <h3>Proactive Notifications</h3>
+                    <p>Receive real-time alerts via MQTT or Telegram when a rule is triggered, enabling a swift response to anomalies or important events.</p>
+                </div>
+                 <div class="feature-card">
+                    <i class="fas fa-users-cog"></i>
+                    <h3>User Management</h3>
+                    <p>Control application access with a login and user management system, defining Administrator and Operator roles with different permissions.</p>
+                </div>
+                 <div class="feature-card">
+                    <i class="fas fa-tasks"></i>
+                    <h3>Centralized Monitoring</h3>
+                    <p>View and manage all your active pipelines from a monitoring center, tracking the status and uptime of each task.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="download">
+            <h2>Get GSmart</h2>
+            <p>Install GSmart and start transforming your data today.</p>
+            <div class="download-buttons">
+                <a href="https://github.com/DCF-2/GSmart/releases/download/v1.0.0/InstaladorGSmart-v1.0.exe" class="download-button windows">
+                    <i class="fab fa-windows"></i> Download for Windows
+                </a>
+                <a href="https://github.com/DCF-2/GSmart/releases/download/v1.0.0/gsmart-package.deb" class="download-button linux">
+                    <i class="fab fa-linux"></i> Download for Linux (Mint/Ubuntu)
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <img id = "img" src="img/GPSERS.jpg" alt="GPSERS Logo" class="gpsers-logo">
+        <p>&copy; 2025 GPSERS. All rights reserved.</p>
+    </footer>
+</body>
+</html>
