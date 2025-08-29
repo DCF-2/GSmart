@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="dc.created" content="2025-08-19">
-<meta name="description" content="declaration: package: com.gsmart.pipeline, class: PipelineManager">
+<meta name="description" content="declaration: package: main.java.com.gsmart.pipeline, class: PipelineManager">
 <meta name="generator" content="javadoc/ClassWriter">
 <link rel="stylesheet" type="text/css" href="../../../resource-files/jquery-ui.min.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../resource-files/stylesheet.css" title="Style">
@@ -41,7 +41,7 @@ loadScripts(document, 'script');</script>
 <div class="sub-nav">
 <div class="nav-content">
 <ol class="sub-nav-list">
-<li><a href="package-summary.html">com.gsmart.pipeline</a></li>
+<li><a href="package-summary.html">main.java.com.gsmart.pipeline</a></li>
 <li><a href="PipelineManager.html" class="current-selection">PipelineManager</a></li>
 </ol>
 <div class="nav-list-search">
@@ -93,23 +93,23 @@ loadScripts(document, 'script');</script>
 <h1 title="Class PipelineManager" class="title">Class PipelineManager</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance">com.gsmart.pipeline.PipelineManager</div>
+<div class="inheritance">main.java.com.gsmart.pipeline.PipelineManager</div>
 </div>
 <section class="class-description" id="class-description">
 <hr>
 <div class="horizontal-scroll">
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">PipelineManager</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">Orquestrador central para o ciclo de vida de múltiplas tarefas de pipeline (<a href="PipelineTask.html" title="class in com.gsmart.pipeline"><code>PipelineTask</code></a>).
+<div class="block">Orquestrador central para o ciclo de vida de múltiplas tarefas de pipeline (<a href="PipelineTask.html" title="class in main.java.com.gsmart.pipeline"><code>PipelineTask</code></a>).
  Esta classe atua como o "maestro" do sistema, responsável por instanciar,
  gerir e finalizar os processos de monitorização de dados. Ela faz a ponte
- entre as configurações definidas na <a href="../GSmartGui.html" title="class in com.gsmart"><code>GSmartGui</code></a> e a execução
- real das <a href="DataPipeline.html" title="class in com.gsmart.pipeline"><code>DataPipeline</code></a> em threads separadas.
+ entre as configurações definidas na <a href="../GSmartGui.html" title="class in main.java.com.gsmart"><code>GSmartGui</code></a> e a execução
+ real das <a href="DataPipeline.html" title="class in main.java.com.gsmart.pipeline"><code>DataPipeline</code></a> em threads separadas.
 <h2 id="principais-responsabilidades--heading">Principais Responsabilidades:</h2>
 <ul>
-<li>Lançar novas tarefas de pipeline com base numa <a href="../config/PipelineConfiguration.html" title="class in com.gsmart.config"><code>PipelineConfiguration</code></a> fornecida pela GUI.</li>
+<li>Lançar novas tarefas de pipeline com base numa <a href="../config/PipelineConfiguration.html" title="class in main.java.com.gsmart.config"><code>PipelineConfiguration</code></a> fornecida pela GUI.</li>
 <li>Manter e fornecer uma lista atualizada de todas as tarefas em execução.</li>
-<li>Gerir a comunicação entre a lógica de fundo (<code>DataPipeline</code>) e a interface gráfica (GUI), utilizando um <a href="../resources/GSmartListener.html" title="interface in com.gsmart.resources"><code>GSmartListener</code></a>.</li>
+<li>Gerir a comunicação entre a lógica de fundo (<code>DataPipeline</code>) e a interface gráfica (GUI), utilizando um <a href="../resources/GSmartListener.html" title="interface in main.java.com.gsmart.resources"><code>GSmartListener</code></a>.</li>
 <li>Controlar a exibição de janelas de monitorização individuais e diálogos de erro de conexão.</li>
 <li>Fornecer métodos para reiniciar ou parar tarefas de forma segura.</li>
 </ul></div>
@@ -117,9 +117,9 @@ loadScripts(document, 'script');</script>
 <dt>See Also:</dt>
 <dd>
 <ul class="tag-list">
-<li><a href="PipelineTask.html" title="class in com.gsmart.pipeline"><code>PipelineTask</code></a></li>
-<li><a href="DataPipeline.html" title="class in com.gsmart.pipeline"><code>DataPipeline</code></a></li>
-<li><a href="../GSmartGui.html" title="class in com.gsmart"><code>GSmartGui</code></a></li>
+<li><a href="PipelineTask.html" title="class in main.java.com.gsmart.pipeline"><code>PipelineTask</code></a></li>
+<li><a href="DataPipeline.html" title="class in main.java.com.gsmart.pipeline"><code>DataPipeline</code></a></li>
+<li><a href="../GSmartGui.html" title="class in main.java.com.gsmart"><code>GSmartGui</code></a></li>
 </ul>
 </dd>
 </dl>
@@ -151,23 +151,23 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="PipelineTask.html" title="class in com.gsmart.pipeline">PipelineTask</a>&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="PipelineTask.html" title="class in main.java.com.gsmart.pipeline">PipelineTask</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRunningTasks()" class="member-name-link">getRunningTasks</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Retorna uma cópia da lista de tarefas atualmente em execução.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#launchPipeline(com.gsmart.config.PipelineConfiguration)" class="member-name-link">launchPipeline</a><wbr>(<a href="../config/PipelineConfiguration.html" title="class in com.gsmart.config">PipelineConfiguration</a>&nbsp;config)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#launchPipeline(com.gsmart.config.PipelineConfiguration)" class="member-name-link">launchPipeline</a><wbr>(<a href="../config/PipelineConfiguration.html" title="class in main.java.com.gsmart.config">PipelineConfiguration</a>&nbsp;config)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Lança um novo pipeline com base em uma configuração fornecida.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#relaunchPipeline(com.gsmart.pipeline.PipelineTask)" class="member-name-link">relaunchPipeline</a><wbr>(<a href="PipelineTask.html" title="class in com.gsmart.pipeline">PipelineTask</a>&nbsp;oldTask)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#relaunchPipeline(com.gsmart.pipeline.PipelineTask)" class="member-name-link">relaunchPipeline</a><wbr>(<a href="PipelineTask.html" title="class in main.java.com.gsmart.pipeline">PipelineTask</a>&nbsp;oldTask)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Para uma tarefa antiga e lança uma nova com base na configuração original da tarefa.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGlobalLogViewer(com.gsmart.Gui.windows.LogViewerWindow)" class="member-name-link">setGlobalLogViewer</a><wbr>(<a href="../Gui/windows/LogViewerWindow.html" title="class in com.gsmart.Gui.windows">LogViewerWindow</a>&nbsp;logViewer)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setGlobalLogViewer(com.gsmart.Gui.windows.LogViewerWindow)" class="member-name-link">setGlobalLogViewer</a><wbr>(<a href="../Gui/windows/LogViewerWindow.html" title="class in main.java.com.gsmart.Gui.windows">LogViewerWindow</a>&nbsp;logViewer)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setOnTaskListUpdated(java.lang.Runnable)" class="member-name-link">setOnTaskListUpdated</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&nbsp;onTaskListUpdated)</code></div>
@@ -179,7 +179,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#setParentComponent(java.awt.Component)" class="member-name-link">setParentComponent</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.desktop/java/awt/Component.html" title="class or interface in java.awt" class="external-link">Component</a>&nbsp;parentComponent)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#showMonitorFor(com.gsmart.pipeline.PipelineTask)" class="member-name-link">showMonitorFor</a><wbr>(<a href="PipelineTask.html" title="class in com.gsmart.pipeline">PipelineTask</a>&nbsp;task)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#showMonitorFor(com.gsmart.pipeline.PipelineTask)" class="member-name-link">showMonitorFor</a><wbr>(<a href="PipelineTask.html" title="class in main.java.com.gsmart.pipeline">PipelineTask</a>&nbsp;task)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Exibe a janela de monitoramento para uma tarefa específica.</div>
 </div>
@@ -248,7 +248,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="setGlobalLogViewer(com.gsmart.Gui.windows.LogViewerWindow)">
 <h3>setGlobalLogViewer</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGlobalLogViewer</span><wbr><span class="parameters">(<a href="../Gui/windows/LogViewerWindow.html" title="class in com.gsmart.Gui.windows">LogViewerWindow</a>&nbsp;logViewer)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">setGlobalLogViewer</span><wbr><span class="parameters">(<a href="../Gui/windows/LogViewerWindow.html" title="class in main.java.com.gsmart.Gui.windows">LogViewerWindow</a>&nbsp;logViewer)</span></div>
 </div>
 </section>
 </li>
@@ -256,7 +256,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="getRunningTasks()">
 <h3>getRunningTasks</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="PipelineTask.html" title="class in com.gsmart.pipeline">PipelineTask</a>&gt;</span>&nbsp;<span class="element-name">getRunningTasks</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="PipelineTask.html" title="class in main.java.com.gsmart.pipeline">PipelineTask</a>&gt;</span>&nbsp;<span class="element-name">getRunningTasks</span>()</div>
 <div class="block">Retorna uma cópia da lista de tarefas atualmente em execução.
  A lista é copiada para evitar problemas de concorrência (ConcurrentModificationException)
  ao iterar sobre ela enquanto a original pode ser modificada.</div>
@@ -271,7 +271,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="launchPipeline(com.gsmart.config.PipelineConfiguration)">
 <h3>launchPipeline</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">launchPipeline</span><wbr><span class="parameters">(<a href="../config/PipelineConfiguration.html" title="class in com.gsmart.config">PipelineConfiguration</a>&nbsp;config)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">launchPipeline</span><wbr><span class="parameters">(<a href="../config/PipelineConfiguration.html" title="class in main.java.com.gsmart.config">PipelineConfiguration</a>&nbsp;config)</span></div>
 <div class="block">Lança um novo pipeline com base em uma configuração fornecida.
 
  Este método instancia e configura todos os componentes necessários para uma nova
@@ -289,7 +289,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="relaunchPipeline(com.gsmart.pipeline.PipelineTask)">
 <h3>relaunchPipeline</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">relaunchPipeline</span><wbr><span class="parameters">(<a href="PipelineTask.html" title="class in com.gsmart.pipeline">PipelineTask</a>&nbsp;oldTask)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">relaunchPipeline</span><wbr><span class="parameters">(<a href="PipelineTask.html" title="class in main.java.com.gsmart.pipeline">PipelineTask</a>&nbsp;oldTask)</span></div>
 <div class="block">Para uma tarefa antiga e lança uma nova com base na configuração original da tarefa.
  Muito útil para reiniciar um pipeline que parou ou encontrou um erro.</div>
 <dl class="notes">
@@ -303,7 +303,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="showMonitorFor(com.gsmart.pipeline.PipelineTask)">
 <h3>showMonitorFor</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">showMonitorFor</span><wbr><span class="parameters">(<a href="PipelineTask.html" title="class in com.gsmart.pipeline">PipelineTask</a>&nbsp;task)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">showMonitorFor</span><wbr><span class="parameters">(<a href="PipelineTask.html" title="class in main.java.com.gsmart.pipeline">PipelineTask</a>&nbsp;task)</span></div>
 <div class="block">Exibe a janela de monitoramento para uma tarefa específica.
 
  Se uma janela de monitoramento para esta tarefa ainda não existir ou tiver sido
