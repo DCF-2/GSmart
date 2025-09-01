@@ -1,4 +1,4 @@
-package main.java.com.gsmart.controller;
+package main.java.com.gsmart.functions;
 
 /**
  * Ponto de entrada (entry point) principal para a aplicação GSmart.
