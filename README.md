@@ -48,7 +48,7 @@ graph TD
     subgraph "Sources & Destinations"
         D["<br>fa:fa-database Data Sources<br>(IDataSource)"]
         H["<br>fa:fa-chart-bar Power BI<br>(Destination)"]
-        I["<br>fa:fa-paper-plane Node-RED / MQTT<br>(Destination)"]
+        I["<br>fa:fa-paper-plane Notifications<br>(MQTT, Telegram)"]
     end
 
     %% Flow
@@ -75,7 +75,6 @@ graph TD
 | **Main Language** | Java (JDK 21+) |
 | **GUI Framework**| Java Swing |
 | **Build System** | Apache Maven |
-| **Local Database**| SQLite (for user management) |
 | **Dependencies** | Docker, Docker Compose, Mosquitto MQTT |
 | **Key Libraries** | OkHttp, Gson, Logback, SLF4J, jBCrypt, Paho MQTT Client, Azure Event Hubs, exp4j, JavaParser, PostgreSQL JDBC Driver |
 
