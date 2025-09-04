@@ -11,7 +11,10 @@ import java.util.List;
 
 /**
  * Janela para a gestão das pipelines configuradas para o início automático.
- * Permite ao utilizador visualizar e remover pipelines da lista de auto-start.
+ * <p>
+ * Permite ao utilizador visualizar e remover pipelines da lista de auto-start,
+ * que é guardada no ficheiro {@code pipelines.conf}. Esta janela oferece um controlo
+ * granular sobre quais processos de monitorização devem ser iniciados com a aplicação.
  */
 public class AutoStartManagerWindow extends JDialog {
 
@@ -19,6 +22,12 @@ public class AutoStartManagerWindow extends JDialog {
     private final AutoStartTableModel tableModel;
     private final JTable pipelineTable;
 
+    /**
+     * Constrói a janela de gestão de pipelines de início automático.
+     *
+     * @param owner A janela pai à qual este diálogo está associado.
+     * @param configManager A instância do {@link ConfigManager} para carregar e guardar a lista de pipelines.
+     */
     public AutoStartManagerWindow(Frame owner, ConfigManager configManager) {
         super(owner, "Gerir Pipelines de Início Automático", true);
         this.configManager = configManager;

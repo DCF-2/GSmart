@@ -3,7 +3,7 @@ package main.java.com.gsmart;
 
 import main.java.com.gsmart.Gui.windows.LoginWindow;
 import main.java.com.gsmart.db.DatabaseManager;
-
+import main.java.com.gsmart.ui.ThemeManager;
 import javax.swing.SwingUtilities;
 
 /**
@@ -18,7 +18,8 @@ public class GSmartGuiLauncher {
 
     public static void main(String[] args) {
         // O ponto de entrada da aplicação agora simplesmente cria e exibe a janela de login.
-        DatabaseManager.initializeDatabase();
+        DatabaseManager.getInstance();
+        ThemeManager.applySavedTheme();
         SwingUtilities.invokeLater(() -> {
             LoginWindow loginWindow = new LoginWindow();
             loginWindow.setVisible(true);

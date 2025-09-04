@@ -5,6 +5,7 @@ import main.java.com.gsmart.Gui.AlertRuleTableModel;
 import main.java.com.gsmart.Gui.InsightRuleTableModel;
 import main.java.com.gsmart.Gui.MetricTableModel;
 import main.java.com.gsmart.Gui.panels.DashboardPanel;
+import main.java.com.gsmart.Gui.panels.SideMenuPanel;
 import main.java.com.gsmart.Gui.windows.*;
 import main.java.com.gsmart.config.ConfigManager;
 import main.java.com.gsmart.config.MetricConfig;
@@ -16,6 +17,7 @@ import main.java.com.gsmart.controller.UIController;
 import main.java.com.gsmart.pipeline.PipelineManager;
 import main.java.com.gsmart.pipeline.PipelineTask;
 import main.java.com.gsmart.resources.IDataSource;
+import main.java.com.gsmart.services.DashboardLogService;
 import main.java.com.gsmart.sources.DatabaseSource;
 import main.java.com.gsmart.sources.Device;
 import main.java.com.gsmart.sources.DeviceProfile;
@@ -25,15 +27,16 @@ import okhttp3.OkHttpClient;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.HashMap;
-
 import static main.java.com.gsmart.pipeline.DataPipeline.logger;
-
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 /**
  * Classe principal da interface gráfica (GUI) e ponto de controlo central da aplicação GSmart.
  *
@@ -62,23 +65,42 @@ public class GSmartGui extends JFrame {
     private final JComboBox<String> sourceSelector;
     private final JComboBox<String> destinationSelector;
     private final JTextField thingsboardUrlField, dbUrlField, dbUserField, pbiUrlField, fabricConnectionStringField, mqttBrokerUrlField, telegramTokenField, telegramChatIdField;
+    private final JButton addAlertRuleButton, editAlertRuleButton, removeAlertRuleButton, importAlertRulesButton, exportAlertRulesButton, duplicateAlertRuleButton;
+    private final JButton addInsightRuleButton, editInsightRuleButton, removeInsightRuleButton, importInsightRulesButton, exportInsightRulesButton, duplicateInsightRuleButton;
+    private final JButton expressionHelpButton, telegramHelpButton;;
     private final JPasswordField dbPasswordField;
-    private final JButton tbConnectButton, dbConnectButton, startButton, stopAllButton, monitoringButton, manageUsersButton;
+    private final JButton tbConnectButton, dbConnectButton, startButton;
     private final JLabel tbStatusLabel, dbStatusLabel;
     private final JComboBox<DeviceProfile> deviceProfileSelector;
     private final JComboBox<Device> deviceSelector;
     private final JComboBox<String> dbTableSelector;
-    private final JPanel sourceConfigCardPanel, destinationConfigCardPanel, thingsboardConfigPanel, databaseConfigPanel;
+    private final JPanel sourceConfigCardPanel, destinationConfigCardPanel, thingsboardConfigPanel, databaseConfigPanel; // --- A DECLARAÇÃO ESTÁ AQUI ---
     private final JTable metricsTable, alertRulesTable, insightRulesTable;
+    private final JComboBox<String> alertCategoryFilter, insightCategoryFilter;
     private final MetricTableModel metricTableModel;
     private final AlertRuleTableModel alertRuleTableModel;
     private final InsightRuleTableModel insightRuleTableModel;
     private JPanel alertRuleButtons, insightRuleButtons;
-    private JCheckBox runInBackgroundCheckBox;
 
     // --- Outros ---
     private final OkHttpClient sharedOkHttpClient;
     private final String currentUserRole;
+    private JPanel contentPanel;
+    private final SideMenuPanel sideMenuPanel;
+    private int recentAlarmsCount = 0;
+
+
+    // ---MAPAS PARA DADOS DO GRÁFICO ---
+    private static final int MAX_DATA_POINTS = 10; // Define quantos pontos o gráfico irá mostrar
+    private final Map<String, Integer> hourlyPipelinesData = new LinkedHashMap<>() {
+        @Override protected boolean removeEldestEntry(Map.Entry<String, Integer> e) { return size() > MAX_DATA_POINTS; }
+    };
+    private final Map<String, Integer> hourlyAlertsData = new LinkedHashMap<>() {
+        @Override protected boolean removeEldestEntry(Map.Entry<String, Integer> e) { return size() > MAX_DATA_POINTS; }
+    };
+    private final Map<String, Integer> hourlyAlarmsData = new LinkedHashMap<>() {
+        @Override protected boolean removeEldestEntry(Map.Entry<String, Integer> e) { return size() > MAX_DATA_POINTS; }
+    };
 
     /**
      * Construtor da janela principal da aplicação GSmart.
@@ -102,7 +124,7 @@ public class GSmartGui extends JFrame {
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
 
-        // --- Inicialização de Componentes da UI ---
+        // --- INICIALIZAÇÃO DE TODOS OS COMPONENTES DA UI PRIMEIRO ---
         this.dashboardPanel = new DashboardPanel();
         this.sourceSelector = new JComboBox<>(new String[]{"Thingsboard API", "Banco de Dados Espelho"});
         this.destinationSelector = new JComboBox<>(new String[]{"Power BI Push URL", "Fabric Eventstream"});
@@ -118,11 +140,20 @@ public class GSmartGui extends JFrame {
         this.tbConnectButton = new JButton("Conectar");
         this.dbConnectButton = new JButton("Conectar");
         this.startButton = new JButton("Iniciar Pipeline");
+        this.addAlertRuleButton = new JButton("Adicionar Regra");
+        this.editAlertRuleButton = new JButton("Editar Regra");
+        this.removeAlertRuleButton = new JButton("Remover Regra");
+        this.importAlertRulesButton = new JButton("Importar Regras");
+        this.exportAlertRulesButton = new JButton("Exportar Regras");
+        this.addInsightRuleButton = new JButton("Adicionar Rega de Alarme");
+        this.editInsightRuleButton = new JButton("Editar Regra de Alarme");
+        this.removeInsightRuleButton = new JButton("Remover Regra de Alarme");
+        this.importInsightRulesButton = new JButton("Importar Regras");
+        this.exportInsightRulesButton = new JButton("Exportar Regras");
+        this.duplicateAlertRuleButton = new JButton("Duplicar"); // --- ADICIONADO ---
+        this.duplicateInsightRuleButton = new JButton("Duplicar"); // --- ADICIONADO ---
+        this.expressionHelpButton = new JButton("Ajuda com Expressões (?)");
         this.startButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        this.stopAllButton = new JButton("Parar Monitoramento");
-        this.stopAllButton.setForeground(Color.RED);
-        this.monitoringButton = new JButton("Central de Monitoramento");
-        this.manageUsersButton = new JButton("Gerir Utilizadores");
         this.tbStatusLabel = new JLabel("Não conectado");
         this.tbStatusLabel.setForeground(Color.GRAY);
         this.dbStatusLabel = new JLabel("Não conectado");
@@ -143,14 +174,16 @@ public class GSmartGui extends JFrame {
         this.alertRulesTable = new JTable(alertRuleTableModel);
         this.insightRuleTableModel = new InsightRuleTableModel();
         this.insightRulesTable = new JTable(insightRuleTableModel);
-        this.runInBackgroundCheckBox = new JCheckBox("Executar em 2º plano ao fechar");
-        this.runInBackgroundCheckBox.setToolTipText("Se marcado, o GSmart continuará a correr na bandeja do sistema ao invés de fechar.");
+        this.alertCategoryFilter = new JComboBox<>();
+        this.insightCategoryFilter = new JComboBox<>();
+        this.telegramHelpButton = new JButton("?");
+        DashboardLogService.getInstance().registerDashboardPanel(this.dashboardPanel);
 
+        this.sideMenuPanel = new SideMenuPanel(this, this.currentUserRole);
         // --- Inicialização dos Controladores ---
         new UIController(this);
         DataSourceController dataSourceController = new DataSourceController(this);
-        new ActionController(this, dataSourceController);
-
+        new ActionController(this, dataSourceController, this.currentUserRole);
         // --- Configuração Final ---
         loadConfiguration();
         applyRolePermissions();
@@ -173,8 +206,12 @@ public class GSmartGui extends JFrame {
     }
 
     /**
-     * Carrega as configurações da última sessão a partir do ficheiro gsmart.properties.
-     * Isto inclui URLs e a última fonte de dados selecionada, melhorando a experiência do utilizador.
+     * Carrega as configurações da última sessão a partir dos ficheiros de configuração.
+     * <p>
+     * Utiliza o {@link ConfigManager} para ler as propriedades guardadas (como URLs e
+     * seleções anteriores) e as listas de regras de alerta e alarme, preenchendo os
+     * respetivos campos e tabelas na UI. Isto melhora a experiência do utilizador,
+     * restaurando o estado da aplicação.
      */
     private void loadConfiguration() {
         Properties props = configManager.loadProperties();
@@ -190,12 +227,16 @@ public class GSmartGui extends JFrame {
         telegramChatIdField.setText(props.getProperty("telegram.chat_id", ""));
         alertRuleTableModel.setRules(configManager.loadAlertRules());
         insightRuleTableModel.setRules(configManager.loadInsightRules());
-        runInBackgroundCheckBox.setSelected(Boolean.parseBoolean(props.getProperty("system.runInBackground", "false")));
+
     }
 
     /**
-     * Salva as configurações atuais (URLs, etc.) no ficheiro gsmart.properties.
-     * Este método é chamado automaticamente quando a janela da aplicação é fechada.
+     * Guarda as configurações atuais da sessão nos respetivos ficheiros.
+     * <p>
+     * Utiliza o {@link ConfigManager} para persistir as configurações gerais (como URLs),
+     * as regras de alerta e alarme, as configurações de métricas e a lista de pipelines
+     * que estão atualmente em execução para que possam ser reiniciadas automaticamente.
+     * Este método é normalmente chamado quando a aplicação está a ser fechada.
      */
     private void saveConfiguration() {
         Properties props = new Properties();
@@ -209,7 +250,6 @@ public class GSmartGui extends JFrame {
         props.setProperty("mqtt.broker.url", mqttBrokerUrlField.getText());
         props.setProperty("telegram.token", telegramTokenField.getText());
         props.setProperty("telegram.chat_id", telegramChatIdField.getText());
-        props.setProperty("system.runInBackground", String.valueOf(runInBackgroundCheckBox.isSelected()));
         configManager.saveProperties(props);
         configManager.saveRules(alertRuleTableModel.getRules(), insightRuleTableModel.getRules());
         configManager.saveMetricConfigs(metricTableModel.getAllMetrics());
@@ -220,18 +260,17 @@ public class GSmartGui extends JFrame {
         configManager.saveActivePipelines(activePipelinesToSave);
     }
 
-    /**
-     * Delega ao PipelineManager a tarefa de parar todas as pipelines em execução,
-     * geralmente após uma confirmação do utilizador.
-     */
-    private void stopAllPipelines() {
-        pipelineManager.stopAllPipelines();
+    public void showSettingsDialog() {
+        SettingsDialog dialog = new SettingsDialog(this);
+        dialog.setVisible(true);
     }
 
     /**
-     * Exibe a "Central de Monitoramento".
+     * Exibe a "Central de Monitoramento" ({@link TaskManagerWindow}).
+     * <p>
      * Se a janela ainda não existir, uma nova é criada. Se já existir,
-     * é simplesmente trazida para a frente.
+     * é simplesmente trazida para a frente, garantindo que apenas uma instância
+     * da janela de gestão de tarefas esteja aberta.
      */
     public void showTaskManager() {
         if (taskManagerWindow == null || !taskManagerWindow.isDisplayable()) {
@@ -272,7 +311,8 @@ public class GSmartGui extends JFrame {
     private void applyRolePermissions() {
         setTitle(getTitle() + " (Utilizador: " + this.currentUserRole + ")");
         boolean isAdmin = "ADMINISTRATOR".equals(this.currentUserRole);
-        manageUsersButton.setVisible(isAdmin);
+
+        // --- ALTERAÇÃO: Desativa os botões de edição de regras se não for admin ---
         if (!isAdmin) {
             if (alertRuleButtons != null) {
                 for (Component comp : alertRuleButtons.getComponents()) {
@@ -381,20 +421,16 @@ public class GSmartGui extends JFrame {
             } catch (Exception e) {
                 logger.error("Falha ao tentar reiniciar automaticamente uma pipeline salva.", e);
             }
-            if (!configsToStart.isEmpty()) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        configsToStart.size() + " pipeline(s) da sessão anterior foram iniciadas automaticamente.",
-                        "Início Automático",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
-            }
         }
     }
 
     /**
-     * Gere o processo de fecho da aplicação, perguntando ao utilizador se deseja
-     * salvar as pipelines ativas.
+     * Gere o processo de fecho da aplicação, interagindo com o utilizador se existirem
+     * pipelines ativas.
+     * <p>
+     * Se houver tarefas em execução, pergunta ao utilizador se deseja guardar a sessão
+     * (para que as pipelines reiniciem na próxima vez) ou sair sem guardar. Se não houver
+     * tarefas ativas, simplesmente guarda a configuração e fecha a aplicação.
      */
     public void handleWindowExit() {
         if (!pipelineManager.getRunningTasks().isEmpty()) {
@@ -447,8 +483,6 @@ public class GSmartGui extends JFrame {
         });
         trayPopupMenu.add(closeItem);
 
-        // O ideal é ter um ficheiro de imagem para o ícone.
-        // Por agora, usaremos null para evitar erros.
         TrayIcon trayIcon = new TrayIcon(getIconImage(), "GSmart", trayPopupMenu);
         trayIcon.setImageAutoSize(true);
 
@@ -508,9 +542,6 @@ public class GSmartGui extends JFrame {
     public JButton getTbConnectButton() { return tbConnectButton; }
     public JButton getDbConnectButton() { return dbConnectButton; }
     public JButton getStartButton() { return startButton; }
-    public JButton getStopAllButton() { return stopAllButton; }
-    public JButton getMonitoringButton() { return monitoringButton; }
-    public JButton getManageUsersButton() { return manageUsersButton; }
     public JLabel getTbStatusLabel() { return tbStatusLabel; }
     public JLabel getDbStatusLabel() { return dbStatusLabel; }
     public JComboBox<DeviceProfile> getDeviceProfileSelector() { return deviceProfileSelector; }
@@ -519,17 +550,110 @@ public class GSmartGui extends JFrame {
     public JPanel getSourceConfigCardPanel() { return sourceConfigCardPanel; }
     public JPanel getDestinationConfigCardPanel() { return destinationConfigCardPanel; }
     public JPanel getThingsboardConfigPanel() { return thingsboardConfigPanel; }
-    public JPanel getDatabaseConfigPanel() { return databaseConfigPanel; }
+    public JPanel getDatabaseConfigPanel() { return databaseConfigPanel; } // --- O GETTER NECESSÁRIO ESTÁ AQUI ---
     public JTable getMetricsTable() { return metricsTable; }
     public JTable getAlertRulesTable() { return alertRulesTable; }
     public JTable getInsightRulesTable() { return insightRulesTable; }
     public MetricTableModel getMetricTableModel() { return metricTableModel; }
     public AlertRuleTableModel getAlertRuleTableModel() { return alertRuleTableModel; }
     public InsightRuleTableModel getInsightRuleTableModel() { return insightRuleTableModel; }
-    public JCheckBox getRunInBackgroundCheckBox() { return runInBackgroundCheckBox; }
     public OkHttpClient getSharedOkHttpClient() { return sharedOkHttpClient; }
     public JPanel getAlertRuleButtons() { return alertRuleButtons; }
     public void setAlertRuleButtons(JPanel alertRuleButtons) { this.alertRuleButtons = alertRuleButtons; }
     public JPanel getInsightRuleButtons() { return insightRuleButtons; }
     public void setInsightRuleButtons(JPanel insightRuleButtons) { this.insightRuleButtons = insightRuleButtons; }
+    public SideMenuPanel getSideMenuPanel() { return sideMenuPanel; }
+    public void setContentPanel(JPanel panel) {this.contentPanel = panel;}
+    public JPanel getContentPanel() {return this.contentPanel;}
+    public JComboBox<String> getAlertCategoryFilter() { return alertCategoryFilter; }
+    public JComboBox<String> getInsightCategoryFilter() { return insightCategoryFilter; }
+    // --- GETTERS PARA OS BOTÕES DE REGRAS ---
+    public JButton getAddAlertRuleButton() { return addAlertRuleButton; }
+    public JButton getEditAlertRuleButton() { return editAlertRuleButton; }
+    public JButton getRemoveAlertRuleButton() { return removeAlertRuleButton; }
+    public JButton getImportAlertRulesButton() { return importAlertRulesButton; }
+    public JButton getExportAlertRulesButton() { return exportAlertRulesButton; }
+    public JButton getAddInsightRuleButton() { return addInsightRuleButton; }
+    public JButton getEditInsightRuleButton() { return editInsightRuleButton; }
+    public JButton getRemoveInsightRuleButton() { return removeInsightRuleButton; }
+    public JButton getImportInsightRulesButton() { return importInsightRulesButton; }
+    public JButton getExportInsightRulesButton() { return exportInsightRulesButton; }
+    public JButton getDuplicateAlertRuleButton() { return duplicateAlertRuleButton; }
+    public JButton getDuplicateInsightRuleButton() { return duplicateInsightRuleButton; }
+    public JButton getExpressionHelpButton() { return expressionHelpButton; }
+    public JButton getTelegramHelpButton() { return telegramHelpButton; }
+    // ---MÉTODOS PARA ATUALIZAR DADOS DO GRÁFICO ---
+
+    /**
+     * Adiciona um novo ponto de dados para as métricas de pipelines e alertas.
+     * Chamado quando o número de tarefas ativas muda.
+     */
+    public void updatePipelineAndAlertChartData() {
+        String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        int pipelineCount = pipelineManager.getRunningTasks().size();
+        long alertCount = pipelineManager.getRunningTasks().stream().filter(PipelineTask::hasAlert).count();
+
+        hourlyPipelinesData.put(currentTime, pipelineCount);
+        hourlyAlertsData.put(currentTime, (int) alertCount);
+
+        updateDashboardChart();
+    }
+
+    /**
+     * Envia os três conjuntos de dados para o painel do gráfico para redesenho.
+     */
+    private void updateDashboardChart() {
+        dashboardPanel.updateChartsData(
+                new LinkedHashMap<>(hourlyPipelinesData),
+                new LinkedHashMap<>(hourlyAlertsData),
+                new LinkedHashMap<>(hourlyAlarmsData)
+        );
+    }
+
+    public void resetRecentAlarmsCount() {
+        this.recentAlarmsCount = 0;
+        dashboardPanel.updateRecentAlarmsCount(this.recentAlarmsCount);
+    }
+
+    public void incrementRecentAlarmsCount() {
+        recentAlarmsCount++;
+        dashboardPanel.updateRecentAlarmsCount(recentAlarmsCount);
+
+        String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        hourlyAlarmsData.put(currentTime, hourlyAlarmsData.getOrDefault(currentTime, 0) + 1);
+
+        updateDashboardChart();
+    }
+
+    /**
+     * Gere o processo de logoff, fechando a sessão atual e reabrindo a janela de login.
+     */
+    public void handleLogoff() {
+        // Primeiro, para todas as pipelines em execução, sem salvar a sessão
+        if (!pipelineManager.getRunningTasks().isEmpty()) {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Para terminar a sessão, todas as pipelines em execução serão paradas.\nContinuar?",
+                    "Confirmar Logoff",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+
+            if (confirm != JOptionPane.YES_OPTION) {
+                return; // O utilizador cancelou o logoff
+            }
+
+            // Para todas as pipelines sem perguntar para salvar
+            List<PipelineTask> tasksToStop = new ArrayList<>(pipelineManager.getRunningTasks());
+            for (PipelineTask task : tasksToStop) {
+                task.stop();
+            }
+        }
+
+        // Fecha a janela principal atual
+        dispose();
+
+        // Abre uma nova janela de login
+        SwingUtilities.invokeLater(() -> {
+            new LoginWindow().setVisible(true);
+        });
+    }
 }

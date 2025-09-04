@@ -10,9 +10,18 @@ import java.net.URISyntaxException;
 
 /**
  * Janela de Ajuda que fornece informações, FAQs e links para tutoriais.
+ * <p>
+ * Esta janela utiliza um {@link JTabbedPane} para organizar o conteúdo de ajuda
+ * em diferentes secções, como "Dúvidas Frequentes" e "Vídeos Tutoriais",
+ * melhorando a experiência de suporte ao utilizador.
  */
 public class HelpWindow extends JDialog {
 
+    /**
+     * Constrói a janela de ajuda e suporte.
+     *
+     * @param owner A janela pai à qual este diálogo está associado.
+     */
     public HelpWindow(Frame owner) {
         super(owner, "Ajuda e Suporte GSmart", true);
         setSize(700, 500);

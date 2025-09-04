@@ -11,11 +11,11 @@ import java.nio.charset.StandardCharsets; // --- IMPORT ADICIONADO ---
 
 /**
  * Uma janela de UI que exibe os logs gerais da aplicação em tempo real.
- *
- * Esta classe é responsável por ler o ficheiro de log principal (ex: gsmart_general.log)
- * e apresentar o seu conteúdo numa área de texto. Ela pode ser configurada para
- * atualizar automaticamente, fornecendo um feedback contínuo sobre o que a
- * aplicação está a fazer em segundo plano.
+ * <p>
+ * Esta classe redireciona as saídas padrão (System.out) e de erro (System.err)
+ * para um {@link JTextPane}, permitindo que todos os logs gerados pela aplicação
+ * sejam visualizados numa única interface. As mensagens são coloridas com base
+ * no nível do log (INFO, WARN, ERROR) para facilitar a leitura.
  */
 public class LogViewerWindow extends JFrame {
 

@@ -31,13 +31,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
- * Classe utilitária estática que atua como o motor de regras de negócio.
+ * Representa o motor de uma única pipeline de processamento de dados.
  *
- * A sua responsabilidade é analisar um conjunto de métricas de um ciclo de processamento
- * e gerar "insights" ou alertas humanamente legíveis com base em limiares pré-definidos.
- * As regras avaliam custos, diagnósticos de manutenção e previsões de falhas,
- * comunicando os resultados através do {@code GSmartListener}.
+ * Esta classe é responsável pelo ciclo de vida completo de uma tarefa de monitorização:
+ * <ol>
+ * <li><b>Busca de Dados:</b> Conecta-se a uma {@link main.java.com.gsmart.resources.IDataSource} para obter os dados de telemetria mais recentes.</li>
+ * <li><b>Processamento e Transformação:</b> Aplica as configurações de métricas ({@link main.java.com.gsmart.config.MetricConfig}), como aliases e expressões matemáticas.</li>
+ * <li><b>Avaliação de Regras:</b> Executa o motor de regras para verificar se alguma {@link main.java.com.gsmart.config.AlertRule} ou {@link main.java.com.gsmart.config.InsightRule} foi despoletada.</li>
+ * <li><b>Notificação:</b> Comunica alertas e insights através do {@link main.java.com.gsmart.resources.GSmartListener} e envia notificações para serviços externos como MQTT e Telegram.</li>
+ * <li><b>Exportação de Dados:</b> Envia os dados processados para destinos como Power BI ou Microsoft Fabric.</li>
+ * <li><b>Gestão de Conexão:</b> Lida com a lógica de reconexão automática em caso de falha na comunicação com a fonte de dados.</li>
+ * </ol>
+ * Cada instância desta classe é executada na sua própria thread, gerida por uma {@link PipelineTask}.
  *
+ * @see main.java.com.gsmart.pipeline.PipelineManager
+ * @see main.java.com.gsmart.pipeline.PipelineTask
  * @see main.java.com.gsmart.resources.GSmartListener
  */
 public class DataPipeline {
@@ -63,16 +71,18 @@ public class DataPipeline {
     private final AtomicBoolean manualReconnectTrigger = new AtomicBoolean(false);
 
     /**
-     * Construtor da DataPipeline.
+     * Constrói e inicializa uma nova instância da pipeline de dados.
      *
-     * @param dataSource A fonte dos dados.
-     * @param destinationType A URL de destino do Power BI ou MicrosoftFabric.
-     * @param metricConfigs A configuração das métricas a serem processadas.
-     * @param listener O canal de comunicação com a GUI.
-     * @param alertRules A lista de regras de alerta a serem avaliadas.
-     * @param insightRules A lista de regras de alarme a serem avaliadas.
-     * @param telegramChatId O id do seu chat no telegram.
-     * @param telegramToken O token do seu chatboot do telegram.
+     * @param dataSource A fonte de dados (ThingsBoard, Banco de Dados, etc.) que fornecerá a telemetria.
+     * @param destinationType O tipo de destino para onde os dados processados serão enviados (ex: POWER_BI, FABRIC).
+     * @param destinationEndpoint O endpoint específico do destino (URL para Power BI, Connection String para Fabric).
+     * @param metricConfigs A lista de configurações de métricas que define como os dados brutos serão tratados.
+     * @param listener O ouvinte (geralmente a UI) que receberá notificações sobre eventos da pipeline.
+     * @param alertRules A lista de regras de alerta a serem avaliadas a cada ciclo.
+     * @param insightRules A lista de regras de alarme (insights) a serem avaliadas a cada ciclo.
+     * @param telegramToken O token de API para o bot do Telegram que enviará as notificações.
+     * @param telegramChatId O ID do chat do Telegram para onde as notificações serão enviadas.
+     * @param mqttBrokerUrl O endereço do broker MQTT para a publicação de alertas e alarmes.
      */
     public DataPipeline(IDataSource dataSource,DestinationType destinationType, String destinationEndpoint,List<MetricConfig> metricConfigs, GSmartListener listener, List<AlertRule> alertRules, List<InsightRule> insightRules, String telegramToken, String telegramChatId, String mqttBrokerUrl) {
         this.dataSource = dataSource;
@@ -90,17 +100,41 @@ public class DataPipeline {
         this.httpClient = new OkHttpClient();
     }
 
-
+    /**
+     * Dispara um sinal para que a pipeline tente uma reconexão manual imediata.
+     * <p>
+     * Este método é normalmente invocado pela UI quando o utilizador clica no botão
+     * "Reconectar Agora" na janela de erro de conexão. Ele define uma flag atómica
+     * e interrompe a thread para que o loop de reconexão possa agir imediatamente.
+     */
     public void triggerManualReconnect() {
         logger.info("Sinal de reconexão manual recebido.");
         this.manualReconnectTrigger.set(true);
         Thread.currentThread().interrupt();
     }
 
+    /**
+     * Sinaliza para a pipeline que a sua execução deve ser interrompida.
+     * <p>
+     * Este método define uma flag volátil que é verificada a cada ciclo do
+     * método {@link #run()}. Quando a flag é detetada, o loop principal
+     * termina, permitindo que a thread encerre de forma graciosa.
+     */
     public void requestStop() {
         this.stopRequested = true;
     }
 
+    /**
+     * Inicia e executa o ciclo de processamento contínuo da pipeline.
+     * <p>
+     * Este método contém o loop principal que busca, processa e envia dados
+     * em intervalos regulares. Ele continuará a ser executado até que o método
+     * {@link #requestStop()} seja chamado.
+     * <p>
+     * Em caso de falha de conexão com a fonte de dados, este método entra num
+     * modo de reconexão automática, com um tempo de espera exponencial, até que
+     * a conexão seja restabelecida ou a tarefa seja interrompida.
+     */
     public void run() {
         logger.info("🚀 INICIANDO PIPELINE COM FONTE: {} 🚀", dataSource.getSourceName());
 
@@ -201,6 +235,7 @@ public class DataPipeline {
                                     alertaCriticoDisparado = true;
 
                                     String mensagemComTimestamp = timestampPrefix + rule.getMessageToSend();
+                                    if (listener != null) listener.onAlert(rule.getRuleName(), mensagemComTimestamp);
 
                                     if (rule.isSendToMqtt()) {
                                         publicarAlertaMqtt(mensagemComTimestamp);
@@ -338,9 +373,13 @@ public class DataPipeline {
             listener.onStatusUpdate(TaskStatus.FINISHED);
         }
     }
+
     /**
      * Publica uma mensagem de alerta crítico no tópico MQTT 'gsmart/alerta'.
+     * <p>
      * Utiliza o {@link main.java.com.gsmart.services.MqttService} para a comunicação direta com o broker.
+     * Este método é chamado quando uma {@link main.java.com.gsmart.config.AlertRule} é despoletada.
+     *
      * @param mensagem O conteúdo da mensagem de alerta a ser publicada.
      */
     private void publicarAlertaMqtt(String mensagem) {
@@ -349,8 +388,11 @@ public class DataPipeline {
 
     /**
      * Publica uma mensagem de alarme (insight) num subtópico MQTT dinâmico.
+     * <p>
      * O tópico é formatado como 'gsmart/alarme/{tipo}', permitindo uma filtragem fácil
-     * por parte dos clientes MQTT.
+     * por parte dos clientes MQTT. Este método é chamado quando uma
+     * {@link main.java.com.gsmart.config.InsightRule} é despoletada.
+     *
      * @param mensagem O conteúdo do alarme a ser publicado.
      * @param tipo A categoria do alarme (ex: "CUSTO", "MANUTENCAO"), que definirá o subtópico.
      */
@@ -362,7 +404,9 @@ public class DataPipeline {
 
     /**
      * Exporta todos os dados de telemetria acumulados no buffer de memória para um ficheiro CSV.
-     * Este método é chamado quando a pipeline é parada.
+     * <p>
+     * Este método é invocado quando a pipeline está a ser terminada para garantir que
+     * os dados recolhidos que ainda não foram enviados ou guardados não sejam perdidos.
      */
     public void exportRemainingData() {
         if (!telemetryBuffer.isEmpty()) {

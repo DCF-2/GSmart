@@ -13,6 +13,19 @@ import com.google.gson.JsonObject;
  */
 public class JsonHelper {
 
+
+
+    /**
+     * Extrai um valor de um objeto de telemetria do ThingsBoard como uma String.
+     * <p>
+     * Lida com a estrutura aninhada do JSON (`{"key":[{"ts":..., "value":...}]}`) de
+     * forma segura, retornando um valor padrão se a chave não existir ou o formato for inesperado.
+     *
+     * @param telemetria O objeto JsonObject contendo os dados.
+     * @param key A chave do valor a ser extraído.
+     * @param defaultValue O valor a ser retornado em caso de falha.
+     * @return O valor como String, ou o valor padrão.
+     */
     public static String getAsString(JsonObject telemetria, String key, String defaultValue) {
         try {
             if (telemetria != null && telemetria.has(key)) {
@@ -25,6 +38,15 @@ public class JsonHelper {
         return defaultValue;
     }
 
+
+    /**
+     * Extrai um valor de um objeto de telemetria do ThingsBoard como um double.
+     *
+     * @param telemetria O objeto JsonObject contendo os dados.
+     * @param key A chave do valor a ser extraído.
+     * @param defaultValue O valor a ser retornado em caso de falha.
+     * @return O valor como double, ou o valor padrão.
+     */
     public static double getAsDouble(JsonObject telemetria, String key, double defaultValue) {
         try {
             if (telemetria != null && telemetria.has(key)) {
@@ -37,6 +59,14 @@ public class JsonHelper {
         return defaultValue;
     }
 
+    /**
+     * Extrai um valor de um objeto de telemetria do ThingsBoard como um long.
+     *
+     * @param telemetria O objeto JsonObject contendo os dados.
+     * @param key A chave do valor a ser extraído.
+     * @param defaultValue O valor a ser retornado em caso de falha.
+     * @return O valor como long, ou o valor padrão.
+     */
     public static long getAsLong(JsonObject telemetria, String key, long defaultValue) {
         try {
             if (telemetria != null && telemetria.has(key)) {

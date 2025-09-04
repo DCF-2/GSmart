@@ -4,15 +4,33 @@ package main.java.com.gsmart.Gui.panels;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+import java.util.Map;
 
 /**
  * Painel de Dashboard que serve como a tela inicial da aplicação GSmart.
- * Exibe informações resumidas e atalhos para as principais funcionalidades.
+ * <p>
+ * Exibe informações resumidas do estado do sistema, como o número de pipelines
+ * e alertas ativos, e apresenta gráficos em tempo real sobre a atividade recente.
+ * Contém também uma área de log para os eventos mais importantes.
+ *
+ * @see main.java.com.gsmart.services.DashboardLogService
  */
 public class DashboardPanel extends JPanel {
 
-    private JLabel activePipelinesLabel;
-    private JButton openTaskManagerButton;
+    private JLabel activePipelinesLabel, activeAlertsLabel, recentAlarmsLabel;
+    private JTextPane logTextPane;
+    private final int MAX_LOG_ENTRIES = 50;
+
+    // Agora temos os dois painéis de gráfico e um container ---
+    private CardLayout chartLayout;
+    private JPanel chartContainerPanel;
+    private ActivityBarChartPanel barChartPanel;
+    private ActivityLineChartPanel lineChartPanel;
+
 
     public DashboardPanel() {
         setLayout(new BorderLayout(20, 20));
@@ -23,48 +41,113 @@ public class DashboardPanel extends JPanel {
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
         add(titleLabel, BorderLayout.NORTH);
 
-        // --- Painel de Status (Centro) ---
+        // --- Painel Central com Status e Gráfico ---
+        JPanel centerPanel = new JPanel(new BorderLayout(20, 20));
+
+        // --- Painel de Status ---
         JPanel statusPanel = new JPanel();
         statusPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 30, 10));
         statusPanel.setBorder(BorderFactory.createTitledBorder("Status do Sistema"));
 
-        // Card para Pipelines Ativas
-        JPanel pipelineStatusCard = new JPanel(new BorderLayout());
-        pipelineStatusCard.setBorder(new EmptyBorder(10, 15, 10, 15));
         activePipelinesLabel = new JLabel("0", SwingConstants.CENTER);
-        activePipelinesLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));
-        pipelineStatusCard.add(new JLabel("Pipelines Ativas", SwingConstants.CENTER), BorderLayout.NORTH);
-        pipelineStatusCard.add(activePipelinesLabel, BorderLayout.CENTER);
+        statusPanel.add(createStatusCard("Pipelines Ativas", activePipelinesLabel));
+        activeAlertsLabel = new JLabel("0", SwingConstants.CENTER);
+        statusPanel.add(createStatusCard("Alertas Ativos", activeAlertsLabel));
+        recentAlarmsLabel = new JLabel("0", SwingConstants.CENTER);
+        statusPanel.add(createStatusCard("Alarmes Recentes", recentAlarmsLabel));
+        centerPanel.add(statusPanel, BorderLayout.NORTH);
 
-        statusPanel.add(pipelineStatusCard);
-        add(statusPanel, BorderLayout.CENTER);
+        // --- NOVO CONTAINER DE GRÁFICOS COM BOTÃO DE TROCA ---
+        JPanel chartWrapperPanel = new JPanel(new BorderLayout());
 
+        // Título e botão
+        JPanel chartTitlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        chartTitlePanel.add(new JLabel("Atividade Recente do Sistema"));
+        JButton toggleChartButton = new JButton("Alternar Gráfico");
+        chartTitlePanel.add(toggleChartButton);
+        chartWrapperPanel.add(chartTitlePanel, BorderLayout.NORTH);
 
-        // --- Painel de Atalhos (Sul) ---
-        JPanel shortcutsPanel = new JPanel();
-        shortcutsPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        shortcutsPanel.setBorder(BorderFactory.createTitledBorder("Ações Rápidas"));
+        // Container com CardLayout
+        chartLayout = new CardLayout();
+        chartContainerPanel = new JPanel(chartLayout);
 
-        openTaskManagerButton = new JButton("Abrir Central de Monitoramento");
-        shortcutsPanel.add(openTaskManagerButton);
+        barChartPanel = new ActivityBarChartPanel();
+        lineChartPanel = new ActivityLineChartPanel();
 
-        add(shortcutsPanel, BorderLayout.SOUTH);
+        chartContainerPanel.add(barChartPanel, "BAR"); // Adiciona o gráfico de barras
+        chartContainerPanel.add(lineChartPanel, "LINE"); // Adiciona o gráfico de linhas
+
+        chartWrapperPanel.add(chartContainerPanel, BorderLayout.CENTER);
+        centerPanel.add(chartWrapperPanel, BorderLayout.CENTER);
+
+        // Ação do botão para trocar os gráficos
+        toggleChartButton.addActionListener(e -> chartLayout.next(chartContainerPanel));
+
+        add(centerPanel, BorderLayout.CENTER);
+
+        // --- Painel de Log de Eventos Recentes ---
+        logTextPane = new JTextPane();
+        logTextPane.setEditable(false);
+        JScrollPane logScrollPane = new JScrollPane(logTextPane);
+        logScrollPane.setBorder(BorderFactory.createTitledBorder("Log de Eventos Recentes"));
+        logScrollPane.setPreferredSize(new Dimension(0, 150));
+        add(logScrollPane, BorderLayout.SOUTH);
     }
 
     /**
-     * Atualiza o contador de pipelines ativas exibido no dashboard.
-     * @param count O número atual de pipelines em execução.
+     * Atualiza os dados para ambos os gráficos de atividade (barras e linhas).
+     * <p>
+     * Este método recebe os dados mais recentes sobre pipelines, alertas e alarmes
+     * e passa-os para os componentes de gráfico para que eles se redesenhem.
+     *
+     * @param pData Os dados de atividade das pipelines.
+     * @param aData Os dados de atividade dos alertas.
+     * @param alData Os dados de atividade dos alarmes.
      */
+    public void updateChartsData(Map<String, Integer> pData, Map<String, Integer> aData, Map<String, Integer> alData) {
+        barChartPanel.updateData(pData, aData, alData);
+        lineChartPanel.updateData(pData, aData, alData);
+    }
+
+    public void addLogMessage(String message, Color color) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                StyledDocument doc = logTextPane.getStyledDocument();
+                Style style = logTextPane.addStyle("Color Style", null);
+                StyleConstants.setForeground(style, color);
+                doc.insertString(0, message + "\n", style);
+                if (doc.getDefaultRootElement().getElementCount() > MAX_LOG_ENTRIES) {
+                    int end = doc.getEndPosition().getOffset() - 1;
+                    int start = doc.getDefaultRootElement().getElement(MAX_LOG_ENTRIES).getStartOffset();
+                    doc.remove(start, end - start);
+                }
+            } catch (BadLocationException e) {
+                System.err.println("Erro ao adicionar mensagem de log ao dashboard: " + e.getMessage());
+            }
+        });
+    }
+
+    private JPanel createStatusCard(String title, JLabel valueLabel) {
+        JPanel cardPanel = new JPanel(new BorderLayout(0, 5));
+        cardPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
+        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 36));
+        cardPanel.add(titleLabel, BorderLayout.NORTH);
+        cardPanel.add(valueLabel, BorderLayout.CENTER);
+        return cardPanel;
+    }
+
     public void updateActivePipelinesCount(int count) {
         activePipelinesLabel.setText(String.valueOf(count));
     }
 
-    /**
-     * Retorna o botão de abrir o gestor de tarefas para que um ActionListener
-     * possa ser adicionado externamente.
-     * @return O JButton para abrir o TaskManager.
-     */
-    public JButton getOpenTaskManagerButton() {
-        return openTaskManagerButton;
+    public void updateActiveAlertsCount(int count) {
+        activeAlertsLabel.setText(String.valueOf(count));
+        activeAlertsLabel.setForeground(count > 0 ? Color.RED : UIManager.getColor("Label.foreground"));
+    }
+
+    public void updateRecentAlarmsCount(int count) {
+        recentAlarmsLabel.setText(String.valueOf(count));
     }
 }

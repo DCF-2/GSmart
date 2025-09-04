@@ -10,6 +10,13 @@ import java.util.Map;
 /**
  * Modelo de dados (TableModel) para a JTable que exibe as pipelines
  * configuradas para o início automático.
+ * <p>
+ * Esta classe adapta a lista de objetos {@link main.java.com.gsmart.config.SerializablePipelineConfig}
+ * para serem exibidos numa tabela, mostrando informações descritivas sobre a fonte
+ * e o destino de cada pipeline guardada.
+ *
+ * @see main.java.com.gsmart.config.SerializablePipelineConfig
+ * @see main.java.com.gsmart.Gui.windows.AutoStartManagerWindow
  */
 public class AutoStartTableModel extends AbstractTableModel {
 
@@ -20,6 +27,11 @@ public class AutoStartTableModel extends AbstractTableModel {
         this.pipelineConfigs = new ArrayList<>();
     }
 
+    /**
+     * Substitui a lista de configurações de pipeline atual por uma nova e notifica a tabela.
+     *
+     * @param configs A nova lista de {@link SerializablePipelineConfig} a ser exibida.
+     */
     public void setPipelineConfigs(List<SerializablePipelineConfig> configs) {
         this.pipelineConfigs = new ArrayList<>(configs);
         fireTableDataChanged(); // Notifica a tabela que os dados mudaram
@@ -36,6 +48,11 @@ public class AutoStartTableModel extends AbstractTableModel {
         return null;
     }
 
+    /**
+     * Remove a configuração de pipeline de uma linha específica e notifica a tabela.
+     *
+     * @param rowIndex O índice da linha (configuração) a ser removida.
+     */
     public void removeRow(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < pipelineConfigs.size()) {
             pipelineConfigs.remove(rowIndex);

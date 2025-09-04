@@ -1,79 +1,148 @@
-// Localização: src/main/java/com/gsmart/LoginWindow.java
+// Localização: src/main/java/com/gsmart/Gui/windows/LoginWindow.java
 package main.java.com.gsmart.Gui.windows;
 
 import main.java.com.gsmart.GSmartGui;
 import main.java.com.gsmart.db.DatabaseManager;
 import main.java.com.gsmart.pipeline.PipelineManager;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.net.URL;
 
 /**
  * Apresenta a janela de login inicial da aplicação GSmart.
- *
- * Esta classe é responsável por obter as credenciais do utilizador e validá-las.
- * Em caso de sucesso na autenticação, ela fecha-se e abre a janela principal
- * da aplicação, a {@code GSmartGui}.
- *
- * Atualmente, a validação é feita com credenciais fixas no código, mas a
- * estrutura permite a sua substituição por um mecanismo de autenticação mais robusto.
+ * <p>
+ * Esta é a primeira janela que o utilizador vê e é responsável por autenticá-lo
+ * contra a base de dados local. Em caso de sucesso, esta janela é fechada e a
+ * janela principal da aplicação ({@link GSmartGui}) é aberta, passando o perfil
+ * de acesso do utilizador.
  */
 public class LoginWindow extends JFrame {
-
-    // --- CREDENCIAIS FIXAS ---
-    //private static final String USUARIO_VALIDO = "admin";
-    //private static final String SENHA_VALIDA = "admin";
 
     private final JTextField userField;
     private final JPasswordField passField;
     private final JButton loginButton;
 
+    /**
+     * Constrói e inicializa a janela de login, montando todos os seus componentes visuais.
+     * <p>
+     * O design é dividido em dois painéis: um painel esquerdo para a marca (logo) e um
+     * painel direito que contém o formulário de autenticação.
+     */
     public LoginWindow() {
         setTitle("GSmart - Autenticação");
-        setSize(350, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Centraliza a janela
         setResizable(false);
+        setMinimumSize(new Dimension(800, 500)); // Define um tamanho fixo para a janela
 
-        JPanel panel = new JPanel(new GridBagLayout());
+        // --- PAINEL PRINCIPAL COM DIVISÃO ---
+        JPanel mainPanel = new JPanel(new GridLayout(1, 2));
+
+        // --- PAINEL ESQUERDO (AZUL COM LOGO) ---
+        // ALTERAÇÕES AQUI: GridLayout para centralizar e cor azul mais saturada
+        JPanel leftPanel = new JPanel(new GridBagLayout()); // Usa GridBagLayout para centralizar
+        leftPanel.setBackground(new Color(40, 70, 160)); // Tom de azul mais saturado
+
+        try {
+            URL iconUrl = getClass().getResource("/gsmart_icon.png");
+            if (iconUrl != null) {
+                ImageIcon originalIcon = new ImageIcon(iconUrl);
+                // Redimensiona o ícone para ser muito maior no painel esquerdo
+                // Ajusta o tamanho para ocupar boa parte do painel
+                Image scaledImage = originalIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                JLabel logoLabel = new JLabel(new ImageIcon(scaledImage));
+
+                // Centraliza o logo no GridBagLayout
+                GridBagConstraints gbcLeft = new GridBagConstraints();
+                gbcLeft.gridx = 0;
+                gbcLeft.gridy = 0;
+                gbcLeft.weightx = 1.0;
+                gbcLeft.weighty = 1.0;
+                gbcLeft.anchor = GridBagConstraints.CENTER;
+                leftPanel.add(logoLabel, gbcLeft);
+            }
+            // Adiciona o ícone à barra de título da janela também (como antes)
+            Image windowIcon = ImageIO.read(iconUrl);
+            setIconImage(windowIcon);
+        } catch (Exception e) {
+            System.err.println("Erro ao carregar o ícone da aplicação: " + e.getMessage());
+        }
+        mainPanel.add(leftPanel);
+
+        // --- PAINEL DIREITO (FORMULÁRIO DE LOGIN) ---
+        JPanel rightPanel = new JPanel(new GridBagLayout());
+        rightPanel.setBackground(Color.WHITE);
+        rightPanel.setBorder(new EmptyBorder(40, 40, 40, 40));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.insets = new Insets(10, 0, 10, 0);
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // --- Componentes da UI ---
-        JLabel userLabel = new JLabel("Usuário:");
-        userField = new JTextField(20);
-        JLabel passLabel = new JLabel("Senha:");
-        passField = new JPasswordField(20);
+        // Título
+        JLabel titleLabel = new JLabel("Bem-vindo ao GSmart");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        gbc.gridy = 0;
+        rightPanel.add(titleLabel, gbc);
+
+        // Subtítulo
+        JLabel subtitleLabel = new JLabel("Insira as suas credenciais para continuar.");
+        subtitleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        subtitleLabel.setForeground(Color.GRAY);
+        gbc.gridy = 1;
+        rightPanel.add(subtitleLabel, gbc);
+
+        // Espaçador
+        gbc.gridy = 2;
+        rightPanel.add(Box.createVerticalStrut(20), gbc);
+
+        // Campo Utilizador
+        JLabel userLabel = new JLabel("Utilizador");
+        userLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        gbc.gridy = 3;
+        rightPanel.add(userLabel, gbc);
+
+        userField = new JTextField(25);
+        userField.putClientProperty("JComponent.roundRect", true); // Borda arredondada (FlatLaf)
+        userField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        gbc.gridy = 4;
+        rightPanel.add(userField, gbc);
+
+        // Campo Senha
+        JLabel passLabel = new JLabel("Senha");
+        passLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        gbc.gridy = 5;
+        rightPanel.add(passLabel, gbc);
+
+        passField = new JPasswordField(25);
+        passField.putClientProperty("JComponent.roundRect", true); // Borda arredondada (FlatLaf)
+        passField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        gbc.gridy = 6;
+        rightPanel.add(passField, gbc);
+
+        // Botão de Login
         loginButton = new JButton("Entrar");
+        loginButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        loginButton.putClientProperty("JButton.buttonType", "roundRect"); // Borda arredondada (FlatLaf)
+        loginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        gbc.gridy = 7;
+        gbc.insets = new Insets(20, 0, 10, 0);
+        rightPanel.add(loginButton, gbc);
 
-        // --- Adicionando componentes ao painel ---
-        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.LINE_END;
-        panel.add(userLabel, gbc);
+        mainPanel.add(rightPanel);
 
-        gbc.gridx = 1; gbc.gridy = 0; gbc.anchor = GridBagConstraints.LINE_START;
-        panel.add(userField, gbc);
+        // Adiciona o painel principal à janela e finaliza
+        add(mainPanel);
+        setLocationRelativeTo(null); // Centraliza a janela
+        pack(); // Ajusta o tamanho da janela aos componentes
 
-        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.LINE_END;
-        panel.add(passLabel, gbc);
-
-        gbc.gridx = 1; gbc.gridy = 1; gbc.anchor = GridBagConstraints.LINE_START;
-        panel.add(passField, gbc);
-
-        gbc.gridx = 1; gbc.gridy = 2; gbc.anchor = GridBagConstraints.CENTER;
-        panel.add(loginButton, gbc);
-
-        add(panel);
-
-        // --- Ações dos Botões ---
+        // Ações
         loginButton.addActionListener(this::performLogin);
-        // Permite que o usuário pressione Enter para tentar o login
         getRootPane().setDefaultButton(loginButton);
     }
 
-    /**
-     * Valida o login usando o DatabaseManager e abre a aplicação principal se for bem-sucedido.
-     */
     private void performLogin(ActionEvent e) {
         String user = userField.getText().trim();
         String password = new String(passField.getPassword());
@@ -86,38 +155,37 @@ public class LoginWindow extends JFrame {
             return;
         }
 
-        // --- 2. USAR O NOSSO NOVO MTODO DE VALIDAÇÃO ---
-        String userRole = DatabaseManager.validateLogin(user, password);
+        String userRole = DatabaseManager.getInstance().validateLogin(user, password);
 
         if (userRole != null) {
-            // Sucesso! Fecha a janela de login e abre a principal, passando o perfil do utilizador.
-            dispose(); // Libera os recursos desta janela
+            dispose();
             showMainApplication(userRole);
         } else {
-            // Falha
             JOptionPane.showMessageDialog(this,
                     "Utilizador ou senha inválidos.",
                     "Erro de Autenticação",
                     JOptionPane.ERROR_MESSAGE);
-            passField.setText(""); // Limpa o campo de senha
+            passField.setText("");
         }
     }
 
-    /**
-     * Inicializa e exibe a janela principal da aplicação, passando o perfil do utilizador.
-     * @param userRole O perfil do utilizador que fez o login (ex: "ADMINISTRATOR").
-     */
     private void showMainApplication(String userRole) {
-        // Usa o mesmo metodo do Launcher para garantir consistência
         SwingUtilities.invokeLater(() -> {
-            LogViewerWindow globalLogViewer = new LogViewerWindow();
-            globalLogViewer.redirectSystemStreams();
-
-            PipelineManager pipelineManager = new PipelineManager();
-
-            // --- 3. PASSAR O PERFIL PARA A GSmartGui ---
-            GSmartGui gui = new GSmartGui(globalLogViewer, pipelineManager, userRole);
-            gui.setVisible(true);
+            try {
+                LogViewerWindow globalLogViewer = new LogViewerWindow();
+                globalLogViewer.redirectSystemStreams();
+                PipelineManager pipelineManager = new PipelineManager();
+                GSmartGui gui = new GSmartGui(globalLogViewer, pipelineManager, userRole);
+                gui.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Ocorreu um erro crítico ao iniciar a aplicação.\nErro: " + e.getMessage(),
+                        "Falha na Inicialização",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
         });
     }
 }

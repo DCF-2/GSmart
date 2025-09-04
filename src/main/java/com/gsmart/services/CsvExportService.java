@@ -22,7 +22,7 @@ import java.util.*;
 public class CsvExportService {
 
     private static final Logger logger = LoggerFactory.getLogger(CsvExportService.class);
-    private static final String EXPORT_DIRECTORY_NAME = "GSmart_Exports";
+    private static final String EXPORT_DIRECTORY_NAME = "exports";
     private static final int MAX_FILES = 10;
     private final File exportDirectory;
 

@@ -12,7 +12,7 @@ import java.util.UUID;
  * sobre o estado do sistema.
  */
 public class InsightRule implements Serializable {
-
+    private static final long serialVersionUID = 1L;
     private final String id;
     private String ruleName;
     private String metricToWatch;
@@ -24,10 +24,11 @@ public class InsightRule implements Serializable {
     private boolean sendToTelegram;
     private boolean sendToMqtt;
     private double thresholdValueMax;
+    private String category;
 
 
     /**
-     * Construtor para uma nova regra de Alarme.
+     * Constrói uma nova regra de Alarme (Insight).
      *
      * @param ruleName O nome descritivo da regra (ex: "Alarme de Baixa Eficiência").
      * @param metricToWatch A chave da métrica a ser monitorizada (ex: "fatorPotencia").
@@ -48,6 +49,24 @@ public class InsightRule implements Serializable {
         this.sendToMqtt = true;
         this.sendToTelegram = true;
         this.thresholdValueMax = 0;
+        this.category = "Geral";
+    }
+
+    /**
+     * Construtor de cópia para duplicar uma regra de alarme.
+     * <p>
+     * Cria uma nova instância de {@code InsightRule} com os mesmos valores da regra
+     * original, mas com um novo ID único.
+     *
+     * @param other A regra a ser copiada.
+     */
+    public InsightRule(InsightRule other) {
+        this(other.ruleName, other.metricToWatch, other.condition, other.thresholdValue, other.messageToSend, other.insightType);
+        this.setThresholdValueMax(other.getThresholdValueMax());
+        this.setCategory(other.getCategory());
+        this.setEnabled(other.isEnabled());
+        this.setSendToMqtt(other.isSendToMqtt());
+        this.setSendToTelegram(other.isSendToTelegram());
     }
 
     // --- Getters e Setters ---
@@ -75,4 +94,6 @@ public class InsightRule implements Serializable {
     public void setSendToMqtt(boolean sendToMqtt) {this.sendToMqtt = sendToMqtt;}
     public double getThresholdValueMax() {return thresholdValueMax;}
     public void setThresholdValueMax(double thresholdValueMax) {this.thresholdValueMax = thresholdValueMax;}
+    public String getCategory() {return category;}
+    public void setCategory(String category) {this.category = category;}
 }

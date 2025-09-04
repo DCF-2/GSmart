@@ -1,11 +1,12 @@
 package main.java.com.gsmart.functions;
 
 /**
- * Ponto de entrada (entry point) principal para a aplicação GSmart.
- *
- * A única responsabilidade desta classe é conter o método {@code main}, que
- * inicializa e exibe a primeira janela da interface gráfica, a {@code LoginWindow},
- * dando início à execução do programa.
+ * Classe utilitária para calcular o custo de consumo de energia.
+ * <p>
+ * Esta classe mantém o estado do último valor de consumo de energia registado
+ * para calcular o custo incremental (delta) entre as medições. Inclui também
+ * um placeholder para uma futura integração com APIs de tarifas de energia,
+ - * como a da Neoenergia.
  */
 public class CalculoDeCusto {
     // Tarifa base em R$/kWh para a região. Pode ser atualizada pela API.
@@ -14,8 +15,13 @@ public class CalculoDeCusto {
 
     /**
      * Calcula o custo do consumo de energia desde a última medição.
-     * @param consumoTotalAtual_kWh O valor total de kWh lido do medidor (EAkWh).
-     * @return O custo em Reais (R$) para o período.
+     * <p>
+     * Este método é stateful: ele armazena o último valor total de consumo para
+     * calcular a diferença (delta) na chamada seguinte. Se o medidor for reiniciado
+     * (valor atual menor que o anterior), o cálculo é reiniciado.
+     *
+     * @param consumoTotalAtual_kWh O valor total de kWh lido do medidor (ex: EAkWh).
+     * @return O custo em Reais (R$) para o período, ou 0.0 na primeira chamada.
      */
     public static double calcularCustoDoPeriodo(double consumoTotalAtual_kWh) {
         if (ultimoConsumoTotal_kWh == -1.0) {
@@ -43,8 +49,12 @@ public class CalculoDeCusto {
     }
 
     /**
-     * Placeholder para uma futura integração com a API da Neoenergia.
-     * Atualmente, retorna um valor fixo.
+     * Placeholder para uma futura integração com uma API de tarifas de energia.
+     * <p>
+     * Atualmente, retorna um valor fixo pré-configurado. A lógica para se conectar
+     * a uma API externa (ex: Neoenergia) e buscar a tarifa em tempo real seria
+     * implementada aqui.
+     *
      * @return A tarifa de energia em R$/kWh.
      */
     public static double getTarifaFromNeoenergiaAPI() {

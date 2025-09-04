@@ -7,13 +7,29 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.atomic.AtomicLong;
 
-
+/**
+ * Uma janela de diálogo não-modal que informa o utilizador sobre o estado da conexão de uma pipeline.
+ * <p>
+ * Esta janela é exibida quando uma {@link main.java.com.gsmart.pipeline.DataPipeline}
+ * perde a sua conexão com a fonte de dados. Ela fornece feedback visual sobre o estado
+ * (ex: "Falha de Conexão", "Tentando reconectar em X segundos...") e permite que o
+ * utilizador intervenha, forçando uma reconexão imediata ou cancelando a pipeline.
+ */
 public class ConnectionErrorDialog extends JDialog {
 
     private final JLabel statusLabel;
     private final JButton reconnectNowButton;
     private Timer countdownTimer;
 
+    /**
+     * Constrói a janela de diálogo de erro de conexão.
+     *
+     * @param owner O Frame pai ao qual este diálogo está associado.
+     * @param pipelineName O nome da pipeline, exibido no título da janela.
+     * @param onReconnectNow Um {@link Runnable} a ser executado quando o utilizador clica em "Reconectar".
+     * @param onCancelPipeline Um {@link Runnable} a ser executado quando o utilizador clica em "Cancelar Pipeline".
+     * @param onDispose Um {@link Runnable} a ser executado quando a janela é fechada, para limpar referências.
+     */
     public ConnectionErrorDialog(Frame owner, String pipelineName, Runnable onReconnectNow, Runnable onCancelPipeline, Runnable onDispose) {
         super(owner, "Status de Conexão: " + pipelineName, false); // false = não-modal
         setSize(450, 150);
@@ -59,6 +75,14 @@ public class ConnectionErrorDialog extends JDialog {
         });
     }
 
+    /**
+     * Exibe o estado de "Conexão Perdida" na janela de diálogo.
+     * <p>
+     * Atualiza o texto do rótulo com a mensagem de erro, altera a cor para vermelho
+     * para indicar uma falha e garante que o botão de reconexão manual esteja visível e ativo.
+     *
+     * @param errorMessage A mensagem de erro específica que causou a perda de conexão.
+     */
     public void showConnectionLost(String errorMessage) {
         SwingUtilities.invokeLater(() -> {
             statusLabel.setText("<html><div style='text-align: center;'><b>Falha de Conexão:</b><br/>" + errorMessage + "</div></html>");
@@ -69,6 +93,15 @@ public class ConnectionErrorDialog extends JDialog {
         });
     }
 
+    /**
+     * Inicia uma contagem decrescente, mostrando ao utilizador o tempo até à próxima tentativa de reconexão.
+     * <p>
+     * Atualiza o rótulo de estado a cada segundo com o tempo restante. A cor do texto é
+     * alterada para indicar que uma tentativa de reconexão está pendente. O botão para
+     * forçar uma reconexão manual permanece ativo durante a contagem.
+     *
+     * @param delayInSeconds O tempo total, em segundos, para a contagem decrescente.
+     */
     public void startCountdown(long delayInSeconds) {
         SwingUtilities.invokeLater(() -> {
             if (countdownTimer != null && countdownTimer.isRunning()) countdownTimer.stop();
@@ -99,6 +132,12 @@ public class ConnectionErrorDialog extends JDialog {
         });
     }
 
+    /**
+     * Exibe o estado de "Conexão Restabelecida" e fecha a janela automaticamente.
+     * <p>
+     * Altera o texto e a cor do rótulo para verde, indicando sucesso. A janela é então
+     * fechada após um curto período para não poluir a tela do utilizador.
+     */
     public void showConnectionRestored() {
         SwingUtilities.invokeLater(() -> {
             if (countdownTimer != null) countdownTimer.stop();

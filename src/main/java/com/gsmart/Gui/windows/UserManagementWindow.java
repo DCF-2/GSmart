@@ -10,7 +10,11 @@ import java.awt.*;
 
 /**
  * Janela para a gestão de utilizadores do sistema GSmart.
- * Permite a administradores visualizar, adicionar, editar e remover utilizadores.
+ * <p>
+ * Permite a administradores visualizar, adicionar, editar e remover utilizadores
+ * através de uma interface tabular. Interage com a {@link UserDialog} para as
+ * operações de criação e edição e com o {@link main.java.com.gsmart.db.DatabaseManager}
+ * para persistir as alterações na base de dados.
  */
 public class UserManagementWindow extends JDialog {
 
@@ -105,7 +109,7 @@ public class UserManagementWindow extends JDialog {
 
             // 3. Se confirmado, chama o método para remover e atualiza a tabela
             if (confirm == JOptionPane.YES_OPTION) {
-                boolean success = DatabaseManager.removeUser(userToRemove.id());
+                boolean success = DatabaseManager.getInstance().removeUser(userToRemove.id());
                 if (success) {
                     loadUsers(); // Atualiza a tabela para refletir a remoção
                 } else {
@@ -126,6 +130,6 @@ public class UserManagementWindow extends JDialog {
      */
     private void loadUsers() {
         // Usa o método que criámos no DatabaseManager
-        tableModel.setUsers(DatabaseManager.getAllUsers());
+        tableModel.setUsers(DatabaseManager.getInstance().getAllUsers());
     }
 }

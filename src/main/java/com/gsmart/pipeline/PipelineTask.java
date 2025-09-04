@@ -13,14 +13,14 @@ import static main.java.com.gsmart.pipeline.DataPipeline.logger;
  * Representa uma tarefa de pipeline completa e o seu estado atual.
  *
  * Esta classe atua como um contentor que agrupa todos os elementos associados a um
- * único processo de monitoramento: a thread de execução, a instância da pipeline,
- * a configuração original e as janelas de UI associadas (monitoramento e erro).
+ * único processo de monitorização: a thread de execução, a instância da pipeline,
+ * a configuração original e as janelas de UI associadas (monitorização e erro).
  *
  * É o principal objeto gerido pelo {@code PipelineManager}.
  *
  * @see main.java.com.gsmart.pipeline.PipelineManager
  * @see main.java.com.gsmart.pipeline.DataPipeline
- * @see MonitoringWindow
+ * @see main.java.com.gsmart.Gui.windows.MonitoringWindow
  */
 public class PipelineTask {
     private final String id;
@@ -36,12 +36,12 @@ public class PipelineTask {
     private final long startTime;
 
     /**
-     * Construtor da classe PipelineTask.
+     * Constrói uma nova tarefa de pipeline, encapsulando a sua thread e configuração.
      *
-     * @param description Uma descrição legível da tarefa (ex: "Fonte: ThingsBoard").
+     * @param description Uma descrição legível da tarefa (ex: "Fonte: ThingsBoard") para exibição na UI.
      * @param pipelineThread A thread na qual a instância da DataPipeline está a ser executada.
      * @param pipeline A instância da DataPipeline que contém a lógica de execução.
-     * @param config A configuração original usada para iniciar esta tarefa, útil para reiniciá-la.
+     * @param config A configuração original usada para iniciar esta tarefa, útil para a reiniciar posteriormente.
      * @param onStopCallback Um callback a ser executado quando esta tarefa é parada, para notificar o PipelineManager.
      */
     public PipelineTask(String description, Thread pipelineThread, DataPipeline pipeline, PipelineConfiguration config, Runnable onStopCallback) {
@@ -58,9 +58,9 @@ public class PipelineTask {
     }
 
     /**
-     * Orquestra uma parada graciosa e completa da tarefa e dos seus componentes.
-     *
-     * A sequência de parada é a seguinte:
+     * Orquestra uma paragem graciosa e completa da tarefa e dos seus componentes.
+     * <p>
+     * A sequência de paragem é a seguinte:
      * <ol>
      * <li>Sinaliza para a instância da {@code DataPipeline} que ela deve encerrar o seu loop.</li>
      * <li>Interrompe a thread da pipeline para acordá-la de qualquer estado de espera (sleep).</li>
@@ -105,6 +105,9 @@ public class PipelineTask {
 
     /**
      * Delega a solicitação de reconexão manual para a instância da DataPipeline subjacente.
+     * <p>
+     * Este método é chamado quando o utilizador interage com a UI para forçar uma
+     * tentativa de reconexão imediata, sem aguardar pelo temporizador automático.
      */
     public void forceReconnect() {
         if (pipeline != null) {

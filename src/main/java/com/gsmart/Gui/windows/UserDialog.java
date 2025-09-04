@@ -8,7 +8,14 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Janela de diálogo para criar ou editar um utilizador.
+ * Janela de diálogo para criar um novo utilizador ou editar um existente.
+ * <p>
+ * Apresenta um formulário com campos para o nome de utilizador, senha e perfil de
+ * acesso. Esta janela é utilizada pela {@link UserManagementWindow} para gerir
+ * o ciclo de vida dos utilizadores do sistema.
+ *
+ * @see main.java.com.gsmart.Gui.windows.UserManagementWindow
+ * @see main.java.com.gsmart.model.User
  */
 public class UserDialog extends JDialog {
 
@@ -22,7 +29,9 @@ public class UserDialog extends JDialog {
     private User userToEdit; // <-- 2. Variável para guardar o utilizador que estamos a editar
 
     /**
-     * Construtor para ADICIONAR um novo utilizador.
+     * Constrói a janela de diálogo no modo de "Adicionar Novo Utilizador".
+     *
+     * @param owner A janela pai ({@link UserManagementWindow}) à qual este diálogo está associado.
      */
     public UserDialog(Dialog owner) {
         super(owner, "Adicionar Novo Utilizador", true);
@@ -35,7 +44,11 @@ public class UserDialog extends JDialog {
     }
 
     /**
-     * Construtor para EDITAR um utilizador existente.
+     * Constrói a janela de diálogo no modo de "Editar Utilizador Existente".
+     *
+     * @param owner A janela pai ({@link UserManagementWindow}) à qual este diálogo está associado.
+     * @param userToEdit O objeto {@link User} a ser editado. Os campos do formulário
+     * serão pré-preenchidos com os dados deste utilizador.
      */
     public UserDialog(Dialog owner, User userToEdit) {
         super(owner, "Editar Utilizador", true);
@@ -100,7 +113,12 @@ public class UserDialog extends JDialog {
     }
 
     /**
-     * Lida com o evento de clique no botão Salvar.
+     * Lida com o evento de clique no botão "Salvar", tratando tanto da adição como da edição.
+     * <p>
+     * Valida os campos de utilizador e senha. Se estiver no modo de adição, chama
+     * o método {@code addUser} do {@link DatabaseManager}. Se estiver no modo de edição,
+     * chama o método {@code updateUser}. A senha só é atualizada se o campo
+     * correspondente for preenchido durante uma edição.
      */
     private void onSave() {
         String username = usernameField.getText().trim();
@@ -118,7 +136,7 @@ public class UserDialog extends JDialog {
                 JOptionPane.showMessageDialog(this, "A senha não pode estar vazia ao criar um novo utilizador.", "Erro de Validação", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            boolean success = DatabaseManager.addUser(username, password, role);
+            boolean success = DatabaseManager.getInstance().addUser(username, password, role);
             if (success) {
                 saved = true;
                 dispose();
@@ -126,11 +144,11 @@ public class UserDialog extends JDialog {
                 JOptionPane.showMessageDialog(this, "Não foi possível adicionar o utilizador.\nO nome de utilizador pode já existir.", "Erro", JOptionPane.ERROR_MESSAGE);
             }
         } else { // Estamos a EDITAR
-            boolean success = DatabaseManager.updateUser(userToEdit.id(), username, role);
+            boolean success = DatabaseManager.getInstance().updateUser(userToEdit.id(), username, role);
 
             // Apenas atualiza a senha se o campo não estiver vazio
             if (!password.isEmpty()) {
-                success = success && DatabaseManager.updateUserPassword(userToEdit.id(), password); // <-- Corrigido para userToEdit
+                success = success && DatabaseManager.getInstance().updateUserPassword(userToEdit.id(), password);
             }
 
             if (success) {

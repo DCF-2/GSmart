@@ -14,11 +14,11 @@ import java.util.stream.Stream;
 
 /**
  * Uma janela de UI dedicada a exibir os logs de reconexão da aplicação.
- *
+ * <p>
  * Esta classe foca-se em ler o ficheiro de log específico de reconexões
- * (ex: reconnection.log) e apresentar o seu conteúdo. Isto permite isolar
- * e analisar facilmente os eventos de perda e restabelecimento de conexão
- * das pipelines, facilitando a depuração de problemas de rede.
+ * (ex: reconnection.log) e apresentar o seu conteúdo de forma colorida,
+ * o que permite isolar e analisar facilmente os eventos de perda e
+ * restabelecimento de conexão das pipelines.
  */
 public class ReconnectionLogViewer extends JFrame {
 

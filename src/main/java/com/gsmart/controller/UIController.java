@@ -1,19 +1,19 @@
 package main.java.com.gsmart.controller;
 
 import main.java.com.gsmart.GSmartGui;
-import main.java.com.gsmart.Gui.AlertRuleTableModel;
-import main.java.com.gsmart.Gui.InsightRuleTableModel;
-import main.java.com.gsmart.Gui.MetricTableModel;
 import main.java.com.gsmart.Gui.SystemMetricCellRenderer;
-import main.java.com.gsmart.Gui.panels.DashboardPanel;
 import javax.imageio.ImageIO;
-
 import javax.swing.*;
 import java.awt.*;
 
 /**
  * Controlador responsável pela construção e montagem de todos os componentes
  * da interface gráfica (UI) da aplicação GSmart.
+ * <p>
+ * A sua principal função é inicializar a janela principal e organizar os vários
+ * painéis (Dashboard, Configuração de Pipeline, Regras, etc.) dentro de um
+ * {@link java.awt.CardLayout}, que permite a navegação entre as diferentes
+ * secções da aplicação.
  */
 public class UIController {
 
@@ -24,36 +24,52 @@ public class UIController {
         initializeUI();
     }
 
+    /**
+     * Configura a janela principal e inicializa todos os painéis da UI.
+     * <p>
+     * Este método define as propriedades da janela principal (título, tamanho, ícone)
+     * e monta os painéis de conteúdo, como o Dashboard e os ecrãs de configuração,
+     * dentro de um painel com CardLayout para permitir a navegação.
+     */
     private void initializeUI() {
         // --- Configuração da Janela Principal ---
         view.setTitle("GSmart - Configurador de Pipeline e Alertas v6.0");
         view.setExtendedState(JFrame.MAXIMIZED_BOTH);
         view.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         view.setLocationRelativeTo(null);
+        view.setLayout(new BorderLayout());
 
         try {
             Image icon = ImageIO.read(view.getClass().getResource("/gsmart_icon.png"));
             view.setIconImage(icon);
         } catch (Exception e) {
-            // Se não encontrar o ícone, a aplicação continua a funcionar, apenas regista o erro.
             System.err.println("Erro ao carregar o ícone da aplicação: " + e.getMessage());
         }
 
-        // --- Montagem dos Painéis ---
+        JPanel contentPanel = new JPanel(new CardLayout());
         JPanel pipelineConfigPanel = createPipelineConfigPanel();
         JPanel alertRulesPanel = createAlertRulesPanel();
         JPanel insightRulesPanel = createInsightRulesPanel();
 
-        // --- Montagem Final com Separadores ---
-        JTabbedPane mainTabbedPane = new JTabbedPane();
-        mainTabbedPane.addTab("Dashboard", view.getDashboardPanel());
-        mainTabbedPane.addTab("Configuração da Pipeline", pipelineConfigPanel);
-        mainTabbedPane.addTab("Regras de Alerta", alertRulesPanel);
-        mainTabbedPane.addTab("Regras de Alarmes", insightRulesPanel);
+        contentPanel.add(view.getDashboardPanel(), "Dashboard");
+        contentPanel.add(pipelineConfigPanel, "Configurar Pipeline");
+        contentPanel.add(alertRulesPanel, "Regras de Alerta");
+        contentPanel.add(insightRulesPanel, "Regras de Alarme");
 
-        view.setContentPane(mainTabbedPane);
+        view.add(view.getSideMenuPanel(), BorderLayout.WEST);
+        view.add(contentPanel, BorderLayout.CENTER);
+        view.setContentPanel(contentPanel);
     }
 
+    /**
+     * Cria e monta o painel de configuração de pipelines.
+     * <p>
+     * Este painel agrega todos os componentes necessários para configurar uma nova
+     * pipeline, incluindo a seleção da fonte de dados, o destino, as configurações
+     * de serviços auxiliares (MQTT, Telegram) e a tabela de métricas.
+     *
+     * @return O {@link JPanel} completo para a configuração de pipelines.
+     */
     private JPanel createPipelineConfigPanel() {
         // --- Painel Superior (Fonte de Dados e Destino) ---
         JPanel topConfigurationPanel = createTopConfigurationPanel();
@@ -61,48 +77,64 @@ public class UIController {
         // --- Tabela de Métricas ---
         JScrollPane keysScrollPane = createMetricsTablePanel();
 
-        // --- Painel de Ações ---
-        JPanel bottomPanel = createBottomActionPanel();
+        // --- ALTERAÇÃO: Adiciona o botão de ajuda abaixo da tabela ---
+        JPanel helpPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        helpPanel.add(view.getExpressionHelpButton());
+
+        // Cria um painel central para agrupar a tabela e o painel de ajuda
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(keysScrollPane, BorderLayout.CENTER);
+        centerPanel.add(helpPanel, BorderLayout.SOUTH);
 
         // --- Montagem Final ---
         JPanel pipelineConfigPanel = new JPanel(new BorderLayout(5, 5));
         pipelineConfigPanel.add(topConfigurationPanel, BorderLayout.NORTH);
-        pipelineConfigPanel.add(keysScrollPane, BorderLayout.CENTER);
-        pipelineConfigPanel.add(bottomPanel, BorderLayout.SOUTH);
+        pipelineConfigPanel.add(centerPanel, BorderLayout.CENTER); // Adiciona o novo painel central
+
+        // Adiciona APENAS o botão de iniciar num novo painel inferior simples
+        JPanel startPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 15));
+        startPanel.add(view.getStartButton());
+        pipelineConfigPanel.add(startPanel, BorderLayout.SOUTH);
+
         return pipelineConfigPanel;
     }
 
+    /**
+     * Cria e agrega o painel superior da secção de configuração de pipelines.
+     * <p>
+     * Este painel contém todos os sub-painéis relacionados com a configuração da
+     * origem dos dados (ThingsBoard/Base de Dados), do destino (Power BI/Fabric) e dos
+     * serviços auxiliares (MQTT/Telegram).
+     *
+     * @return Um {@link JPanel} que contém todos os painéis de configuração superior.
+     */
     private JPanel createTopConfigurationPanel() {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 
-        // Fonte de Dados
         JPanel sourceSelectionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         sourceSelectionPanel.setBorder(BorderFactory.createTitledBorder("Selecione a Fonte de Dados"));
         sourceSelectionPanel.add(new JLabel("Tipo de Fonte:"));
         sourceSelectionPanel.add(view.getSourceSelector());
         topPanel.add(sourceSelectionPanel);
 
-        // Painel CardLayout para Configurações da Fonte
         createDataSourceConfigPanels();
         topPanel.add(view.getSourceConfigCardPanel());
 
-        // Destino
         JPanel destinationPanel = createDestinationPanel();
         topPanel.add(destinationPanel);
 
-        // Serviços Auxiliares
         JPanel auxiliaryServicesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         auxiliaryServicesPanel.setBorder(BorderFactory.createTitledBorder("Configurar Serviços Auxiliares"));
         auxiliaryServicesPanel.add(new JLabel("URL do Broker MQTT:"));
         auxiliaryServicesPanel.add(view.getMqttBrokerUrlField());
         topPanel.add(auxiliaryServicesPanel);
 
-        // Telegram
         JPanel telegramPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         telegramPanel.setBorder(BorderFactory.createTitledBorder("Configurar Notificações do Telegram"));
         telegramPanel.add(new JLabel("Token do Bot:"));
         telegramPanel.add(view.getTelegramTokenField());
+        telegramPanel.add(view.getTelegramHelpButton());
         telegramPanel.add(new JLabel("Chat ID:"));
         telegramPanel.add(view.getTelegramChatIdField());
         topPanel.add(telegramPanel);
@@ -110,8 +142,15 @@ public class UIController {
         return topPanel;
     }
 
+    /**
+     * Constrói os painéis de configuração específicos para cada fonte de dados.
+     * <p>
+     * Este método cria os painéis para o ThingsBoard e para a Base de Dados,
+     * organizando os seus respetivos campos de texto, seletores e botões de conexão.
+     * Os painéis são depois adicionados a um {@link java.awt.CardLayout} para
+     * permitir a alternância entre eles.
+     */
     private void createDataSourceConfigPanels() {
-        // Painel ThingsBoard
         JPanel tbPanel = view.getThingsboardConfigPanel();
         tbPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbcTb = new GridBagConstraints();
@@ -126,7 +165,6 @@ public class UIController {
         gbcTb.gridx = 0; gbcTb.gridy = 2; gbcTb.gridwidth = 1; tbPanel.add(new JLabel("Dispositivo:"), gbcTb);
         gbcTb.gridx = 1; gbcTb.gridwidth = 3; tbPanel.add(view.getDeviceSelector(), gbcTb);
 
-        // Painel Banco de Dados
         JPanel dbPanel = view.getDatabaseConfigPanel();
         dbPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbcDb = new GridBagConstraints();
@@ -146,12 +184,23 @@ public class UIController {
         view.getSourceConfigCardPanel().add(dbPanel, "Banco de Dados Espelho");
     }
 
+    /**
+     * Cria e monta o painel para a configuração do destino dos dados.
+     * <p>
+     * Contém um JComboBox para selecionar o tipo de destino (Power BI ou Fabric) e um
+     * painel com {@link java.awt.CardLayout} que exibe os campos de configuração
+     * apropriados (URL de Push ou Connection String) com base na seleção.
+     *
+     * @return O {@link JPanel} completo para a configuração do destino.
+     */
     private JPanel createDestinationPanel() {
         JPanel destinationPanel = new JPanel(new BorderLayout(5, 5));
         destinationPanel.setBorder(BorderFactory.createTitledBorder("Configurar Destino dos Dados"));
         JPanel destinationSelectionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         destinationSelectionPanel.add(new JLabel("Tipo de Destino:"));
         destinationSelectionPanel.add(view.getDestinationSelector());
+
+        // O painel de seleção é adicionado ao painel principal (destinationPanel).
         destinationPanel.add(destinationSelectionPanel, BorderLayout.NORTH);
 
         JPanel pbiPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -168,8 +217,19 @@ public class UIController {
         return destinationPanel;
     }
 
+    /**
+     * Cria e configura o painel que contém a tabela de métricas.
+     * <p>
+     * Este método configura a JTable para exibir as métricas, ajustando a largura das
+     * colunas e aplicando um renderizador customizado ({@link main.java.com.gsmart.Gui.SystemMetricCellRenderer})
+     * para diferenciar visualmente as métricas de sistema.
+     *
+     * @return Um {@link JScrollPane} contendo a tabela de métricas configurada.
+     */
     private JScrollPane createMetricsTablePanel() {
         JTable metricsTable = view.getMetricsTable();
+        metricsTable.setShowGrid(true);
+        metricsTable.setGridColor(Color.LIGHT_GRAY);
         SystemMetricCellRenderer systemMetricRenderer = new SystemMetricCellRenderer();
         metricsTable.setDefaultRenderer(Object.class, systemMetricRenderer);
         metricsTable.setDefaultRenderer(Boolean.class, systemMetricRenderer);
@@ -183,81 +243,92 @@ public class UIController {
         return keysScrollPane;
     }
 
-    private JPanel createBottomActionPanel() {
-        // Painel de Ações da Pipeline (Esquerda)
-        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 15));
-        actionPanel.add(view.getStartButton());
-
-        // Painel de Administração (Direita)
-        JPanel adminPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        adminPanel.add(view.getRunInBackgroundCheckBox());
-        adminPanel.add(new JSeparator(SwingConstants.VERTICAL));
-        adminPanel.add(view.getManageUsersButton());
-
-        JButton autoStartButton = new JButton("Gerir Início Automático");
-        autoStartButton.addActionListener(e -> view.showAutoStartManager());
-        adminPanel.add(autoStartButton);
-
-        adminPanel.add(view.getMonitoringButton());
-        adminPanel.add(view.getStopAllButton());
-
-        JPopupMenu logsPopupMenu = new JPopupMenu();
-        JMenuItem generalLogItem = new JMenuItem("Log Geral");
-        generalLogItem.addActionListener(e -> view.getGlobalLogViewer().setVisible(true));
-        JMenuItem reconexLogItem = new JMenuItem("Log de Reconexão");
-        reconexLogItem.addActionListener(e -> view.showReconnectionLog());
-        logsPopupMenu.add(generalLogItem);
-        logsPopupMenu.add(reconexLogItem);
-        JButton logsButton = new JButton("Ver Logs");
-        logsButton.addActionListener(e -> logsPopupMenu.show(logsButton, 0, logsButton.getHeight()));
-        adminPanel.add(logsButton);
-
-        adminPanel.add(new JSeparator(SwingConstants.VERTICAL));
-        JButton helpButton = new JButton("Ajuda");
-        helpButton.addActionListener(e -> view.showHelpWindow());
-        adminPanel.add(helpButton);
-
-        // Painel Inferior Completo
-        JPanel bottomPanel = new JPanel(new BorderLayout(10, 0));
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
-        bottomPanel.add(actionPanel, BorderLayout.WEST);
-        bottomPanel.add(adminPanel, BorderLayout.CENTER);
-        return bottomPanel;
-    }
-
+    /**
+     * Cria e monta o painel completo para a gestão de Regras de Alerta.
+     * <p>
+     * O painel inclui um filtro por categoria, a tabela principal que exibe as regras
+     * e um painel inferior com os botões de ação (adicionar, editar, remover,
+     * importar/exportar).
+     *
+     * @return O {@link JPanel} completo para a gestão de regras de alerta.
+     */
     private JPanel createAlertRulesPanel() {
         JPanel alertRulesPanel = new JPanel(new BorderLayout(5, 5));
         alertRulesPanel.setBorder(BorderFactory.createTitledBorder("Configurador de Alertas Customizados"));
 
+        // --- PAINEL DE FILTRO ---
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        filterPanel.add(new JLabel("Filtrar por Categoria:"));
+        filterPanel.add(view.getAlertCategoryFilter());
+        alertRulesPanel.add(filterPanel, BorderLayout.NORTH);
+
         JTable alertRulesTable = view.getAlertRulesTable();
+        alertRulesTable.setShowGrid(true);
+        alertRulesTable.setGridColor(Color.LIGHT_GRAY);
         alertRulesTable.setFillsViewportHeight(true);
         alertRulesTable.getColumnModel().getColumn(0).setMaxWidth(50);
         alertRulesPanel.add(new JScrollPane(alertRulesTable), BorderLayout.CENTER);
 
         JPanel ruleButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        ruleButtonsPanel.add(new JButton("Adicionar Regra"));
-        ruleButtonsPanel.add(new JButton("Editar Regra"));
-        ruleButtonsPanel.add(new JButton("Remover Regra"));
-        view.setAlertRuleButtons(ruleButtonsPanel); // Passa o painel para a view
+        ruleButtonsPanel.add(view.getAddAlertRuleButton());
+        ruleButtonsPanel.add(view.getEditAlertRuleButton());
+        ruleButtonsPanel.add(view.getRemoveAlertRuleButton());
+        ruleButtonsPanel.add(view.getDuplicateAlertRuleButton());
+        ruleButtonsPanel.add(Box.createHorizontalStrut(20));
+
+        // Adiciona ToolTips aqui
+        view.getImportAlertRulesButton().setToolTipText("Importa TODAS as regras (Alertas e Alarmes) de um ficheiro, substituindo as atuais.");
+        view.getExportAlertRulesButton().setToolTipText("Exporta TODAS as regras (Alertas e Alarmes) para um único ficheiro de backup.");
+
+        ruleButtonsPanel.add(view.getImportAlertRulesButton());
+        ruleButtonsPanel.add(view.getExportAlertRulesButton());
+
+        view.setAlertRuleButtons(ruleButtonsPanel);
         alertRulesPanel.add(ruleButtonsPanel, BorderLayout.SOUTH);
 
         return alertRulesPanel;
     }
 
+    /**
+     * Cria e monta o painel completo para a gestão de Regras de Alarme (Insights).
+     * <p>
+     * De forma semelhante ao painel de alertas, este painel inclui um filtro, a tabela
+     * de regras de alarme e os botões de ação correspondentes.
+     *
+     * @return O {@link JPanel} completo para a gestão de regras de alarme.
+     */
     private JPanel createInsightRulesPanel() {
         JPanel insightRulesPanel = new JPanel(new BorderLayout(5, 5));
         insightRulesPanel.setBorder(BorderFactory.createTitledBorder("Configurador de Alarmes Inteligentes"));
 
+        // --- PAINEL DE FILTRO ---
+        JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        filterPanel.add(new JLabel("Filtrar por Categoria:"));
+        filterPanel.add(view.getInsightCategoryFilter());
+        insightRulesPanel.add(filterPanel, BorderLayout.NORTH);
+
         JTable insightRulesTable = view.getInsightRulesTable();
+        insightRulesTable.setShowGrid(true);
+        insightRulesTable.setGridColor(Color.LIGHT_GRAY);
         insightRulesTable.setFillsViewportHeight(true);
         insightRulesTable.getColumnModel().getColumn(0).setMaxWidth(50);
         insightRulesPanel.add(new JScrollPane(insightRulesTable), BorderLayout.CENTER);
 
         JPanel insightButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        insightButtonsPanel.add(new JButton("Adicionar Regra de Alarme"));
-        insightButtonsPanel.add(new JButton("Editar Regra de Alarme"));
-        insightButtonsPanel.add(new JButton("Remover Regra de Alarme"));
-        view.setInsightRuleButtons(insightButtonsPanel); // Passa o painel para a view
+        insightButtonsPanel.add(view.getAddInsightRuleButton());
+        insightButtonsPanel.add(view.getEditInsightRuleButton());
+        insightButtonsPanel.add(view.getRemoveInsightRuleButton());
+        insightButtonsPanel.add(view.getDuplicateInsightRuleButton());
+        insightButtonsPanel.add(Box.createHorizontalStrut(20));
+
+        // Adiciona ToolTips aqui
+        view.getImportInsightRulesButton().setToolTipText("Importa TODAS as regras (Alertas e Alarmes) de um ficheiro, substituindo as atuais.");
+        view.getExportInsightRulesButton().setToolTipText("Exporta TODAS as regras (Alertas e Alarmes) para um único ficheiro de backup.");
+
+        insightButtonsPanel.add(view.getImportInsightRulesButton());
+        insightButtonsPanel.add(view.getExportInsightRulesButton());
+
+        view.setInsightRuleButtons(insightButtonsPanel);
         insightRulesPanel.add(insightButtonsPanel, BorderLayout.SOUTH);
 
         return insightRulesPanel;

@@ -110,6 +110,14 @@ public class TaskManagerWindow extends JFrame {
         });
     }
 
+    @Override
+    public void dispose() {
+        // Garante que o ouvinte seja removido antes de a janela ser destruída
+        Runnable tableUpdater = () -> tableModel.updateTasks(this.pipelineManager.getRunningTasks());
+        pipelineManager.removeTaskListUpdatedListener(tableUpdater);
+        super.dispose(); // Chama o comportamento padrão de dispose
+    }
+
     /**
      * Atualiza a lista de tarefas exibidas na tabela da janela.
      * Este método é chamado externamente para sincronizar a UI com o estado atual.
@@ -174,11 +182,12 @@ public class TaskManagerWindow extends JFrame {
     }
 
     /**
-     * Renderizador de células customizado para a tabela, responsável por dar
-     * feedback visual sobre o estado da tarefa.
-     *
-     * Altera a cor do texto com base no {@code TaskStatus} e destaca a cor de
-     * fundo da linha caso a tarefa tenha um alerta pendente que ainda não foi visto.
+     * Renderizador de células customizado, responsável por dar feedback visual sobre
+     * o estado da tarefa na tabela.
+     * <p>
+     * Altera a cor do texto com base no {@link main.java.com.gsmart.resources.TaskStatus}
+     * e destaca a cor de fundo da linha caso a tarefa tenha um alerta pendente que
+     * ainda não foi visto pelo utilizador.
      */
     private class StatusCellRenderer extends DefaultTableCellRenderer {
         @Override
@@ -212,11 +221,11 @@ public class TaskManagerWindow extends JFrame {
 
     // Renderer para as colunas de AÇÃO. A classe É UM BOTÃO.
     /**
-     * Renderizador de células que faz com que uma célula da tabela se pareça
-     * com um botão (JButton).
-     *
+     * Renderizador de células que faz com que uma célula da tabela se pareça com um botão (JButton).
+     * <p>
      * É usado para as colunas de ação ("Visualizar", "Parar", "Reiniciar"),
-     * fornecendo um feedback visual claro de que a célula é clicável.
+     * fornecendo um feedback visual claro de que a célula é clicável e alterando a
+     * sua cor com base na ação (ex: vermelho para "Parar").
      */
     private class ButtonColumnRenderer extends JButton implements TableCellRenderer {
         public ButtonColumnRenderer() {

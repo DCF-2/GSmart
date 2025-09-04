@@ -17,10 +17,16 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Controlador responsável por toda a lógica de interação com as fontes de dados,
- * como conexões, busca de metadados (dispositivos, tabelas) e carregamento de métricas.
+ * Controlador responsável por toda a lógica de interação com as fontes de dados.
+ * <p>
+ * Esta classe isola a {@link main.java.com.gsmart.GSmartGui} dos detalhes de implementação
+ * de como se conectar e obter metadados (como listas de dispositivos, perfis, tabelas e
+ * métricas) das diferentes fontes de dados suportadas, como o ThingsBoard e bases de
+ * dados JDBC.
+ * <p>
+ * Utiliza {@link javax.swing.SwingWorker} para executar operações de rede em segundo plano,
+ * evitando que a interface do utilizador bloqueie durante as conexões.
  */
-
 public class DataSourceController {
 
     private final GSmartGui view;
@@ -29,6 +35,13 @@ public class DataSourceController {
         this.view = view;
     }
 
+    /**
+     * Inicia uma tentativa de conexão assíncrona com o servidor ThingsBoard.
+     * <p>
+     * Utiliza um {@link SwingWorker} para realizar a chamada de rede em segundo plano.
+     * Atualiza a UI para mostrar o estado da conexão (conectando, sucesso ou falha)
+     * e, em caso de sucesso, chama o método para carregar os perfis de dispositivo.
+     */
     public void connectToThingsboard() {
         view.getTbStatusLabel().setText("Conectando...");
         view.getTbStatusLabel().setForeground(Color.ORANGE);
@@ -64,6 +77,13 @@ public class DataSourceController {
         }.execute();
     }
 
+    /**
+     * Inicia uma tentativa de conexão assíncrona com a base de dados.
+     * <p>
+     * Utiliza um {@link SwingWorker} para realizar a conexão JDBC e buscar a lista de
+     * tabelas disponíveis em segundo plano. Atualiza a UI com o estado da conexão
+     * e, em caso de sucesso, preenche o seletor de tabelas com os resultados.
+     */
     public void connectToDatabase() {
         view.getDbStatusLabel().setText("Conectando...");
         view.getDbStatusLabel().setForeground(Color.ORANGE);
@@ -102,6 +122,13 @@ public class DataSourceController {
         }.execute();
     }
 
+    /**
+     * Carrega de forma assíncrona a lista de perfis de dispositivo do servidor ThingsBoard.
+     * <p>
+     * Utiliza um {@link SwingWorker} para fazer a chamada à API em segundo plano.
+     * Após a conclusão, preenche o JComboBox de perfis de dispositivo na UI com os
+     * resultados obtidos e tenta manter o perfil anteriormente selecionado.
+     */
     public void loadDeviceProfiles() {
         Object previouslySelected = view.getDeviceProfileSelector().getSelectedItem();
         view.getTbConnectButton().setEnabled(false);
@@ -135,6 +162,14 @@ public class DataSourceController {
         }.execute();
     }
 
+    /**
+     * Carrega de forma assíncrona a lista de dispositivos que pertencem a um perfil selecionado.
+     * <p>
+     * Este método é acionado quando o utilizador seleciona um perfil de dispositivo na UI.
+     * Utiliza um {@link SwingWorker} para buscar os dispositivos correspondentes e, em caso
+     * de sucesso, preenche o seletor de dispositivos e aciona o carregamento das
+     * suas métricas.
+     */
     public void loadDevicesByProfile() {
         DeviceProfile selectedProfile = (DeviceProfile) view.getDeviceProfileSelector().getSelectedItem();
         if (selectedProfile == null) {
@@ -165,6 +200,14 @@ public class DataSourceController {
         }.execute();
     }
 
+    /**
+     * Carrega de forma assíncrona as métricas (chaves de telemetria ou colunas de tabela)
+     * disponíveis para a fonte de dados selecionada.
+     * <p>
+     * Este método determina se a fonte selecionada é o ThingsBoard ou uma base de dados
+     * e invoca a chamada apropriada em segundo plano usando um {@link SwingWorker}.
+     * Os resultados são então usados para popular a tabela de métricas na UI.
+     */
     public void loadAvailableKeys() {
         String selectedSource = (String) view.getSourceSelector().getSelectedItem();
         try {
@@ -202,6 +245,16 @@ public class DataSourceController {
         }
     }
 
+    /**
+     * Processa o resultado do {@link SwingWorker} que carrega as métricas/colunas.
+     * <p>
+     * Este método é chamado na Event Dispatch Thread (EDT) do Swing após a conclusão
+     * da busca de métricas. Ele atualiza o {@link main.java.com.gsmart.Gui.MetricTableModel}
+     * com as novas métricas, tentando preservar quaisquer configurações (como aliases
+     * ou expressões) que o utilizador possa ter guardado de sessões anteriores.
+     *
+     * @param worker O SwingWorker que contém o resultado da operação de busca.
+     */
     private void handleKeysLoaded(SwingWorker<List<String>, Void> worker) {
         try {
             List<String> keys = worker.get();
@@ -219,13 +272,13 @@ public class DataSourceController {
                     savedConfigMap.getOrDefault(key, new MetricConfig(key))
             ).collect(Collectors.toList());
 
-            newConfigs.add(0, new MetricConfig("AlertaCritico", true, true));
-            newConfigs.add(0, new MetricConfig("timestamp", true, true));
-            newConfigs.add(0, new MetricConfig("UltimoAlarme", true, true));
-            newConfigs.add(0, new MetricConfig("UltimoAlerta", true, true));
-            newConfigs.add(0, new MetricConfig("DataDev", true, true));
-            newConfigs.add(0, new MetricConfig("HoraDev", true, true));
-            newConfigs.add(0, new MetricConfig("OrigemDados", true, true));
+            newConfigs.addFirst(new MetricConfig("AlertaCritico", true, true));
+            newConfigs.addFirst(new MetricConfig("timestamp", true, true));
+            newConfigs.addFirst(new MetricConfig("UltimoAlarme", true, true));
+            newConfigs.addFirst(new MetricConfig("UltimoAlerta", true, true));
+            newConfigs.addFirst(new MetricConfig("DataDev", true, true));
+            newConfigs.addFirst(new MetricConfig("HoraDev", true, true));
+            newConfigs.addFirst(new MetricConfig("OrigemDados", true, true));
 
             view.getMetricTableModel().setMetrics(newConfigs);
 
@@ -234,6 +287,22 @@ public class DataSourceController {
         }
     }
 
+    /**
+     * Cria e retorna uma instância da {@link main.java.com.gsmart.resources.IDataSource}
+     * com base nas configurações selecionadas na interface do utilizador.
+     * <p>
+     * Este método funciona como uma "fábrica" (factory), lendo a seleção atual da UI
+     * para instanciar e configurar o objeto de fonte de dados correto (seja
+     * {@link main.java.com.gsmart.sources.ThingsBoardSource} ou
+     * {@link main.java.com.gsmart.sources.DatabaseSource}) que será usado pela pipeline.
+     * Antes de retornar, testa a conexão com a fonte de dados para garantir que está operacional.
+     *
+     * @param originalKeys A lista de nomes de métricas originais que a fonte de dados
+     * deve buscar.
+     * @return Uma instância configurada e pronta a usar da IDataSource.
+     * @throws Exception se a fonte de dados selecionada for inválida, se faltar alguma
+     * configuração ou se o teste de conexão falhar.
+     */
     public IDataSource createSelectedDataSource(List<String> originalKeys) throws Exception {
         String selectedSource = (String) view.getSourceSelector().getSelectedItem();
         if ("Thingsboard API".equals(selectedSource)) {
@@ -255,10 +324,13 @@ public class DataSourceController {
     // --- MÉTODOS AUXILIARES MOVIDOS DA GSmartGui ---
 
     /**
-     * Obtém e valida a URL do servidor ThingsBoard a partir do campo de texto correspondente.
-     * Lança uma IllegalStateException se o campo estiver vazio.
+     * Obtém e valida a URL do servidor ThingsBoard a partir do campo de texto correspondente na UI.
+     * <p>
+     * Lança uma {@link IllegalStateException} se o campo estiver vazio, garantindo que
+     * nenhuma operação de rede seja tentada com uma URL inválida.
      *
      * @return A URL do ThingsBoard como uma String.
+     * @throws IllegalStateException se a URL não for fornecida na UI.
      */
     private String getThingsboardUrl() {
         String url = view.getThingsboardUrlField().getText().trim();

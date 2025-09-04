@@ -17,11 +17,11 @@ import java.util.function.Consumer;
 
 /**
  * Representa a janela de monitorização detalhada para uma única tarefa de pipeline.
- *
+ * <p>
  * Esta janela fornece uma visão em tempo real do estado de uma pipeline específica,
- * exibindo o seu estado atual (a correr, erro, etc.) e uma área de log para
- * insights e alertas gerados por essa tarefa.
- *
+ * exibindo o seu estado atual (a correr, erro, etc.), um cronómetro do tempo de
+ * execução e uma área de log para os insights e alertas gerados por essa tarefa.
+ * <p>
  * Cada instância desta classe está associada a uma única {@code PipelineTask}.
  *
  * @see main.java.com.gsmart.pipeline.PipelineTask
@@ -36,6 +36,15 @@ public class MonitoringWindow extends JFrame implements GSmartListener {
     private final Timer executionTimer; // Timer para atualizar o cronômetro
 
     // Construtor foi simplificado
+    /**
+     * Constrói a janela de monitorização para uma tarefa específica.
+     *
+     * @param task A {@link PipelineTask} a ser monitorizada. O título da janela e o
+     * cronómetro são inicializados com base nesta tarefa.
+     * @param onDisposeRequest Um callback {@link Consumer} que é executado quando a
+     * janela é fechada, permitindo que o {@link main.java.com.gsmart.pipeline.PipelineManager}
+     * limpe a referência a esta janela.
+     */
     public MonitoringWindow(PipelineTask task, Consumer<MonitoringWindow> onDisposeRequest) {
         setTitle("Monitor: " + task.getDescription());
         setSize(700, 500);

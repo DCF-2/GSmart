@@ -1,0 +1,6 @@
+16:07:19.982 [main] INFO  m.java.com.gsmart.db.DatabaseManager - Ficheiro da base de dados não encontrado. A criar novo em: C:\Users\Desn01\Documents\GSmart\target\gsmart_users.db
+16:07:19.999 [main] INFO  m.java.com.gsmart.db.DatabaseManager - A verificar a estrutura da base de dados...
+16:07:20.106 [main] INFO  m.java.com.gsmart.db.DatabaseManager - Utilizador 'admin' não encontrado. A criar utilizador administrador padrão.
+16:07:20.314 [main] INFO  m.java.com.gsmart.db.DatabaseManager - Utilizador 'admin' com senha padrão criado com sucesso.
+16:07:20.314 [main] INFO  m.java.com.gsmart.db.DatabaseManager - Base de dados inicializada com sucesso.
+16:07:28.111 [AWT-EventQueue-0] INFO  m.java.com.gsmart.db.DatabaseManager - Utilizador 'admin' autenticado com sucesso com o perfil 'ADMINISTRATOR'.

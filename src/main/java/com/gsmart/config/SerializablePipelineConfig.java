@@ -9,8 +9,10 @@ import java.util.Map;
 
 /**
  * Uma representação "salvável" da configuração de uma pipeline.
- * Esta classe armazena os parâmetros necessários para reconstruir uma IDataSource
- * e uma PipelineConfiguration completa, uma vez que a IDataSource em si não pode ser serializada.
+ * <p>
+ * Esta classe armazena os parâmetros necessários para reconstruir uma {@link main.java.com.gsmart.resources.IDataSource}
+ * e uma {@link PipelineConfiguration} completa, uma vez que a IDataSource em si não pode ser serializada,
+ * permitindo que as sessões de pipeline sejam guardadas e restauradas.
  */
 public class SerializablePipelineConfig implements Serializable {
     private static final long serialVersionUID = 2L; // Versão atualizada
@@ -32,6 +34,21 @@ public class SerializablePipelineConfig implements Serializable {
     private final Map<String, String> dataSourceParams;
 
     // --- Construtor Atualizado com 10 argumentos ---
+
+    /**
+     * Constrói uma representação "salvável" da configuração de uma pipeline.
+     *
+     * @param destinationType O tipo de destino dos dados (POWER_BI ou FABRIC).
+     * @param destinationEndpoint A URL ou Connection String do destino.
+     * @param mqttBrokerUrl O endereço do broker MQTT.
+     * @param telegramToken O token do bot do Telegram.
+     * @param telegramChatId O ID do chat do Telegram.
+     * @param metricConfigs A lista de configurações de métricas.
+     * @param alertRules A lista de regras de alerta.
+     * @param insightRules A lista de regras de alarme.
+     * @param dataSourceType Uma string que identifica o tipo da fonte de dados (ex: "ThingsBoard").
+     * @param dataSourceParams Um mapa com os parâmetros necessários para reconstruir a fonte de dados.
+     */
     public SerializablePipelineConfig(DestinationType destinationType, String destinationEndpoint, String mqttBrokerUrl, String telegramToken, String telegramChatId, List<MetricConfig> metricConfigs, List<AlertRule> alertRules, List<InsightRule> insightRules, String dataSourceType, Map<String, String> dataSourceParams) {
         this.destinationType = destinationType;
         this.destinationEndpoint = destinationEndpoint;

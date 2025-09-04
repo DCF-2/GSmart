@@ -7,6 +7,7 @@ import main.java.com.gsmart.config.PipelineConfiguration;
 import main.java.com.gsmart.Gui.windows.ConnectionErrorDialog;
 import main.java.com.gsmart.Gui.windows.LogViewerWindow;
 import main.java.com.gsmart.Gui.windows.MonitoringWindow;
+import main.java.com.gsmart.services.DashboardLogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,18 +19,21 @@ import java.util.function.Consumer;
 
 /**
  * Orquestrador central para o ciclo de vida de múltiplas tarefas de pipeline ({@link PipelineTask}).
+ * <p>
  * Esta classe atua como o "maestro" do sistema, responsável por instanciar,
  * gerir e finalizar os processos de monitorização de dados. Ela faz a ponte
  * entre as configurações definidas na {@link main.java.com.gsmart.GSmartGui} e a execução
  * real das {@link DataPipeline} em threads separadas.
- *<h2>Principais Responsabilidades:</h2>
- *<ul>
- *<li>Lançar novas tarefas de pipeline com base numa {@link main.java.com.gsmart.config.PipelineConfiguration} fornecida pela GUI.</li>
- *<li>Manter e fornecer uma lista atualizada de todas as tarefas em execução.</li>
- *<li>Gerir a comunicação entre a lógica de fundo ({@code DataPipeline}) e a interface gráfica (GUI), utilizando um {@link main.java.com.gsmart.resources.GSmartListener}.</li>
- *<li>Controlar a exibição de janelas de monitorização individuais e diálogos de erro de conexão.</li>
- *<li>Fornecer métodos para reiniciar ou parar tarefas de forma segura.</li>
- *</ul>
+ *
+ * <h2>Principais Responsabilidades:</h2>
+ * <ul>
+ * <li>Lançar novas tarefas de pipeline com base numa {@link main.java.com.gsmart.config.PipelineConfiguration}.</li>
+ * <li>Manter e fornecer uma lista atualizada de todas as tarefas em execução.</li>
+ * <li>Gerir a comunicação entre a lógica de fundo ({@code DataPipeline}) e a interface gráfica (GUI).</li>
+ * <li>Controlar a exibição de janelas de monitorização e diálogos de erro de conexão.</li>
+ * <li>Fornecer métodos para reiniciar ou parar tarefas de forma segura.</li>
+ * </ul>
+ *
  * @see main.java.com.gsmart.pipeline.PipelineTask
  * @see main.java.com.gsmart.pipeline.DataPipeline
  * @see main.java.com.gsmart.GSmartGui
@@ -42,6 +46,7 @@ public class PipelineManager {
     private LogViewerWindow globalLogViewer;
     private Component parentComponentForDialogs;
     private final List<Runnable> listeners = new ArrayList<>();
+    private final List<Runnable> alarmListeners = new ArrayList<>();
 
     /**
      * Define um callback (Runnable) a ser executado sempre que a lista de tarefas
@@ -50,13 +55,28 @@ public class PipelineManager {
      *
      * @param onTaskListUpdated O Runnable a ser executado.
      */
-    public void setOnTaskListUpdated(Runnable onTaskListUpdated) { this.onTaskListUpdated = onTaskListUpdated; }
+    public void setOnTaskListUpdated(Runnable onTaskListUpdated) {
+        this.onTaskListUpdated = onTaskListUpdated;
+    }
 
 
-    public void setParentComponent(Component parentComponent) { this.parentComponentForDialogs = parentComponent; }
+    public void setParentComponent(Component parentComponent) {
+        this.parentComponentForDialogs = parentComponent;
+    }
 
 
-    public void setGlobalLogViewer(LogViewerWindow logViewer) { this.globalLogViewer = logViewer; }
+    public void setGlobalLogViewer(LogViewerWindow logViewer) {
+        this.globalLogViewer = logViewer;
+    }
+
+    /**
+     * Adiciona um "ouvinte" (listener) que será notificado sempre que a lista de tarefas em execução for alterada.
+     * <p>
+     * Isto permite que componentes da UI, como a {@link main.java.com.gsmart.Gui.windows.TaskManagerWindow},
+     * se atualizem automaticamente quando uma pipeline é iniciada ou parada.
+     *
+     * @param listener O Runnable a ser executado quando a lista de tarefas muda.
+     */
     public void addTaskListUpdatedListener(Runnable listener) {
         listeners.add(listener);
     }
@@ -64,6 +84,13 @@ public class PipelineManager {
     public void removeTaskListUpdatedListener(Runnable listener) {
         listeners.remove(listener);
     }
+
+    /**
+     * Notifica todos os ouvintes registados de que a lista de tarefas foi atualizada.
+     * <p>
+     * A notificação é executada na Event Dispatch Thread (EDT) do Swing para garantir
+     * a segurança ao atualizar componentes da interface gráfica.
+     */
     private void notifyUpdate() {
         // Notifica todos os ouvintes registados
         for (Runnable listener : listeners) {
@@ -78,18 +105,23 @@ public class PipelineManager {
      *
      * @return Uma nova lista contendo as tarefas em execução.
      */
-    public List<PipelineTask> getRunningTasks() { return new ArrayList<>(runningTasks); }
+    public List<PipelineTask> getRunningTasks() {
+        return new ArrayList<>(runningTasks);
+    }
 
     /**
-     * Lança um novo pipeline com base em uma configuração fornecida.
+     * Lança uma nova pipeline com base numa configuração fornecida.
+     * <p>
      * Este método instancia e configura todos os componentes necessários para uma nova
      * tarefa de monitoramento, incluindo a {@code DataPipeline}, a {@code Thread} de execução
-     * e o listener de eventos, encapsulando tudo em um objeto {@code PipelineTask}.
+     * e o listener de eventos, encapsulando tudo num objeto {@code PipelineTask}.
+     * <p>
+     * Antes de iniciar, verifica se já existe uma pipeline em execução para a mesma fonte
+     * de dados para evitar duplicados.
+     *
      * @param config O objeto de configuração contendo todos os parâmetros necessários
      * para o pipeline, como a fonte de dados, métricas e URL de destino.
      */
-    // Localização: src/com/gsmart/pipeline/PipelineManager.java
-
     public void launchPipeline(PipelineConfiguration config) {
         String taskDescription = config.dataSource().getSourceName();
         for (PipelineTask existingTask : runningTasks) {
@@ -102,21 +134,27 @@ public class PipelineManager {
                 return; // Impede o resto do método de ser executado
             }
         }
-
+        DashboardLogService.getInstance().logInfo("A iniciar pipeline para: " + taskDescription);
         logger.info("Recebida ordem para lançar pipeline: {}", taskDescription);
 
         final PipelineTask[] taskWrapper = new PipelineTask[1];
 
         GSmartListener listener = new GSmartListener() {
-            @Override public void onInsight(String message, String type) {
+            @Override
+            public void onInsight(String message, String type) {
+                notifyAlarmListeners();
+                DashboardLogService.getInstance().logAlarm("Alarme '" + type + "' gerado: " + message);
                 PipelineTask task = taskWrapper[0];
                 if (task != null && task.getMonitoringWindow() != null) {
                     task.getMonitoringWindow().onInsight(message, type);
                 }
             }
-            @Override public void onAlert(String title, String message) {
+
+            @Override
+            public void onAlert(String title, String message) {
                 PipelineTask task = taskWrapper[0];
                 if (task != null) {
+                    DashboardLogService.getInstance().logAlert("Alerta Crítico '" + title + "' disparado!");
                     task.setHasAlert(true);
                     if (task.getMonitoringWindow() != null) {
                         task.getMonitoringWindow().onAlert(title, message);
@@ -124,18 +162,21 @@ public class PipelineManager {
                     notifyUpdate();
                 }
             }
-            @Override public void onStatusUpdate(TaskStatus status) {
+
+            @Override
+            public void onStatusUpdate(TaskStatus status) {
                 PipelineTask task = taskWrapper[0];
                 if (task != null) {
                     task.setStatus(status);
                 }
                 notifyUpdate();
             }
+
             @Override
             public void onConnectionLost(String errorMessage) {
                 PipelineTask task = taskWrapper[0];
                 if (task == null) return;
-
+                DashboardLogService.getInstance().logAlert("Conexão perdida na pipeline '" + task.getDescription() + "'.");
                 if (task.getConnectionErrorDialog() == null || !task.getConnectionErrorDialog().isDisplayable()) {
                     SwingUtilities.invokeLater(() -> {
                         ConnectionErrorDialog newDialog = new ConnectionErrorDialog(
@@ -148,6 +189,7 @@ public class PipelineManager {
                     });
                 }
             }
+
             @Override
             public void onReconnectionAttempt(long delayInSeconds) {
                 PipelineTask task = taskWrapper[0];
@@ -155,10 +197,12 @@ public class PipelineManager {
                     task.getConnectionErrorDialog().startCountdown(delayInSeconds);
                 }
             }
+
             @Override
             public void onConnectionRestored() {
                 PipelineTask task = taskWrapper[0];
                 if (task != null && task.getConnectionErrorDialog() != null) {
+                    DashboardLogService.getInstance().logSuccess("Conexão restabelecida para a pipeline '" + task.getDescription() + "'.");
                     task.getConnectionErrorDialog().showConnectionRestored();
                 }
                 if (task != null) {
@@ -169,7 +213,7 @@ public class PipelineManager {
         };
 
 
-        DataPipeline pipeline = new DataPipeline(config.dataSource(), config.destinationType(), config.destinationEndpoint(),config.metricConfigs(), listener, config.alertRules(), config.insightRules(), config.telegramToken(), config.telegramChatId(), config.mqttBrokerUrl());
+        DataPipeline pipeline = new DataPipeline(config.dataSource(), config.destinationType(), config.destinationEndpoint(), config.metricConfigs(), listener, config.alertRules(), config.insightRules(), config.telegramToken(), config.telegramChatId(), config.mqttBrokerUrl());
 
         Thread pipelineThread = new Thread(() -> {
             try {
@@ -199,7 +243,10 @@ public class PipelineManager {
 
     /**
      * Para uma tarefa antiga e lança uma nova com base na configuração original da tarefa.
-     * Muito útil para reiniciar um pipeline que parou ou encontrou um erro.
+     * <p>
+     * Este método é particularmente útil para reiniciar uma pipeline que parou devido a um
+     * erro, reutilizando a {@link main.java.com.gsmart.config.PipelineConfiguration}
+     * que foi guardada quando a tarefa foi criada inicialmente.
      *
      * @param oldTask A tarefa existente que precisa ser reiniciada.
      */
@@ -212,10 +259,13 @@ public class PipelineManager {
     }
 
     /**
-     * Exibe a janela de monitoramento para uma tarefa específica.
-     * Se uma janela de monitoramento para esta tarefa ainda não existir ou tiver sido
-     * fechada, uma nova é criada. Se já existir, a janela existente é trazida
-     * para a frente, garantindo que apenas uma instância do monitor seja exibida por tarefa.
+     * Exibe a janela de monitorização para uma tarefa específica.
+     * <p>
+     * Se uma janela de monitorização para esta tarefa ainda não existir ou tiver sido
+     * fechada, uma nova é criada. Se já existir e estiver visível, a janela existente
+     * é trazida para a frente, garantindo que apenas uma instância do monitor seja
+     * exibida por tarefa.
+     *
      * @param task A tarefa para a qual o monitor deve ser exibido.
      */
     public void showMonitorFor(PipelineTask task) {
@@ -229,11 +279,11 @@ public class PipelineManager {
     }
 
     /**
-     * Tenta parar todas as tarefas de monitoramento que estão em execução.
+     * Tenta parar todas as tarefas de monitorização que estão em execução.
+     * <p>
      * Exibe um diálogo de confirmação ao utilizador antes de prosseguir. Se a ação for
-     * confirmada, o metodo {@code stop()} de cada tarefa ativa é invocado para
-     * garantir uma finalização segura.
-     + * garantir uma finalização segura.
+     * confirmada, o método {@code stop()} de cada tarefa ativa é invocado para
+     * garantir uma finalização segura e a exportação de dados pendentes.
      */
     public void stopAllPipelines() {
         if (runningTasks.isEmpty()) {
@@ -246,11 +296,23 @@ public class PipelineManager {
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
         if (confirm == JOptionPane.YES_OPTION) {
+            DashboardLogService.getInstance().logInfo("Comando de paragem geral enviado para " + runningTasks.size() + " pipeline(s).");
             logger.warn("Sinal de parada geral enviado pelo usuário para {} monitores.", runningTasks.size());
             List<PipelineTask> tasksToStop = new ArrayList<>(runningTasks);
             for (PipelineTask task : tasksToStop) {
                 task.stop();
             }
+        }
+    }
+    // --- MÉTODOS PARA GESTÃO DE ALARMES ---
+
+    public void addAlarmListener(Runnable listener) {
+        alarmListeners.add(listener);
+    }
+
+    private void notifyAlarmListeners() {
+        for (Runnable listener : alarmListeners) {
+            SwingUtilities.invokeLater(listener);
         }
     }
 }
