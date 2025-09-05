@@ -1,0 +1,123 @@
+\doxysection{main.\+java.\+com.\+gsmart.\+pipeline.\+Data\+Pipeline Class Reference}
+\hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline}{}\label{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline}\index{main.java.com.gsmart.pipeline.DataPipeline@{main.java.com.gsmart.pipeline.DataPipeline}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a1a7b9e161644f8fd908e974809baa916}{Data\+Pipeline}} (\mbox{\hyperlink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_i_data_source}{IData\+Source}} data\+Source, \mbox{\hyperlink{enummain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_destination_type}{Destination\+Type}} destination\+Type, String destination\+Endpoint, List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_metric_config}{Metric\+Config}} $>$ metric\+Configs, \mbox{\hyperlink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_g_smart_listener}{GSmart\+Listener}} listener, List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_alert_rule}{Alert\+Rule}} $>$ alert\+Rules, List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_insight_rule}{Insight\+Rule}} $>$ insight\+Rules, String telegram\+Token, String telegram\+Chat\+Id, String mqtt\+Broker\+Url)
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a9a68783e7c1d032d4bf406c2ca11b06a}{trigger\+Manual\+Reconnect}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a467670cc3a089af123318633ac9be9d3}{request\+Stop}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_aa2403cf9276ea8eab2ba1f127307bbc1}{run}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a86ee77f13bb9963343a46d2932d27a54}{export\+Remaining\+Data}} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_af27dce411e7f4d52003943ab2bcad628}\label{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_af27dce411e7f4d52003943ab2bcad628} 
+static final Logger {\bfseries logger} = Logger\+Factory.\+get\+Logger(Data\+Pipeline.\+class)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Representa o motor de uma única pipeline de processamento de dados.
+
+Esta classe é responsável pelo ciclo de vida completo de uma tarefa de monitorização\+: 
+\begin{DoxyEnumerate}
+\item {\bfseries{Busca de Dados\+:}} Conecta-\/se a uma {\ttfamily \doxylink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_i_data_source}{main.\+java.\+com.\+gsmart.\+resources.\+IData\+Source}} para obter os dados de telemetria mais recentes. 
+\item {\bfseries{Processamento e Transformação\+:}} Aplica as configurações de métricas ({\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_metric_config}{main.\+java.\+com.\+gsmart.\+config.\+Metric\+Config}}), como aliases e expressões matemáticas. 
+\item {\bfseries{Avaliação de Regras\+:}} Executa o motor de regras para verificar se alguma {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_alert_rule}{main.\+java.\+com.\+gsmart.\+config.\+Alert\+Rule}} ou {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_insight_rule}{main.\+java.\+com.\+gsmart.\+config.\+Insight\+Rule}} foi despoletada. 
+\item {\bfseries{Notificação\+:}} Comunica alertas e insights através do {\ttfamily \doxylink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_g_smart_listener}{main.\+java.\+com.\+gsmart.\+resources.\+GSmart\+Listener}} e envia notificações para serviços externos como MQTT e Telegram. 
+\item {\bfseries{Exportação de Dados\+:}} Envia os dados processados para destinos como Power BI ou Microsoft Fabric. 
+\item {\bfseries{Gestão de Conexão\+:}} Lida com a lógica de reconexão automática em caso de falha na comunicação com a fonte de dados. 
+\end{DoxyEnumerate}Cada instância desta classe é executada na sua própria thread, gerida por uma {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_pipeline_task}{Pipeline\+Task}}.
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_pipeline_manager}{main.\+java.\+com.\+gsmart.\+pipeline.\+Pipeline\+Manager} 
+
+\doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_pipeline_task}{main.\+java.\+com.\+gsmart.\+pipeline.\+Pipeline\+Task} 
+
+\doxylink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_g_smart_listener}{main.\+java.\+com.\+gsmart.\+resources.\+GSmart\+Listener} 
+\end{DoxySeeAlso}
+
+
+\label{doc-constructors}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a1a7b9e161644f8fd908e974809baa916}\index{main.java.com.gsmart.pipeline.DataPipeline@{main.java.com.gsmart.pipeline.DataPipeline}!DataPipeline@{DataPipeline}}
+\index{DataPipeline@{DataPipeline}!main.java.com.gsmart.pipeline.DataPipeline@{main.java.com.gsmart.pipeline.DataPipeline}}
+\doxysubsubsection{\texorpdfstring{DataPipeline()}{DataPipeline()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a1a7b9e161644f8fd908e974809baa916} 
+main.\+java.\+com.\+gsmart.\+pipeline.\+Data\+Pipeline.\+Data\+Pipeline (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_i_data_source}{IData\+Source}}}]{data\+Source}{, }\item[{\mbox{\hyperlink{enummain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_destination_type}{Destination\+Type}}}]{destination\+Type}{, }\item[{String}]{destination\+Endpoint}{, }\item[{List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_metric_config}{Metric\+Config}} $>$}]{metric\+Configs}{, }\item[{\mbox{\hyperlink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_g_smart_listener}{GSmart\+Listener}}}]{listener}{, }\item[{List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_alert_rule}{Alert\+Rule}} $>$}]{alert\+Rules}{, }\item[{List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_insight_rule}{Insight\+Rule}} $>$}]{insight\+Rules}{, }\item[{String}]{telegram\+Token}{, }\item[{String}]{telegram\+Chat\+Id}{, }\item[{String}]{mqtt\+Broker\+Url}{}\end{DoxyParamCaption})}
+
+Constrói e inicializa uma nova instância da pipeline de dados.
+
+
+\begin{DoxyParams}{Parameters}
+{\em data\+Source} & A fonte de dados (Things\+Board, Banco de Dados, etc.) que fornecerá a telemetria. \\
+\hline
+{\em destination\+Type} & O tipo de destino para onde os dados processados serão enviados (ex\+: POWER\+\_\+\+BI, FABRIC). \\
+\hline
+{\em destination\+Endpoint} & O endpoint específico do destino (URL para Power BI, Connection String para Fabric). \\
+\hline
+{\em metric\+Configs} & A lista de configurações de métricas que define como os dados brutos serão tratados. \\
+\hline
+{\em listener} & O ouvinte (geralmente a UI) que receberá notificações sobre eventos da pipeline. \\
+\hline
+{\em alert\+Rules} & A lista de regras de alerta a serem avaliadas a cada ciclo. \\
+\hline
+{\em insight\+Rules} & A lista de regras de alarme (insights) a serem avaliadas a cada ciclo. \\
+\hline
+{\em telegram\+Token} & O token de API para o bot do Telegram que enviará as notificações. \\
+\hline
+{\em telegram\+Chat\+Id} & O ID do chat do Telegram para onde as notificações serão enviadas. \\
+\hline
+{\em mqtt\+Broker\+Url} & O endereço do broker MQTT para a publicação de alertas e alarmes. \\
+\hline
+\end{DoxyParams}
+
+
+\label{doc-func-members}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a86ee77f13bb9963343a46d2932d27a54}\index{main.java.com.gsmart.pipeline.DataPipeline@{main.java.com.gsmart.pipeline.DataPipeline}!exportRemainingData@{exportRemainingData}}
+\index{exportRemainingData@{exportRemainingData}!main.java.com.gsmart.pipeline.DataPipeline@{main.java.com.gsmart.pipeline.DataPipeline}}
+\doxysubsubsection{\texorpdfstring{exportRemainingData()}{exportRemainingData()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a86ee77f13bb9963343a46d2932d27a54} 
+void main.\+java.\+com.\+gsmart.\+pipeline.\+Data\+Pipeline.\+export\+Remaining\+Data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Exporta todos os dados de telemetria acumulados no buffer de memória para um ficheiro CSV. 
+
+Este método é invocado quando a pipeline está a ser terminada para garantir que os dados recolhidos que ainda não foram enviados ou guardados não sejam perdidos. \Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a467670cc3a089af123318633ac9be9d3}\index{main.java.com.gsmart.pipeline.DataPipeline@{main.java.com.gsmart.pipeline.DataPipeline}!requestStop@{requestStop}}
+\index{requestStop@{requestStop}!main.java.com.gsmart.pipeline.DataPipeline@{main.java.com.gsmart.pipeline.DataPipeline}}
+\doxysubsubsection{\texorpdfstring{requestStop()}{requestStop()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a467670cc3a089af123318633ac9be9d3} 
+void main.\+java.\+com.\+gsmart.\+pipeline.\+Data\+Pipeline.\+request\+Stop (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Sinaliza para a pipeline que a sua execução deve ser interrompida. 
+
+Este método define uma flag volátil que é verificada a cada ciclo do método {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_aa2403cf9276ea8eab2ba1f127307bbc1}{run()}}. Quando a flag é detetada, o loop principal termina, permitindo que a thread encerre de forma graciosa. \Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_aa2403cf9276ea8eab2ba1f127307bbc1}\index{main.java.com.gsmart.pipeline.DataPipeline@{main.java.com.gsmart.pipeline.DataPipeline}!run@{run}}
+\index{run@{run}!main.java.com.gsmart.pipeline.DataPipeline@{main.java.com.gsmart.pipeline.DataPipeline}}
+\doxysubsubsection{\texorpdfstring{run()}{run()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_aa2403cf9276ea8eab2ba1f127307bbc1} 
+void main.\+java.\+com.\+gsmart.\+pipeline.\+Data\+Pipeline.\+run (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Inicia e executa o ciclo de processamento contínuo da pipeline. 
+
+Este método contém o loop principal que busca, processa e envia dados em intervalos regulares. Ele continuará a ser executado até que o método {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a467670cc3a089af123318633ac9be9d3}{request\+Stop()}} seja chamado. 
+
+Em caso de falha de conexão com a fonte de dados, este método entra num modo de reconexão automática, com um tempo de espera exponencial, até que a conexão seja restabelecida ou a tarefa seja interrompida. \Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a9a68783e7c1d032d4bf406c2ca11b06a}\index{main.java.com.gsmart.pipeline.DataPipeline@{main.java.com.gsmart.pipeline.DataPipeline}!triggerManualReconnect@{triggerManualReconnect}}
+\index{triggerManualReconnect@{triggerManualReconnect}!main.java.com.gsmart.pipeline.DataPipeline@{main.java.com.gsmart.pipeline.DataPipeline}}
+\doxysubsubsection{\texorpdfstring{triggerManualReconnect()}{triggerManualReconnect()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_data_pipeline_a9a68783e7c1d032d4bf406c2ca11b06a} 
+void main.\+java.\+com.\+gsmart.\+pipeline.\+Data\+Pipeline.\+trigger\+Manual\+Reconnect (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Dispara um sinal para que a pipeline tente uma reconexão manual imediata. 
+
+Este método é normalmente invocado pela UI quando o utilizador clica no botão "{}\+Reconectar Agora"{} na janela de erro de conexão. Ele define uma flag atómica e interrompe a thread para que o loop de reconexão possa agir imediatamente. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Desn01/\+Documents/\+GSmart/src/main/java/com/gsmart/pipeline/Data\+Pipeline.\+java\end{DoxyCompactItemize}

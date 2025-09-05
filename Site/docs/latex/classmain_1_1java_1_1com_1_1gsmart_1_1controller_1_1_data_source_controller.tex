@@ -1,0 +1,100 @@
+\doxysection{main.\+java.\+com.\+gsmart.\+controller.\+Data\+Source\+Controller Class Reference}
+\hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller}{}\label{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller}\index{main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a59acfc1b3bf9ca39282fb7863b3ee646}\label{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a59acfc1b3bf9ca39282fb7863b3ee646} 
+{\bfseries Data\+Source\+Controller} (\mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1_g_smart_gui}{GSmart\+Gui}} view)
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a79d552bd11ac1b702b2b98f3d926c325}{connect\+To\+Thingsboard}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a53ea2b4f3851672bfc225093705dedfe}{connect\+To\+Database}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_abc40b359f2f8be3c8dde12cff5a3be79}{load\+Device\+Profiles}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a6cfa5b0c6560dc9dc01bd492e0ad46eb}{load\+Devices\+By\+Profile}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a6b5bc0fa9548a18691514232ed6ca2b8}{load\+Available\+Keys}} ()
+\item 
+\mbox{\hyperlink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_i_data_source}{IData\+Source}} \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_abe0d291e8033dfc869791208b573e924}{create\+Selected\+Data\+Source}} (List$<$ String $>$ original\+Keys)  throws Exception 
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Controlador responsável por toda a lógica de interação com as fontes de dados. 
+
+Esta classe isola a {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1_g_smart_gui}{main.\+java.\+com.\+gsmart.\+GSmart\+Gui}} dos detalhes de implementação de como se conectar e obter metadados (como listas de dispositivos, perfis, tabelas e métricas) das diferentes fontes de dados suportadas, como o Things\+Board e bases de dados JDBC. 
+
+Utiliza {\ttfamily \doxylink{}{javax.\+swing.\+Swing\+Worker}} para executar operações de rede em segundo plano, evitando que a interface do utilizador bloqueie durante as conexões. 
+
+\label{doc-func-members}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a53ea2b4f3851672bfc225093705dedfe}\index{main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}!connectToDatabase@{connectToDatabase}}
+\index{connectToDatabase@{connectToDatabase}!main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}}
+\doxysubsubsection{\texorpdfstring{connectToDatabase()}{connectToDatabase()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a53ea2b4f3851672bfc225093705dedfe} 
+void main.\+java.\+com.\+gsmart.\+controller.\+Data\+Source\+Controller.\+connect\+To\+Database (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Inicia uma tentativa de conexão assíncrona com a base de dados. 
+
+Utiliza um {\ttfamily \doxylink{}{Swing\+Worker}} para realizar a conexão JDBC e buscar a lista de tabelas disponíveis em segundo plano. Atualiza a UI com o estado da conexão e, em caso de sucesso, preenche o seletor de tabelas com os resultados. \Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a79d552bd11ac1b702b2b98f3d926c325}\index{main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}!connectToThingsboard@{connectToThingsboard}}
+\index{connectToThingsboard@{connectToThingsboard}!main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}}
+\doxysubsubsection{\texorpdfstring{connectToThingsboard()}{connectToThingsboard()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a79d552bd11ac1b702b2b98f3d926c325} 
+void main.\+java.\+com.\+gsmart.\+controller.\+Data\+Source\+Controller.\+connect\+To\+Thingsboard (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Inicia uma tentativa de conexão assíncrona com o servidor Things\+Board. 
+
+Utiliza um {\ttfamily \doxylink{}{Swing\+Worker}} para realizar a chamada de rede em segundo plano. Atualiza a UI para mostrar o estado da conexão (conectando, sucesso ou falha) e, em caso de sucesso, chama o método para carregar os perfis de dispositivo. \Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_abe0d291e8033dfc869791208b573e924}\index{main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}!createSelectedDataSource@{createSelectedDataSource}}
+\index{createSelectedDataSource@{createSelectedDataSource}!main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}}
+\doxysubsubsection{\texorpdfstring{createSelectedDataSource()}{createSelectedDataSource()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_abe0d291e8033dfc869791208b573e924} 
+\mbox{\hyperlink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_i_data_source}{IData\+Source}} main.\+java.\+com.\+gsmart.\+controller.\+Data\+Source\+Controller.\+create\+Selected\+Data\+Source (\begin{DoxyParamCaption}\item[{List$<$ String $>$}]{original\+Keys}{}\end{DoxyParamCaption}) throws Exception}
+
+Cria e retorna uma instância da {\ttfamily \doxylink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_i_data_source}{main.\+java.\+com.\+gsmart.\+resources.\+IData\+Source}} com base nas configurações selecionadas na interface do utilizador. 
+
+Este método funciona como uma "{}fábrica"{} (factory), lendo a seleção atual da UI para instanciar e configurar o objeto de fonte de dados correto (seja {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_things_board_source}{main.\+java.\+com.\+gsmart.\+sources.\+Things\+Board\+Source}} ou {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source}{main.\+java.\+com.\+gsmart.\+sources.\+Database\+Source}}) que será usado pela pipeline. Antes de retornar, testa a conexão com a fonte de dados para garantir que está operacional.
+
+
+\begin{DoxyParams}{Parameters}
+{\em original\+Keys} & A lista de nomes de métricas originais que a fonte de dados deve buscar. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Uma instância configurada e pronta a usar da \doxylink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_i_data_source}{IData\+Source}. 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Exception} & se a fonte de dados selecionada for inválida, se faltar alguma configuração ou se o teste de conexão falhar. \\
+\hline
+\end{DoxyExceptions}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a6b5bc0fa9548a18691514232ed6ca2b8}\index{main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}!loadAvailableKeys@{loadAvailableKeys}}
+\index{loadAvailableKeys@{loadAvailableKeys}!main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}}
+\doxysubsubsection{\texorpdfstring{loadAvailableKeys()}{loadAvailableKeys()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a6b5bc0fa9548a18691514232ed6ca2b8} 
+void main.\+java.\+com.\+gsmart.\+controller.\+Data\+Source\+Controller.\+load\+Available\+Keys (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Carrega de forma assíncrona as métricas (chaves de telemetria ou colunas de tabela) disponíveis para a fonte de dados selecionada. 
+
+Este método determina se a fonte selecionada é o Things\+Board ou uma base de dados e invoca a chamada apropriada em segundo plano usando um {\ttfamily \doxylink{}{Swing\+Worker}}. Os resultados são então usados para popular a tabela de métricas na UI. \Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_abc40b359f2f8be3c8dde12cff5a3be79}\index{main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}!loadDeviceProfiles@{loadDeviceProfiles}}
+\index{loadDeviceProfiles@{loadDeviceProfiles}!main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}}
+\doxysubsubsection{\texorpdfstring{loadDeviceProfiles()}{loadDeviceProfiles()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_abc40b359f2f8be3c8dde12cff5a3be79} 
+void main.\+java.\+com.\+gsmart.\+controller.\+Data\+Source\+Controller.\+load\+Device\+Profiles (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Carrega de forma assíncrona a lista de perfis de dispositivo do servidor Things\+Board. 
+
+Utiliza um {\ttfamily \doxylink{}{Swing\+Worker}} para fazer a chamada à API em segundo plano. Após a conclusão, preenche o JCombo\+Box de perfis de dispositivo na UI com os resultados obtidos e tenta manter o perfil anteriormente selecionado. \Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a6cfa5b0c6560dc9dc01bd492e0ad46eb}\index{main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}!loadDevicesByProfile@{loadDevicesByProfile}}
+\index{loadDevicesByProfile@{loadDevicesByProfile}!main.java.com.gsmart.controller.DataSourceController@{main.java.com.gsmart.controller.DataSourceController}}
+\doxysubsubsection{\texorpdfstring{loadDevicesByProfile()}{loadDevicesByProfile()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1controller_1_1_data_source_controller_a6cfa5b0c6560dc9dc01bd492e0ad46eb} 
+void main.\+java.\+com.\+gsmart.\+controller.\+Data\+Source\+Controller.\+load\+Devices\+By\+Profile (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Carrega de forma assíncrona a lista de dispositivos que pertencem a um perfil selecionado. 
+
+Este método é acionado quando o utilizador seleciona um perfil de dispositivo na UI. Utiliza um {\ttfamily \doxylink{}{Swing\+Worker}} para buscar os dispositivos correspondentes e, em caso de sucesso, preenche o seletor de dispositivos e aciona o carregamento das suas métricas. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Desn01/\+Documents/\+GSmart/src/main/java/com/gsmart/controller/Data\+Source\+Controller.\+java\end{DoxyCompactItemize}

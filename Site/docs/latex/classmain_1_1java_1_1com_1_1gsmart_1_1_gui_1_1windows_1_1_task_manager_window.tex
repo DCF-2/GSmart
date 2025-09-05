@@ -1,0 +1,69 @@
+\doxysection{main.\+java.\+com.\+gsmart.\+Gui.\+windows.\+Task\+Manager\+Window Class Reference}
+\hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window}{}\label{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window}\index{main.java.com.gsmart.Gui.windows.TaskManagerWindow@{main.java.com.gsmart.Gui.windows.TaskManagerWindow}}
+Inheritance diagram for main.\+java.\+com.\+gsmart.\+Gui.\+windows.\+Task\+Manager\+Window\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window_adb9915dad6967d1f95ce115549b1374f}{Task\+Manager\+Window}} (\mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_pipeline_manager}{Pipeline\+Manager}} pipeline\+Manager)
+\item 
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window_aec2425ffc146852cee5fdc0c633a9c09}\label{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window_aec2425ffc146852cee5fdc0c633a9c09} 
+void {\bfseries dispose} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window_a502059c2ab1295548af676d4b146d7e6}{update\+Tasks}} (List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_pipeline_task}{Pipeline\+Task}} $>$ new\+Tasks)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Uma janela (JFrame) que funciona como a "{}\+Central de Monitoramento"{}.
+
+Ela exibe uma tabela (JTable) com todas as tarefas de pipeline ativas, mostrando informações cruciais como seu estado, descrição e tempo de execução. Esta classe comunica-\/se com o {\ttfamily Pipeline\+Manager} para receber atualizações em tempo real e permite que o utilizador interaja com as tarefas (visualizar, parar ou reiniciar) diretamente pela interface.
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_pipeline_manager}{main.\+java.\+com.\+gsmart.\+pipeline.\+Pipeline\+Manager} 
+
+\doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_pipeline_task}{main.\+java.\+com.\+gsmart.\+pipeline.\+Pipeline\+Task} 
+\end{DoxySeeAlso}
+
+
+\label{doc-constructors}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window_adb9915dad6967d1f95ce115549b1374f}\index{main.java.com.gsmart.Gui.windows.TaskManagerWindow@{main.java.com.gsmart.Gui.windows.TaskManagerWindow}!TaskManagerWindow@{TaskManagerWindow}}
+\index{TaskManagerWindow@{TaskManagerWindow}!main.java.com.gsmart.Gui.windows.TaskManagerWindow@{main.java.com.gsmart.Gui.windows.TaskManagerWindow}}
+\doxysubsubsection{\texorpdfstring{TaskManagerWindow()}{TaskManagerWindow()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window_adb9915dad6967d1f95ce115549b1374f} 
+main.\+java.\+com.\+gsmart.\+Gui.\+windows.\+Task\+Manager\+Window.\+Task\+Manager\+Window (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_pipeline_manager}{Pipeline\+Manager}}}]{pipeline\+Manager}{}\end{DoxyParamCaption})}
+
+Construtor da Central de Monitoramento.
+
+
+\begin{DoxyParams}{Parameters}
+{\em pipeline\+Manager} & A instância do gestor de pipelines que fornecerá os dados das tarefas a serem exibidas e gerenciadas. \\
+\hline
+\end{DoxyParams}
+
+
+\label{doc-func-members}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window_a502059c2ab1295548af676d4b146d7e6}\index{main.java.com.gsmart.Gui.windows.TaskManagerWindow@{main.java.com.gsmart.Gui.windows.TaskManagerWindow}!updateTasks@{updateTasks}}
+\index{updateTasks@{updateTasks}!main.java.com.gsmart.Gui.windows.TaskManagerWindow@{main.java.com.gsmart.Gui.windows.TaskManagerWindow}}
+\doxysubsubsection{\texorpdfstring{updateTasks()}{updateTasks()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_task_manager_window_a502059c2ab1295548af676d4b146d7e6} 
+void main.\+java.\+com.\+gsmart.\+Gui.\+windows.\+Task\+Manager\+Window.\+update\+Tasks (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1pipeline_1_1_pipeline_task}{Pipeline\+Task}} $>$}]{new\+Tasks}{}\end{DoxyParamCaption})}
+
+Atualiza a lista de tarefas exibidas na tabela da janela. Este método é chamado externamente para sincronizar a UI com o estado atual. 
+\begin{DoxyParams}{Parameters}
+{\em new\+Tasks} & A nova lista de tarefas ativas. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Desn01/\+Documents/\+GSmart/src/main/java/com/gsmart/\+Gui/windows/Task\+Manager\+Window.\+java\end{DoxyCompactItemize}

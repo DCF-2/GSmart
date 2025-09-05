@@ -239,7 +239,7 @@ public class GSmartGui extends JFrame {
      * Este método é normalmente chamado quando a aplicação está a ser fechada.
      */
     private void saveConfiguration() {
-        Properties props = new Properties();
+        Properties props = configManager.loadProperties();
         props.setProperty("thingsboard.url", thingsboardUrlField.getText());
         props.setProperty("db.url", dbUrlField.getText());
         props.setProperty("db.user", dbUserField.getText());
@@ -253,6 +253,7 @@ public class GSmartGui extends JFrame {
         configManager.saveProperties(props);
         configManager.saveRules(alertRuleTableModel.getRules(), insightRuleTableModel.getRules());
         configManager.saveMetricConfigs(metricTableModel.getAllMetrics());
+
         List<SerializablePipelineConfig> activePipelinesToSave = new ArrayList<>();
         for (PipelineTask task : pipelineManager.getRunningTasks()) {
             activePipelinesToSave.add(convertToSerializable(task.getOriginalConfig()));

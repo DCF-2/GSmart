@@ -1,0 +1,159 @@
+\doxysection{main.\+java.\+com.\+gsmart.\+config.\+Config\+Manager Class Reference}
+\hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager}{}\label{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager}\index{main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+Properties \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a95aa9e85340e85fdbd9964e110284efe}{load\+Properties}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a862ed81189112ebe8e405d5adb349120}{save\+Properties}} (Properties props)
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_afbe7d09589233bc137b4fb4281694074}{save\+Rules}} (List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_alert_rule}{Alert\+Rule}} $>$ alert\+Rules, List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_insight_rule}{Insight\+Rule}} $>$ insight\+Rules)
+\item 
+List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_alert_rule}{Alert\+Rule}} $>$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a4543831cd635ca111986eb7e6c7cff93}{load\+Alert\+Rules}} ()
+\item 
+List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_insight_rule}{Insight\+Rule}} $>$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_aca822be6c7aa390d763469f6f5daab96}{load\+Insight\+Rules}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a4445d50b66276b0e0337d2b32784ff8f}{save\+Metric\+Configs}} (List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_metric_config}{Metric\+Config}} $>$ metric\+Configs)
+\item 
+List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_metric_config}{Metric\+Config}} $>$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a18f6aeec4d8bf339ae5b103687db7f67}{load\+Metric\+Configs}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a619dcb80c68826b057543ca02f11228a}{save\+Active\+Pipelines}} (List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_serializable_pipeline_config}{Serializable\+Pipeline\+Config}} $>$ active\+Pipelines)
+\item 
+List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_serializable_pipeline_config}{Serializable\+Pipeline\+Config}} $>$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a1a17e577d2bd372c0da0d69b13344c66}{load\+Active\+Pipelines}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Gere a persistência das configurações da aplicação.
+
+Esta classe é responsável por carregar as configurações do utilizador da última sessão (como URLs, nomes de utilizador, etc.) de um ficheiro {\ttfamily .\+properties} quando a aplicação inicia, e por salvar as configurações atuais quando a aplicação é fechada.
+
+Isto garante uma melhor experiência do utilizador, que não precisa de reintroduzir os mesmos dados a cada execução. 
+
+\label{doc-func-members}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a1a17e577d2bd372c0da0d69b13344c66}\index{main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}!loadActivePipelines@{loadActivePipelines}}
+\index{loadActivePipelines@{loadActivePipelines}!main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}}
+\doxysubsubsection{\texorpdfstring{loadActivePipelines()}{loadActivePipelines()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a1a17e577d2bd372c0da0d69b13344c66} 
+List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_serializable_pipeline_config}{Serializable\+Pipeline\+Config}} $>$ main.\+java.\+com.\+gsmart.\+config.\+Config\+Manager.\+load\+Active\+Pipelines (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Carrega a lista de configurações de pipelines que estavam ativas na última sessão.
+
+\begin{DoxyReturn}{Returns}
+Uma lista de {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_serializable_pipeline_config}{Serializable\+Pipeline\+Config}} prontas para serem usadas para reiniciar as pipelines. Retorna uma lista vazia se o ficheiro não for encontrado. 
+\end{DoxyReturn}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a4543831cd635ca111986eb7e6c7cff93}\index{main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}!loadAlertRules@{loadAlertRules}}
+\index{loadAlertRules@{loadAlertRules}!main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}}
+\doxysubsubsection{\texorpdfstring{loadAlertRules()}{loadAlertRules()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a4543831cd635ca111986eb7e6c7cff93} 
+List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_alert_rule}{Alert\+Rule}} $>$ main.\+java.\+com.\+gsmart.\+config.\+Config\+Manager.\+load\+Alert\+Rules (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Carrega a lista de regras de Alerta a partir de um ficheiro serializado ({\ttfamily alerts.\+conf}).
+
+\begin{DoxyReturn}{Returns}
+Uma lista de {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_alert_rule}{Alert\+Rule}}. Se o ficheiro não for encontrado ou estiver corrompido, retorna uma lista vazia para garantir que a aplicação inicie sem erros. 
+\end{DoxyReturn}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_aca822be6c7aa390d763469f6f5daab96}\index{main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}!loadInsightRules@{loadInsightRules}}
+\index{loadInsightRules@{loadInsightRules}!main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}}
+\doxysubsubsection{\texorpdfstring{loadInsightRules()}{loadInsightRules()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_aca822be6c7aa390d763469f6f5daab96} 
+List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_insight_rule}{Insight\+Rule}} $>$ main.\+java.\+com.\+gsmart.\+config.\+Config\+Manager.\+load\+Insight\+Rules (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Carrega a lista de regras de Alarme a partir de um ficheiro serializado ({\ttfamily insights.\+conf}).
+
+\begin{DoxyReturn}{Returns}
+Uma lista de {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_insight_rule}{Insight\+Rule}}. Se o ficheiro não for encontrado ou estiver corrompido, retorna uma lista vazia. 
+\end{DoxyReturn}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a18f6aeec4d8bf339ae5b103687db7f67}\index{main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}!loadMetricConfigs@{loadMetricConfigs}}
+\index{loadMetricConfigs@{loadMetricConfigs}!main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}}
+\doxysubsubsection{\texorpdfstring{loadMetricConfigs()}{loadMetricConfigs()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a18f6aeec4d8bf339ae5b103687db7f67} 
+List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_metric_config}{Metric\+Config}} $>$ main.\+java.\+com.\+gsmart.\+config.\+Config\+Manager.\+load\+Metric\+Configs (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Carrega a lista de configurações de métricas a partir do ficheiro serializado ({\ttfamily metrics.\+conf}).
+
+\begin{DoxyReturn}{Returns}
+Uma lista de {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_metric_config}{Metric\+Config}}. Se o ficheiro não for encontrado, retorna uma lista vazia. 
+\end{DoxyReturn}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a95aa9e85340e85fdbd9964e110284efe}\index{main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}!loadProperties@{loadProperties}}
+\index{loadProperties@{loadProperties}!main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}}
+\doxysubsubsection{\texorpdfstring{loadProperties()}{loadProperties()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a95aa9e85340e85fdbd9964e110284efe} 
+Properties main.\+java.\+com.\+gsmart.\+config.\+Config\+Manager.\+load\+Properties (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Carrega as propriedades do ficheiro de configuração principal ({\ttfamily gsmart.\+conf}). 
+
+Se o ficheiro não for encontrado, retorna um objeto de propriedades vazio. Após o carregamento, este método decifra automaticamente os valores de chaves sensíveis (como URLs e tokens) usando o {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1utils_1_1_crypto_utils}{main.\+java.\+com.\+gsmart.\+utils.\+Crypto\+Utils}}.
+
+\begin{DoxyReturn}{Returns}
+Um objeto {\ttfamily \doxylink{}{Properties}} com as configurações carregadas e decifradas. 
+\end{DoxyReturn}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a619dcb80c68826b057543ca02f11228a}\index{main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}!saveActivePipelines@{saveActivePipelines}}
+\index{saveActivePipelines@{saveActivePipelines}!main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}}
+\doxysubsubsection{\texorpdfstring{saveActivePipelines()}{saveActivePipelines()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a619dcb80c68826b057543ca02f11228a} 
+void main.\+java.\+com.\+gsmart.\+config.\+Config\+Manager.\+save\+Active\+Pipelines (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_serializable_pipeline_config}{Serializable\+Pipeline\+Config}} $>$}]{active\+Pipelines}{}\end{DoxyParamCaption})}
+
+Guarda a lista de pipelines que estão atualmente em execução num ficheiro serializado ({\ttfamily pipelines.\+conf}). 
+
+Esta funcionalidade permite que a aplicação reinicie automaticamente as pipelines ativas na próxima vez que for iniciada.
+
+
+\begin{DoxyParams}{Parameters}
+{\em active\+Pipelines} & A lista de configurações de pipelines ativas a serem guardadas. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a4445d50b66276b0e0337d2b32784ff8f}\index{main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}!saveMetricConfigs@{saveMetricConfigs}}
+\index{saveMetricConfigs@{saveMetricConfigs}!main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}}
+\doxysubsubsection{\texorpdfstring{saveMetricConfigs()}{saveMetricConfigs()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a4445d50b66276b0e0337d2b32784ff8f} 
+void main.\+java.\+com.\+gsmart.\+config.\+Config\+Manager.\+save\+Metric\+Configs (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_metric_config}{Metric\+Config}} $>$}]{metric\+Configs}{}\end{DoxyParamCaption})}
+
+Guarda a lista de configurações de métricas (incluindo aliases e expressões) num ficheiro serializado ({\ttfamily metrics.\+conf}). 
+
+Isto permite que as personalizações feitas pelo utilizador na tabela de métricas sejam preservadas entre as sessões.
+
+
+\begin{DoxyParams}{Parameters}
+{\em metric\+Configs} & A lista de {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_metric_config}{Metric\+Config}} a ser guardada. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a862ed81189112ebe8e405d5adb349120}\index{main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}!saveProperties@{saveProperties}}
+\index{saveProperties@{saveProperties}!main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}}
+\doxysubsubsection{\texorpdfstring{saveProperties()}{saveProperties()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_a862ed81189112ebe8e405d5adb349120} 
+void main.\+java.\+com.\+gsmart.\+config.\+Config\+Manager.\+save\+Properties (\begin{DoxyParamCaption}\item[{Properties}]{props}{}\end{DoxyParamCaption})}
+
+Guarda as propriedades no ficheiro de configuração principal ({\ttfamily gsmart.\+conf}). 
+
+Antes de guardar, este método cifra automaticamente os valores associados a chaves sensíveis (definidas na lista {\ttfamily SENSITIVE\+\_\+\+KEYS}) para garantir que não são armazenados em texto puro.
+
+
+\begin{DoxyParams}{Parameters}
+{\em props} & O objeto {\ttfamily \doxylink{}{Properties}} contendo as configurações a serem guardadas. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_afbe7d09589233bc137b4fb4281694074}\index{main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}!saveRules@{saveRules}}
+\index{saveRules@{saveRules}!main.java.com.gsmart.config.ConfigManager@{main.java.com.gsmart.config.ConfigManager}}
+\doxysubsubsection{\texorpdfstring{saveRules()}{saveRules()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_config_manager_afbe7d09589233bc137b4fb4281694074} 
+void main.\+java.\+com.\+gsmart.\+config.\+Config\+Manager.\+save\+Rules (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_alert_rule}{Alert\+Rule}} $>$}]{alert\+Rules}{, }\item[{List$<$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1config_1_1_insight_rule}{Insight\+Rule}} $>$}]{insight\+Rules}{}\end{DoxyParamCaption})}
+
+Guarda as listas de regras de Alerta e de Alarme em ficheiros serializados separados. 
+
+A serialização de objetos permite guardar o estado completo de cada regra de forma eficiente, facilitando o seu carregamento na próxima sessão da aplicação.
+
+
+\begin{DoxyParams}{Parameters}
+{\em alert\+Rules} & A lista de regras de alerta a ser guardada. \\
+\hline
+{\em insight\+Rules} & A lista de regras de alarme a ser guardada. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Desn01/\+Documents/\+GSmart/src/main/java/com/gsmart/config/Config\+Manager.\+java\end{DoxyCompactItemize}

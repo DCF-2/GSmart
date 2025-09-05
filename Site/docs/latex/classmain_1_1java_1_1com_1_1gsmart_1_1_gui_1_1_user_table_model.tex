@@ -1,0 +1,78 @@
+\doxysection{main.\+java.\+com.\+gsmart.\+Gui.\+User\+Table\+Model Class Reference}
+\hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model}{}\label{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model}\index{main.java.com.gsmart.Gui.UserTableModel@{main.java.com.gsmart.Gui.UserTableModel}}
+Inheritance diagram for main.\+java.\+com.\+gsmart.\+Gui.\+User\+Table\+Model\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a553f601b046eebcbe778a488377e463d}{set\+Users}} (List$<$ User $>$ users)
+\item 
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_adcfb20c31b5c682d34450139885e181c}\label{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_adcfb20c31b5c682d34450139885e181c} 
+int {\bfseries get\+Row\+Count} ()
+\item 
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a0e3083352890ce50f8b7e0a509f7d469}\label{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a0e3083352890ce50f8b7e0a509f7d469} 
+int {\bfseries get\+Column\+Count} ()
+\item 
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a9a74b7bd19ecd7b771896c2fb13bd650}\label{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a9a74b7bd19ecd7b771896c2fb13bd650} 
+String {\bfseries get\+Column\+Name} (int column)
+\item 
+Object \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a154a62513ec0489b33cbe63ae055edc3}{get\+Value\+At}} (int row\+Index, int column\+Index)
+\item 
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a8a6599f6f201592a9e9a499c5343af86}\label{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a8a6599f6f201592a9e9a499c5343af86} 
+User {\bfseries get\+User\+At} (int row\+Index)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Modelo de dados (Table\+Model) para a JTable que exibe os utilizadores do sistema. 
+
+Faz a ponte entre a lista de objetos {\ttfamily \doxylink{}{main.\+java.\+com.\+gsmart.\+model.\+User}} vindos da base de dados e a tabela na janela de gestão de utilizadores.
+
+\begin{DoxySeeAlso}{See also}
+main.\+java.\+com.\+gsmart.\+model.\+User 
+
+\doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1windows_1_1_user_management_window}{main.\+java.\+com.\+gsmart.\+Gui.\+windows.\+User\+Management\+Window} 
+\end{DoxySeeAlso}
+
+
+\label{doc-func-members}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a154a62513ec0489b33cbe63ae055edc3}\index{main.java.com.gsmart.Gui.UserTableModel@{main.java.com.gsmart.Gui.UserTableModel}!getValueAt@{getValueAt}}
+\index{getValueAt@{getValueAt}!main.java.com.gsmart.Gui.UserTableModel@{main.java.com.gsmart.Gui.UserTableModel}}
+\doxysubsubsection{\texorpdfstring{getValueAt()}{getValueAt()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a154a62513ec0489b33cbe63ae055edc3} 
+Object main.\+java.\+com.\+gsmart.\+Gui.\+User\+Table\+Model.\+get\+Value\+At (\begin{DoxyParamCaption}\item[{int}]{row\+Index}{, }\item[{int}]{column\+Index}{}\end{DoxyParamCaption})}
+
+Retorna o objeto de utilizador de uma linha específica da tabela.
+
+
+\begin{DoxyParams}{Parameters}
+{\em row\+Index} & O índice da linha da qual obter o utilizador. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+O objeto {\ttfamily \doxylink{}{User}} correspondente, ou {\ttfamily null} se o índice da linha for inválido. 
+\end{DoxyReturn}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a553f601b046eebcbe778a488377e463d}\index{main.java.com.gsmart.Gui.UserTableModel@{main.java.com.gsmart.Gui.UserTableModel}!setUsers@{setUsers}}
+\index{setUsers@{setUsers}!main.java.com.gsmart.Gui.UserTableModel@{main.java.com.gsmart.Gui.UserTableModel}}
+\doxysubsubsection{\texorpdfstring{setUsers()}{setUsers()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1_gui_1_1_user_table_model_a553f601b046eebcbe778a488377e463d} 
+void main.\+java.\+com.\+gsmart.\+Gui.\+User\+Table\+Model.\+set\+Users (\begin{DoxyParamCaption}\item[{List$<$ User $>$}]{users}{}\end{DoxyParamCaption})}
+
+Substitui a lista de utilizadores atual por uma nova e notifica a tabela.
+
+
+\begin{DoxyParams}{Parameters}
+{\em users} & A nova lista de {\ttfamily \doxylink{}{User}} a ser exibida. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Desn01/\+Documents/\+GSmart/src/main/java/com/gsmart/\+Gui/User\+Table\+Model.\+java\end{DoxyCompactItemize}

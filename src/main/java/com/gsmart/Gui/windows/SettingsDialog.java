@@ -62,7 +62,10 @@ public class SettingsDialog extends JDialog {
         // --- Botão de Fechar ---
         JPanel closeButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton closeButton = new JButton("Fechar");
-        closeButton.addActionListener(e -> dispose());
+        closeButton.addActionListener(e -> {
+            saveSettings(); // Salva as configurações explicitamente
+            dispose();      // Depois fecha a janela
+        });
         closeButtonPanel.add(closeButton);
 
         // --- Montagem Final ---

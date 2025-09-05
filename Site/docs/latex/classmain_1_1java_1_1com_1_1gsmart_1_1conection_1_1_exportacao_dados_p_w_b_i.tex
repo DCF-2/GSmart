@@ -1,0 +1,46 @@
+\doxysection{main.\+java.\+com.\+gsmart.\+conection.\+Exportacao\+Dados\+PWBI Class Reference}
+\hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1conection_1_1_exportacao_dados_p_w_b_i}{}\label{classmain_1_1java_1_1com_1_1gsmart_1_1conection_1_1_exportacao_dados_p_w_b_i}\index{main.java.com.gsmart.conection.ExportacaoDadosPWBI@{main.java.com.gsmart.conection.ExportacaoDadosPWBI}}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1conection_1_1_exportacao_dados_p_w_b_i_a913ae1e200760a7a03edba2380f64258}{send\+Data\+To\+Power\+BI}} (Json\+Object data\+Object, String power\+Bi\+Api\+Url)  throws Exception 
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Classe utilitária responsável por enviar dados para a API de Push do Microsoft Power BI.
+
+Esta classe contém um método estático que formata o objeto de dados num payload JSON, conforme esperado pela API, e realiza uma requisição POST para o endpoint especificado, tratando a resposta do servidor. 
+
+\label{doc-func-members}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1conection_1_1_exportacao_dados_p_w_b_i_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1conection_1_1_exportacao_dados_p_w_b_i_a913ae1e200760a7a03edba2380f64258}\index{main.java.com.gsmart.conection.ExportacaoDadosPWBI@{main.java.com.gsmart.conection.ExportacaoDadosPWBI}!sendDataToPowerBI@{sendDataToPowerBI}}
+\index{sendDataToPowerBI@{sendDataToPowerBI}!main.java.com.gsmart.conection.ExportacaoDadosPWBI@{main.java.com.gsmart.conection.ExportacaoDadosPWBI}}
+\doxysubsubsection{\texorpdfstring{sendDataToPowerBI()}{sendDataToPowerBI()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1conection_1_1_exportacao_dados_p_w_b_i_a913ae1e200760a7a03edba2380f64258} 
+void main.\+java.\+com.\+gsmart.\+conection.\+Exportacao\+Dados\+PWBI.\+send\+Data\+To\+Power\+BI (\begin{DoxyParamCaption}\item[{Json\+Object}]{data\+Object}{, }\item[{String}]{power\+Bi\+Api\+Url}{}\end{DoxyParamCaption}) throws Exception\hspace{0.3cm}{\ttfamily [static]}}
+
+Envia um único objeto de dados para um endpoint da API de Push do Power BI.
+
+Este método encapsula a lógica de conexão HTTP, a formatação do corpo da requisição e o tratamento da resposta do servidor para garantir que os dados foram recebidos com sucesso.
+
+
+\begin{DoxyParams}{Parameters}
+{\em data\+Object} & O objeto {\ttfamily Json\+Object} contendo os dados a serem enviados. \\
+\hline
+{\em power\+Bi\+Api\+Url} & A URL completa do conjunto de dados de streaming do Power BI. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Illegal\+Argument\+Exception} & se a URL do Power BI for nula, vazia ou inválida. \\
+\hline
+{\em Exception} & se ocorrer um erro na comunicação com a API do Power BI (ex\+: código de resposta não-\/2xx). \\
+\hline
+\end{DoxyExceptions}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Desn01/\+Documents/\+GSmart/src/main/java/com/gsmart/conection/Exportacao\+Dados\+PWBI.\+java\end{DoxyCompactItemize}

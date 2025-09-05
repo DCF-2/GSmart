@@ -1,0 +1,183 @@
+\doxysection{main.\+java.\+com.\+gsmart.\+sources.\+Database\+Source Class Reference}
+\hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source}{}\label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source}\index{main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}}
+Inheritance diagram for main.\+java.\+com.\+gsmart.\+sources.\+Database\+Source\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a95c673195dce62571e094752f5103770}{Database\+Source}} (String db\+Url, String user, String password, String table\+Name, List$<$ String $>$ selected\+Columns)
+\item 
+boolean \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a4207579e17514ed5ff9aec0265c4ee06}{test\+Connection}} ()
+\item 
+List$<$ String $>$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_ae61115dddd0a35739c757b8e2da75ae9}{get\+Available\+Tables}} ()  throws SQLException 
+\item 
+Json\+Object \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a9152732fbffbefb3bd6b9ef9b2bb08d7}{fetch\+Data}} ()  throws Exception 
+\item 
+List$<$ String $>$ \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_abe1defdac67084f3273635a89fd87d43}{get\+Available\+Columns}} (String table\+Name)  throws SQLException 
+\item 
+String \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a3534f493cc16dff9ce30d9856c2f8694}{get\+Source\+Name}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_abc2327debd07ecba042395ddf148c159}{test\+Connection\+And\+Throw}} ()  throws SQLException 
+\item 
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_aa1dd9b183ad13de45fa534596f8a5192}\label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_aa1dd9b183ad13de45fa534596f8a5192} 
+String {\bfseries get\+Db\+Url} ()
+\item 
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a9849d384e2e0360d809f3001a95f3142}\label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a9849d384e2e0360d809f3001a95f3142} 
+String {\bfseries get\+User} ()
+\item 
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a41270ca792a0615a084a6c53b8f4bbc6}\label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a41270ca792a0615a084a6c53b8f4bbc6} 
+String {\bfseries get\+Password} ()
+\item 
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_afb2ba2d1984c7e3ec6d2b12594612325}\label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_afb2ba2d1984c7e3ec6d2b12594612325} 
+String {\bfseries get\+Table\+Name} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Implementação da interface {\ttfamily IData\+Source} para se conectar e interagir com um banco de dados relacional através de JDBC.
+
+Esta classe é projetada para buscar o registo mais recente de uma tabela específica, simulando uma fonte de dados de telemetria. Ela lida com a conexão, execução de queries e formatação dos resultados para o formato JSON esperado pela pipeline.
+
+\begin{DoxySeeAlso}{See also}
+\doxylink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_i_data_source}{main.\+java.\+com.\+gsmart.\+resources.\+IData\+Source} 
+
+java.\+sql.\+Connection 
+\end{DoxySeeAlso}
+
+
+\label{doc-constructors}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a95c673195dce62571e094752f5103770}\index{main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}!DatabaseSource@{DatabaseSource}}
+\index{DatabaseSource@{DatabaseSource}!main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}}
+\doxysubsubsection{\texorpdfstring{DatabaseSource()}{DatabaseSource()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a95c673195dce62571e094752f5103770} 
+main.\+java.\+com.\+gsmart.\+sources.\+Database\+Source.\+Database\+Source (\begin{DoxyParamCaption}\item[{String}]{db\+Url}{, }\item[{String}]{user}{, }\item[{String}]{password}{, }\item[{String}]{table\+Name}{, }\item[{List$<$ String $>$}]{selected\+Columns}{}\end{DoxyParamCaption})}
+
+Construtor da classe \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source}{Database\+Source}.
+
+
+\begin{DoxyParams}{Parameters}
+{\em db\+Url} & A string de conexão JDBC para o banco de dados (ex\+: "{}jdbc\+:postgresql\+://host\+:port/database"{}). \\
+\hline
+{\em user} & O nome de utilizador para a conexão. \\
+\hline
+{\em password} & A senha para a conexão. \\
+\hline
+{\em table\+Name} & O nome da tabela da qual os dados serão buscados. \\
+\hline
+{\em selected\+Columns} & A lista de nomes das colunas a serem incluídas na busca. \\
+\hline
+\end{DoxyParams}
+
+
+\label{doc-func-members}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a9152732fbffbefb3bd6b9ef9b2bb08d7}\index{main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}!fetchData@{fetchData}}
+\index{fetchData@{fetchData}!main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}}
+\doxysubsubsection{\texorpdfstring{fetchData()}{fetchData()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a9152732fbffbefb3bd6b9ef9b2bb08d7} 
+Json\+Object main.\+java.\+com.\+gsmart.\+sources.\+Database\+Source.\+fetch\+Data (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) throws Exception}
+
+Busca o registro mais recente (ordenado por \textquotesingle{}timestamp\textquotesingle{} descendente) da tabela configurada. Constrói e retorna um objeto JSON formatado de maneira similar à API do Things\+Board para manter a compatibilidade com o resto da pipeline.
+
+\begin{DoxyReturn}{Returns}
+Um Json\+Object contendo os dados do registro mais recente. 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Exception} & se a busca no banco de dados falhar ou se a configuração estiver incompleta. \\
+\hline
+\end{DoxyExceptions}
+
+
+Implements \mbox{\hyperlink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_i_data_source_a67c66f70fe2b36ba2b5250c8e3b843b5}{main.\+java.\+com.\+gsmart.\+resources.\+IData\+Source}}.
+
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_abe1defdac67084f3273635a89fd87d43}\index{main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}!getAvailableColumns@{getAvailableColumns}}
+\index{getAvailableColumns@{getAvailableColumns}!main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}}
+\doxysubsubsection{\texorpdfstring{getAvailableColumns()}{getAvailableColumns()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_abe1defdac67084f3273635a89fd87d43} 
+List$<$ String $>$ main.\+java.\+com.\+gsmart.\+sources.\+Database\+Source.\+get\+Available\+Columns (\begin{DoxyParamCaption}\item[{String}]{table\+Name}{}\end{DoxyParamCaption}) throws SQLException}
+
+Retorna uma lista com os nomes de todas as colunas de uma tabela específica.
+
+
+\begin{DoxyParams}{Parameters}
+{\em table\+Name} & O nome da tabela cujas colunas serão listadas. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Uma lista contendo os nomes das colunas. 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em java.\+sql.\+SQLException} & se a tabela não for encontrada ou se ocorrer um erro de acesso ao banco. \\
+\hline
+\end{DoxyExceptions}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_ae61115dddd0a35739c757b8e2da75ae9}\index{main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}!getAvailableTables@{getAvailableTables}}
+\index{getAvailableTables@{getAvailableTables}!main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}}
+\doxysubsubsection{\texorpdfstring{getAvailableTables()}{getAvailableTables()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_ae61115dddd0a35739c757b8e2da75ae9} 
+List$<$ String $>$ main.\+java.\+com.\+gsmart.\+sources.\+Database\+Source.\+get\+Available\+Tables (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) throws SQLException}
+
+Busca e retorna uma lista com os nomes de todas as tabelas visíveis no schema \textquotesingle{}public\textquotesingle{}.
+
+\begin{DoxyReturn}{Returns}
+Uma lista de nomes de tabelas. 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em java.\+sql.\+SQLException} & se ocorrer um erro de acesso ao banco de dados durante a busca. \\
+\hline
+\end{DoxyExceptions}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a3534f493cc16dff9ce30d9856c2f8694}\index{main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}!getSourceName@{getSourceName}}
+\index{getSourceName@{getSourceName}!main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}}
+\doxysubsubsection{\texorpdfstring{getSourceName()}{getSourceName()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a3534f493cc16dff9ce30d9856c2f8694} 
+String main.\+java.\+com.\+gsmart.\+sources.\+Database\+Source.\+get\+Source\+Name (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Retorna um nome descritivo e legível para a fonte de dados.
+
+Este nome é utilizado na interface do utilizador para identificar a tarefa de monitoramento e em logs para facilitar a depuração.
+
+\begin{DoxyReturn}{Returns}
+Uma {\ttfamily String} com o nome da fonte (ex\+: "{}\+Things\+Board"{} ou "{}\+Banco de Dados"{}). 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{interfacemain_1_1java_1_1com_1_1gsmart_1_1resources_1_1_i_data_source_a5f17e1a2a6684de9977dcf3ff831d637}{main.\+java.\+com.\+gsmart.\+resources.\+IData\+Source}}.
+
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a4207579e17514ed5ff9aec0265c4ee06}\index{main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}!testConnection@{testConnection}}
+\index{testConnection@{testConnection}!main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}}
+\doxysubsubsection{\texorpdfstring{testConnection()}{testConnection()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a4207579e17514ed5ff9aec0265c4ee06} 
+boolean main.\+java.\+com.\+gsmart.\+sources.\+Database\+Source.\+test\+Connection (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Tenta estabelecer uma conexão com o banco de dados para validar a URL e as credenciais.
+
+\begin{DoxyReturn}{Returns}
+{\ttfamily true} se a conexão for bem-\/sucedida e válida, {\ttfamily false} caso contrário. 
+\end{DoxyReturn}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_abc2327debd07ecba042395ddf148c159}\index{main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}!testConnectionAndThrow@{testConnectionAndThrow}}
+\index{testConnectionAndThrow@{testConnectionAndThrow}!main.java.com.gsmart.sources.DatabaseSource@{main.java.com.gsmart.sources.DatabaseSource}}
+\doxysubsubsection{\texorpdfstring{testConnectionAndThrow()}{testConnectionAndThrow()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_abc2327debd07ecba042395ddf148c159} 
+void main.\+java.\+com.\+gsmart.\+sources.\+Database\+Source.\+test\+Connection\+And\+Throw (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) throws SQLException}
+
+Testa a conexão com o banco de dados e lança uma exceção em caso de falha. Diferente de {\ttfamily \doxylink{classmain_1_1java_1_1com_1_1gsmart_1_1sources_1_1_database_source_a4207579e17514ed5ff9aec0265c4ee06}{test\+Connection()}}, este método é projetado para interromper o fluxo caso a conexão não possa ser estabelecida, propagando a exceção.
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em SQLException} & se a conexão falhar ou não for válida. \\
+\hline
+\end{DoxyExceptions}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Desn01/\+Documents/\+GSmart/src/main/java/com/gsmart/sources/Database\+Source.\+java\end{DoxyCompactItemize}

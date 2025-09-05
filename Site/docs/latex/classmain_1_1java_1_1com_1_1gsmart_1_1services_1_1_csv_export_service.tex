@@ -1,0 +1,48 @@
+\doxysection{main.\+java.\+com.\+gsmart.\+services.\+Csv\+Export\+Service Class Reference}
+\hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1services_1_1_csv_export_service}{}\label{classmain_1_1java_1_1com_1_1gsmart_1_1services_1_1_csv_export_service}\index{main.java.com.gsmart.services.CsvExportService@{main.java.com.gsmart.services.CsvExportService}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1services_1_1_csv_export_service_a94a6d3078f7b29bc7d6afcc3f201d136}{Csv\+Export\+Service}} ()
+\item 
+void \mbox{\hyperlink{classmain_1_1java_1_1com_1_1gsmart_1_1services_1_1_csv_export_service_a8a0e9967de8fba60eece55f25489bb95}{export\+Data}} (List$<$ Map$<$ String, Object $>$ $>$ telemetry\+Data)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Serviço responsável por exportar dados de telemetria para ficheiros CSV.
+
+Esta classe gere a criação, escrita e rotação de ficheiros de log de telemetria, garantindo que apenas os 10 registos mais recentes (correspondentes a 200 horas de dados) são mantidos, implementando uma lógica de pilha (buffer circular). 
+
+\label{doc-constructors}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1services_1_1_csv_export_service_doc-constructors}
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1services_1_1_csv_export_service_a94a6d3078f7b29bc7d6afcc3f201d136}\index{main.java.com.gsmart.services.CsvExportService@{main.java.com.gsmart.services.CsvExportService}!CsvExportService@{CsvExportService}}
+\index{CsvExportService@{CsvExportService}!main.java.com.gsmart.services.CsvExportService@{main.java.com.gsmart.services.CsvExportService}}
+\doxysubsubsection{\texorpdfstring{CsvExportService()}{CsvExportService()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1services_1_1_csv_export_service_a94a6d3078f7b29bc7d6afcc3f201d136} 
+main.\+java.\+com.\+gsmart.\+services.\+Csv\+Export\+Service.\+Csv\+Export\+Service (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})}
+
+Construtor do serviço de exportação. Garante que o diretório de exportação existe. 
+
+\label{doc-func-members}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1services_1_1_csv_export_service_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmain_1_1java_1_1com_1_1gsmart_1_1services_1_1_csv_export_service_a8a0e9967de8fba60eece55f25489bb95}\index{main.java.com.gsmart.services.CsvExportService@{main.java.com.gsmart.services.CsvExportService}!exportData@{exportData}}
+\index{exportData@{exportData}!main.java.com.gsmart.services.CsvExportService@{main.java.com.gsmart.services.CsvExportService}}
+\doxysubsubsection{\texorpdfstring{exportData()}{exportData()}}
+{\footnotesize\ttfamily \label{classmain_1_1java_1_1com_1_1gsmart_1_1services_1_1_csv_export_service_a8a0e9967de8fba60eece55f25489bb95} 
+void main.\+java.\+com.\+gsmart.\+services.\+Csv\+Export\+Service.\+export\+Data (\begin{DoxyParamCaption}\item[{List$<$ Map$<$ String, Object $>$ $>$}]{telemetry\+Data}{}\end{DoxyParamCaption})}
+
+Método principal que recebe os dados de telemetria e os escreve num novo ficheiro CSV. Antes de escrever, ele gere a rotação dos ficheiros para garantir que o limite não é excedido.
+
+
+\begin{DoxyParams}{Parameters}
+{\em telemetry\+Data} & Uma lista de mapas, onde cada mapa representa uma linha de dados. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Desn01/\+Documents/\+GSmart/src/main/java/com/gsmart/services/Csv\+Export\+Service.\+java\end{DoxyCompactItemize}

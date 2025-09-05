@@ -1,1 +1,0 @@
-tagSearchIndex = [{"l":"Constant Field Values","h":"","u":"constant-values.html"},{"l":"Principais Responsabilidades:","h":"class main.java.com.gsmart.pipeline.PipelineManager","d":"Section","u":"main/java/com/gsmart/pipeline/PipelineManager.html#principais-responsabilidades--heading"},{"l":"Serialized Form","h":"","u":"serialized-form.html"}];updateSearchResults();
