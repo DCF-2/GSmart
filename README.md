@@ -142,8 +142,8 @@ java -jar target/GSmart-Processador-gui.jar
 
 For more detailed information, please consult our official documentation.
 
-* **GSmart Documentation:** `http://10.5.0.118:8080/docs/gsmart`
-* **Streaming Replication Documentation:** `http://10.5.0.118:8080/docs/streaming`
+* **GSmart Documentation:** `https://gsmart-site.netlify.app/`
+* **Streaming Replication Documentation:** `https://gsmart-site.netlify.app/`
 
 The complete project documentation, including the API reference, can also be viewed locally via MkDocs.
 
