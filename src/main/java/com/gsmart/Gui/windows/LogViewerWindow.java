@@ -4,10 +4,7 @@ package main.java.com.gsmart.Gui.windows;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets; // --- IMPORT ADICIONADO ---
+import main.java.com.gsmart.Gui.windows.LogViewerAppender;
 
 /**
  * Uma janela de UI que exibe os logs gerais da aplicação em tempo real.
@@ -15,87 +12,116 @@ import java.nio.charset.StandardCharsets; // --- IMPORT ADICIONADO ---
  * Esta classe redireciona as saídas padrão (System.out) e de erro (System.err)
  * para um {@link JTextPane}, permitindo que todos os logs gerados pela aplicação
  * sejam visualizados numa única interface. As mensagens são coloridas com base
- * no nível do log (INFO, WARN, ERROR) para facilitar a leitura.
+ * no nível e no conteúdo do log para facilitar a leitura.
  */
 public class LogViewerWindow extends JFrame {
 
     private final JTextPane textPane;
 
-    private static final Color COLOR_INFO = new Color(0, 128, 0); // Verde
-    private static final Color COLOR_WARN = new Color(255, 165, 0); // Laranja
-    private static final Color COLOR_ERROR = Color.RED;
-    private static final Color COLOR_DEBUG = Color.BLUE;
+    // --- PALETA DE CORES PARA LOGS ---
+    private static final Color COLOR_SUCCESS = new Color(0, 150, 0);       // Verde Escuro
+    private static final Color COLOR_INFO = new Color(60, 150, 220);       // Azul
+    private static final Color COLOR_WARN = new Color(255, 165, 0);        // Laranja
+    private static final Color COLOR_ERROR = new Color(220, 20, 60);         // Vermelho
+    private static final Color COLOR_DEBUG = new Color(150, 150, 150);     // Cinzento
+    private static final Color COLOR_LIFECYCLE = new Color(138, 43, 226);  // Roxo
     private static final Color COLOR_DEFAULT = Color.BLACK;
 
     public LogViewerWindow() {
         setTitle("GSmart - Visualizador de Logs");
-        setSize(750, 450);
+        setSize(850, 500);
         setLocationByPlatform(true);
 
         textPane = new JTextPane();
         textPane.setEditable(false);
         textPane.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
+        // Adiciona estilos ao JTextPane
+        addStylesToDocument(textPane);
+
         JScrollPane scrollPane = new JScrollPane(textPane);
         add(scrollPane, BorderLayout.CENTER);
 
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        LogViewerAppender.setLogViewer(this);
     }
 
-    private void append(String message, Color color) {
+    /**
+     * Adiciona os estilos de cor e formatação ao documento do JTextPane.
+     */
+    private void addStylesToDocument(JTextPane textPane) {
         StyledDocument doc = textPane.getStyledDocument();
-        Style style = textPane.addStyle("Color Style", null);
+        // Estilo Padrão
+        Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+        StyleConstants.setFontFamily(def, "Monospaced");
+        StyleConstants.setFontSize(def, 12);
+        // Estilos de Log
+        createStyle("SUCCESS", doc, COLOR_SUCCESS, true);
+        createStyle("INFO", doc, COLOR_INFO, false);
+        createStyle("WARN", doc, COLOR_WARN, false);
+        createStyle("ERROR", doc, COLOR_ERROR, true);
+        createStyle("DEBUG", doc, COLOR_DEBUG, false);
+        createStyle("LIFECYCLE", doc, COLOR_LIFECYCLE, true);
+        createStyle("DEFAULT", doc, COLOR_DEFAULT, false);
+    }
+
+    /**
+     * Método auxiliar para criar um novo estilo.
+     */
+    private void createStyle(String name, StyledDocument doc, Color color, boolean isBold) {
+        Style style = doc.addStyle(name, doc.getStyle(StyleContext.DEFAULT_STYLE));
         StyleConstants.setForeground(style, color);
-        try {
-            doc.insertString(doc.getLength(), message, style);
-            textPane.setCaretPosition(doc.getLength());
-        } catch (BadLocationException e) {
-            // Em vez de imprimir no stack trace (que seria redirecionado de volta para cá),
-            // podemos lidar com isso de forma mais segura, talvez logando para um arquivo futuramente.
-            // Por enquanto, vamos evitar a recursão infinita.
-        }
+        StyleConstants.setBold(style, isBold);
     }
 
-    public void redirectSystemStreams() {
-        OutputStream out = new OutputStream() {
-            @Override
-            public void write(int b) throws IOException {
-                // A decodificação de bytes para char é complexa.
-                // A maneira como o PrintStream lida com isso é mais robusta.
-                // Apenas encaminhamos o byte bruto. O PrintStream fará o resto.
-                // Esta abordagem simples pode não lidar com todos os caracteres multibyte
-                // perfeitamente, mas para o Logback que envia strings completas,
-                // a especificação do charset no PrintStream é o mais importante.
-                updateTextPane(String.valueOf((char) b));
-            }
-
-            @Override
-            public void write(byte[] b, int off, int len) throws IOException {
-                // O Logback geralmente chama este metodo, enviando uma string completa.
-                // Aqui garantimos a decodificação correta.
-                updateTextPane(new String(b, off, len, StandardCharsets.UTF_8));
-            }
-        };
-
-        // --- MUDANÇA PRINCIPAL AQUI ---
-        // Especificamos o encoding UTF-8 ao criar o PrintStream.
-        System.setOut(new PrintStream(out, true, StandardCharsets.UTF_8));
-        System.setErr(new PrintStream(out, true, StandardCharsets.UTF_8));
-    }
-
-    private void updateTextPane(final String text) {
+    /**
+     * Adiciona texto à janela, aplicando estilos com base no conteúdo da mensagem.
+     * @param text O texto a ser adicionado.
+     */
+    public void appendText(final String text) {
         SwingUtilities.invokeLater(() -> {
-            if (text.contains("ERROR")) {
-                append(text, COLOR_ERROR);
-            } else if (text.contains("WARN")) {
-                append(text, COLOR_WARN);
-            } else if (text.contains("INFO") || text.contains("sucesso")) {
-                append(text, COLOR_INFO);
-            } else if (text.contains("DEBUG")) {
-                append(text, COLOR_DEBUG);
-            } else {
-                append(text, COLOR_DEFAULT);
+            StyledDocument doc = textPane.getStyledDocument();
+            String styleName = getStyleNameFor(text); // Determina o estilo a ser usado
+
+            try {
+                doc.insertString(doc.getLength(), text, doc.getStyle(styleName));
+                textPane.setCaretPosition(doc.getLength());
+            } catch (BadLocationException e) {
+                // Erro interno, não fazer nada para evitar loops infinitos
             }
         });
+    }
+
+    /**
+     * Determina qual o nome do estilo a ser aplicado com base no conteúdo da linha de log.
+     * @param text A linha de log.
+     * @return O nome do estilo ("SUCCESS", "ERROR", etc.).
+     */
+    private String getStyleNameFor(String text) {
+        String upperCaseText = text.toUpperCase();
+
+        if (upperCaseText.contains("ERROR") || upperCaseText.contains("FALHA AO")) {
+            return "ERROR";
+        }
+        if (upperCaseText.contains("PARADA PROCESSADO") || upperCaseText.contains("ENCERRANDO A PIPELINE")) {
+            return "ERROR";
+        }
+        if (upperCaseText.contains("WARN") || upperCaseText.contains("AVISO")) {
+            return "WARN";
+        }
+        if (upperCaseText.contains("CONCLUÍDA COM SUCESSO") || upperCaseText.contains("BEM-SUCEDIDO")) {
+            return "SUCCESS";
+        }
+        if (upperCaseText.startsWith("--- INICIANDO") || upperCaseText.contains("FIM DO LOOP")) {
+            return "LIFECYCLE";
+        }
+        if (upperCaseText.contains("INFO") || text.startsWith("[")) {
+            return "INFO";
+        }
+        if (upperCaseText.contains("DEBUG") || upperCaseText.contains("AZ.SDK.MESSAGE")) {
+            return "DEBUG";
+        }
+
+        return "DEFAULT";
     }
 }

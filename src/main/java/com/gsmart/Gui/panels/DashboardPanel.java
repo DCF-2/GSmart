@@ -4,10 +4,7 @@ package main.java.com.gsmart.Gui.panels;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.*;
 import java.util.Map;
 
 /**
@@ -57,7 +54,7 @@ public class DashboardPanel extends JPanel {
         statusPanel.add(createStatusCard("Alarmes Recentes", recentAlarmsLabel));
         centerPanel.add(statusPanel, BorderLayout.NORTH);
 
-        // --- NOVO CONTAINER DE GRÁFICOS COM BOTÃO DE TROCA ---
+        // --- CONTAINER DE GRÁFICOS COM BOTÃO DE TROCA ---
         JPanel chartWrapperPanel = new JPanel(new BorderLayout());
 
         // Título e botão
@@ -109,18 +106,27 @@ public class DashboardPanel extends JPanel {
         lineChartPanel.updateData(pData, aData, alData);
     }
 
+    /**
+     * Adiciona uma nova mensagem de log ao painel do Dashboard.
+     * @param message A mensagem a ser exibida.
+     * @param color A cor do texto da mensagem.
+     */
     public void addLogMessage(String message, Color color) {
         SwingUtilities.invokeLater(() -> {
             try {
                 StyledDocument doc = logTextPane.getStyledDocument();
                 Style style = logTextPane.addStyle("Color Style", null);
                 StyleConstants.setForeground(style, color);
-                doc.insertString(0, message + "\n", style);
+                doc.insertString(doc.getLength(), message + "\n", style);
+
+                // Limita o número de linhas para evitar sobrecarga de memória, removendo do topo
                 if (doc.getDefaultRootElement().getElementCount() > MAX_LOG_ENTRIES) {
-                    int end = doc.getEndPosition().getOffset() - 1;
-                    int start = doc.getDefaultRootElement().getElement(MAX_LOG_ENTRIES).getStartOffset();
-                    doc.remove(start, end - start);
+                    Element root = doc.getDefaultRootElement();
+                    Element firstLine = root.getElement(0);
+                    doc.remove(0, firstLine.getEndOffset());
                 }
+                // --- Força a barra de rolagem a ir para o final ---
+                logTextPane.setCaretPosition(doc.getLength());
             } catch (BadLocationException e) {
                 System.err.println("Erro ao adicionar mensagem de log ao dashboard: " + e.getMessage());
             }
