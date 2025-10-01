@@ -4,16 +4,16 @@ package main.java.com.gsmart.Gui.windows;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
  * Janela de Ajuda que fornece informações, FAQs e links para tutoriais.
+ * <p>
+ * Esta janela utiliza um {@link JTabbedPane} para organizar o conteúdo de ajuda
+ * em diferentes secções, como "Dúvidas Frequentes" e "Vídeos Tutoriais",
+ * melhorando a experiência de suporte ao utilizador.
  */
 public class HelpWindow extends JDialog {
 
@@ -30,7 +30,6 @@ public class HelpWindow extends JDialog {
     }
 
     private JPanel createFaqPanel() {
-        // (Este método permanece o mesmo)
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(new EmptyBorder(15, 15, 15, 15));
         JEditorPane editorPane = new JEditorPane();
@@ -55,35 +54,36 @@ public class HelpWindow extends JDialog {
         return panel;
     }
 
+    /**
+     * Cria o painel que conterá os links para os vídeos tutoriais online.
+     */
     private JPanel createVideosPanel() {
-        // (Este método permanece o mesmo)
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(new EmptyBorder(15, 15, 15, 15));
 
         panel.add(createSectionLabel("Introdução"));
-        panel.add(createVideoLinkButton("1. O Que é o GSmart? (Introdução e Instalação)", "GSmart Tutorial - Video 1.mp4"));
+        panel.add(createVideoLinkButton("1. O Que é o GSmart? (Introdução e Instalação)", "https://drive.google.com/file/d/1U3MJznb8NLfccVTDxbqMBr8Y2u-BvcO3/view?usp=drive_link"));
         panel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         panel.add(createSectionLabel("Configuração Inicial"));
-        panel.add(createVideoLinkButton("2. Conexão às Fontes de Dados (Primeiros Passos)", "GSmart Tutorial - Video 2.mp4"));
-        panel.add(createVideoLinkButton("3. Criando o Seu Primeiro Pipeline de Dados", "GSmart Tutorial - Video 3.mp4"));
+        panel.add(createVideoLinkButton("2. Conexão às Fontes de Dados (Primeiros Passos)", "https://drive.google.com/file/d/1xEzoE771FC5JtT9aYh-biKDo-HMAABEG/view?usp=drive_link"));
+        panel.add(createVideoLinkButton("3. Criando o Seu Primeiro Pipeline de Dados", "https://drive.google.com/file/d/1b3UJHjhZAVOLl3twVoKSVskPCdl3nCXt/view?usp=drive_link"));
         panel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         panel.add(createSectionLabel("Funcionalidades Essenciais"));
-        panel.add(createVideoLinkButton("4. Desvendando as Regras (Alertas e Insights)", "GSmart Tutorial - Video 4.mp4"));
-        panel.add(createVideoLinkButton("5. Dashboard: O Seu Centro de Comando", "GSmart Tutorial - Video 5.mp4"));
+        panel.add(createVideoLinkButton("4. Desvendando as Regras (Alertas e Insights)", "https://drive.google.com/file/d/12a-H2f0pEPOdg_KZznLSWuGkBT179CSM/view?usp=drive_link"));
+        panel.add(createVideoLinkButton("5. Dashboard: O Seu Centro de Comando", "https://drive.google.com/file/d/1zL3FrUZj2SFMmuS8mstbUXKZH-yYkgEW/view?usp=drive_link"));
         panel.add(Box.createRigidArea(new Dimension(0, 15)));
 
         panel.add(createSectionLabel("Gestão e Dicas"));
-        panel.add(createVideoLinkButton("6. Gestão de Utilizadores (Para Administradores)", "GSmart Tutorial - Video 6.mp4"));
-        panel.add(createVideoLinkButton("7. Dicas e Truques Avançados", "GSmart Tutorial - Video 7.mp4"));
+        panel.add(createVideoLinkButton("6. Gestão de Utilizadores (Para Administradores)", "https://drive.google.com/file/d/18IVvthrE4HvauYX5_EfR6i_iDOeMs-dZ/view?usp=drive_link"));
+        panel.add(createVideoLinkButton("7. Dicas e Truques Avançados", "https://drive.google.com/file/d/1HAYASx1azGc4gwWeH0Qf5bO4kxYPzlW9/view?usp=drive_link"));
 
         return panel;
     }
 
     private JLabel createSectionLabel(String text) {
-        // (Este método permanece o mesmo)
         JLabel label = new JLabel(text);
         label.setFont(new Font("Segoe UI", Font.BOLD, 14));
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -91,8 +91,10 @@ public class HelpWindow extends JDialog {
         return label;
     }
 
-    private JButton createVideoLinkButton(String text, String videoFileName) {
-        // (Este método permanece o mesmo)
+    /**
+     * Método auxiliar para criar um botão que abre um URL no navegador.
+     */
+    private JButton createVideoLinkButton(String text, String url) {
         JButton button = new JButton("<html><body style='text-align:left;'>▶ " + text + "</body></html>");
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -101,37 +103,25 @@ public class HelpWindow extends JDialog {
         button.setFocusPainted(false);
         button.setForeground(new Color(0, 102, 204));
         button.setAlignmentX(Component.LEFT_ALIGNMENT);
-        button.addActionListener(e -> openLocalVideo(videoFileName));
+
+        button.addActionListener(e -> openUrlInBrowser(url));
+
         return button;
     }
 
-    private void openLocalVideo(String videoFileName) {
+    /**
+     * Abre um URL no navegador padrão do sistema.
+     * @param url O endereço da web a ser aberto.
+     */
+    private void openUrlInBrowser(String url) {
         try {
-            // --- ✨ CORREÇÃO APLICADA AQUI ✨ ---
-            // O caminho agora aponta para a sua pasta "/GSmart-Tutoriais/"
-            String resourcePath = "/GSmart-Tutoriais/" + videoFileName;
-            InputStream videoStream = getClass().getResourceAsStream(resourcePath);
-
-            if (videoStream == null) {
-                JOptionPane.showMessageDialog(this, "Ficheiro de vídeo não encontrado no caminho: " + resourcePath, "Erro", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            File tempFile = File.createTempFile("gsmart_tutorial_", ".mp4");
-            tempFile.deleteOnExit();
-
-            try (OutputStream outputStream = new FileOutputStream(tempFile)) {
-                videoStream.transferTo(outputStream);
-            }
-
-            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
-                Desktop.getDesktop().open(tempFile);
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(new URI(url));
             } else {
-                JOptionPane.showMessageDialog(this, "Abertura de ficheiros de vídeo não suportada neste sistema.", "Erro de Compatibilidade", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Abertura de links não suportada neste sistema.", "Erro de Compatibilidade", JOptionPane.ERROR_MESSAGE);
             }
-
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "Ocorreu um erro ao tentar abrir o vídeo:\n" + ex.getMessage(), "Erro de Ficheiro", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException | URISyntaxException ex) {
+            JOptionPane.showMessageDialog(this, "Não foi possível abrir o link: " + url, "Erro", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
