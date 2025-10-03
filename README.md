@@ -11,7 +11,7 @@
 The application is designed to fetch data from IoT platforms and databases, process it through a **fully configurable dual-rule engine**, and export the results to modern BI tools while sending proactive notifications throughout the process.
 
 
-![Screenshot of GSmartGui.java](Site/img/Gsmart-logo.png)
+![Screenshot of GSmartGui.java](src/main/resources/gsmart_icon.png)
 
 ---
 
