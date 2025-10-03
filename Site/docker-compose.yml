@@ -1,9 +1,0 @@
-version: '3.8'
-
-services:
-  gsmart-site:
-    build: .
-    container_name: container-gsmart
-    ports:
-      - "8080:80"
-    restart: unless-stopped
