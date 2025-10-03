@@ -10,6 +10,8 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Classe utilitária responsável por enviar dados para a API de Push do Microsoft Power BI.
@@ -19,7 +21,7 @@ import java.util.Scanner;
  * tratando a resposta do servidor.
  */
 public class ExportacaoDadosPWBI {
-
+    private static final Logger logger = LoggerFactory.getLogger(ExportacaoDadosPWBI.class);
     /**
      * Envia um único objeto de dados para um endpoint da API de Push do Power BI.
      *
@@ -40,7 +42,7 @@ public class ExportacaoDadosPWBI {
         payloadArray.add(dataObject);
         String jsonToSend = payloadArray.toString();
 
-        System.out.println("\n[DEBUG POWER BI] Enviando para " + powerBiApiUrl);
+        logger.debug("Enviando dados para o Power BI. URL: {}", powerBiApiUrl);
 
         URL url = URI.create(powerBiApiUrl).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -55,7 +57,7 @@ public class ExportacaoDadosPWBI {
 
         int responseCode = connection.getResponseCode();
         if (responseCode >= 200 && responseCode < 300) {
-            System.out.println("Dados enviados para o Power BI com sucesso!");
+           logger.info("Dados enviados para o Power BI com sucesso!");
         } else {
             String responseMessage = connection.getResponseMessage();
             try (InputStream errorStream = connection.getErrorStream()) {

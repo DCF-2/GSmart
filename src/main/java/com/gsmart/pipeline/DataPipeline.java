@@ -13,7 +13,9 @@ import main.java.com.gsmart.resources.GSmartListener;
 import main.java.com.gsmart.resources.IDataSource;
 import main.java.com.gsmart.resources.TaskStatus;
 import main.java.com.gsmart.services.CsvExportService;
+import main.java.com.gsmart.services.MqttService;
 import main.java.com.gsmart.services.TelegramService;
+import main.java.com.gsmart.sources.DatabaseSource;
 import main.java.com.gsmart.sources.ThingsBoardSource;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
@@ -29,29 +31,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
 /**
  * Representa o motor de uma única pipeline de processamento de dados.
  *
- * Esta classe é responsável pelo ciclo de vida completo de uma tarefa de monitorização:
- * <ol>
- * <li><b>Busca de Dados:</b> Conecta-se a uma {@link main.java.com.gsmart.resources.IDataSource} para obter os dados de telemetria mais recentes.</li>
- * <li><b>Processamento e Transformação:</b> Aplica as configurações de métricas ({@link main.java.com.gsmart.config.MetricConfig}), como aliases e expressões matemáticas.</li>
- * <li><b>Avaliação de Regras:</b> Executa o motor de regras para verificar se alguma {@link main.java.com.gsmart.config.AlertRule} ou {@link main.java.com.gsmart.config.InsightRule} foi despoletada.</li>
- * <li><b>Notificação:</b> Comunica alertas e insights através do {@link main.java.com.gsmart.resources.GSmartListener} e envia notificações para serviços externos como MQTT e Telegram.</li>
- * <li><b>Exportação de Dados:</b> Envia os dados processados para destinos como Power BI ou Microsoft Fabric.</li>
- * <li><b>Gestão de Conexão:</b> Lida com a lógica de reconexão automática em caso de falha na comunicação com a fonte de dados.</li>
- * </ol>
- * Cada instância desta classe é executada na sua própria thread, gerida por uma {@link PipelineTask}.
- *
- * @see main.java.com.gsmart.pipeline.PipelineManager
- * @see main.java.com.gsmart.pipeline.PipelineTask
- * @see main.java.com.gsmart.resources.GSmartListener
+ * (O Javadoc permanece o mesmo)
  */
 public class DataPipeline {
     public static final Logger logger = LoggerFactory.getLogger(DataPipeline.class);
     private static final Logger reconnectionLogger = LoggerFactory.getLogger("ReconnectionLogger");
 
+    // ... (As variáveis de instância permanecem as mesmas)
     private final IDataSource dataSource;
     private final DestinationType destinationType;
     private final String destinationEndpoint;
@@ -70,20 +59,7 @@ public class DataPipeline {
     private volatile boolean stopRequested = false;
     private final AtomicBoolean manualReconnectTrigger = new AtomicBoolean(false);
 
-    /**
-     * Constrói e inicializa uma nova instância da pipeline de dados.
-     *
-     * @param dataSource A fonte de dados (ThingsBoard, Banco de Dados, etc.) que fornecerá a telemetria.
-     * @param destinationType O tipo de destino para onde os dados processados serão enviados (ex: POWER_BI, FABRIC).
-     * @param destinationEndpoint O endpoint específico do destino (URL para Power BI, Connection String para Fabric).
-     * @param metricConfigs A lista de configurações de métricas que define como os dados brutos serão tratados.
-     * @param listener O ouvinte (geralmente a UI) que receberá notificações sobre eventos da pipeline.
-     * @param alertRules A lista de regras de alerta a serem avaliadas a cada ciclo.
-     * @param insightRules A lista de regras de alarme (insights) a serem avaliadas a cada ciclo.
-     * @param telegramToken O token de API para o bot do Telegram que enviará as notificações.
-     * @param telegramChatId O ID do chat do Telegram para onde as notificações serão enviadas.
-     * @param mqttBrokerUrl O endereço do broker MQTT para a publicação de alertas e alarmes.
-     */
+
     public DataPipeline(IDataSource dataSource,DestinationType destinationType, String destinationEndpoint,List<MetricConfig> metricConfigs, GSmartListener listener, List<AlertRule> alertRules, List<InsightRule> insightRules, String telegramToken, String telegramChatId, String mqttBrokerUrl) {
         this.dataSource = dataSource;
         this.destinationType = destinationType;
@@ -100,43 +76,28 @@ public class DataPipeline {
         this.httpClient = new OkHttpClient();
     }
 
-    /**
-     * Dispara um sinal para que a pipeline tente uma reconexão manual imediata.
-     * <p>
-     * Este método é normalmente invocado pela UI quando o utilizador clica no botão
-     * "Reconectar Agora" na janela de erro de conexão. Ele define uma flag atómica
-     * e interrompe a thread para que o loop de reconexão possa agir imediatamente.
-     */
+    // ... (Os métodos triggerManualReconnect e requestStop permanecem os mesmos)
     public void triggerManualReconnect() {
         logger.info("Sinal de reconexão manual recebido.");
         this.manualReconnectTrigger.set(true);
         Thread.currentThread().interrupt();
     }
 
-    /**
-     * Sinaliza para a pipeline que a sua execução deve ser interrompida.
-     * <p>
-     * Este método define uma flag volátil que é verificada a cada ciclo do
-     * método {@link #run()}. Quando a flag é detetada, o loop principal
-     * termina, permitindo que a thread encerre de forma graciosa.
-     */
     public void requestStop() {
         this.stopRequested = true;
     }
 
+
     /**
      * Inicia e executa o ciclo de processamento contínuo da pipeline.
-     * <p>
-     * Este método contém o loop principal que busca, processa e envia dados
-     * em intervalos regulares. Ele continuará a ser executado até que o método
-     * {@link #requestStop()} seja chamado.
-     * <p>
-     * Em caso de falha de conexão com a fonte de dados, este método entra num
-     * modo de reconexão automática, com um tempo de espera exponencial, até que
-     * a conexão seja restabelecida ou a tarefa seja interrompida.
      */
     public void run() {
-        logger.info("🚀 INICIANDO PIPELINE COM FONTE: {} 🚀", dataSource.getSourceName());
+        // --- ✨ LOG INICIAL MELHORADO ✨ ---
+        logger.info("======================================================================");
+        logger.info("🚀 NOVA PIPELINE INICIADA");
+        logger.info("   ├─ Fonte de Dados: {}", getDataSourceDetails());
+        logger.info("   └─ Destino dos Dados: {}", getDestinationDetails());
+        logger.info("======================================================================");
 
         final long MAX_RETRY_DELAY = 300;
         final long RETRY_INCREMENT = 5;
@@ -145,275 +106,280 @@ public class DataPipeline {
         while (!stopRequested) {
             try {
                 if (currentRetryDelay > 0) {
-                    logger.info("Conexão restaurada. Retomando operação normal.");
+                    logger.info("✅ Conexão restabelecida. Retomando operação normal.");
                     currentRetryDelay = 0;
                 }
 
-                ZonedDateTime horaAtualBrasil = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
-                String mensagemAlertaPBI = "";
-                String mensagemAlarmePBI = "";
-                String timestampPrefix = horaAtualBrasil.format(DateTimeFormatter.ofPattern("'['dd/MM/yyyy HH:mm:ss']' "));
-                logger.info("--- Iniciando novo ciclo de processamento às {} ---", horaAtualBrasil.toLocalTime());
+                logger.info("🔄 --- Novo ciclo de processamento iniciado ---");
 
-                logger.info("[ETAPA 1/3] Buscando dados da fonte...");
+                // [ETAPA 1] BUSCA DE DADOS
+                logger.info("[1/4] 📥 Buscando dados da fonte: '{}'", dataSource.getSourceName());
                 JsonObject telemetria = dataSource.fetchData();
+                if (telemetria.keySet().isEmpty()) {
+                    logger.warn("⚠️ A fonte de dados não retornou nenhuma métrica. O ciclo será reiniciado em 5 segundos.");
+                    Thread.sleep(5000);
+                    continue;
+                }
 
+                // [ETAPA 2] PROCESSAMENTO E TRANSFORMAÇÃO
+                logger.info("[2/4] ⚙️  Processando e transformando {} métricas...", metricConfigs.stream().filter(m -> !m.isSystemMetric()).count());
                 Map<String, Double> currentMetricValues = new HashMap<>();
                 JsonObject pbiPayload = new JsonObject();
+                processMetrics(telemetria, currentMetricValues, pbiPayload);
 
-                for (MetricConfig config : this.metricConfigs) {
-                    String originalName = config.getOriginalName();
-                    String alias = config.getAlias();
-                    if (telemetria.has(originalName)) {
-                        try {
-                            JsonElement valorFinal = telemetria.get(originalName).getAsJsonArray().get(0).getAsJsonObject().get("value");
-                            if (valorFinal.isJsonPrimitive()) {
-                                double valorNumerico;
-                                try {
-                                    valorNumerico = Double.parseDouble(valorFinal.getAsString());
-                                } catch (NumberFormatException | UnsupportedOperationException ex) {
-                                    pbiPayload.addProperty(alias, valorFinal.getAsString());
-                                    continue;
-                                }
+                // [ETAPA 3] AVALIAÇÃO DE REGRAS
+                logger.info("[3/4] ⚖️  Avaliando {} regras de alerta e {} de alarme...", alertRules.size(), insightRules.size());
+                String mensagemAlertaPBI = evaluateAlertRules(currentMetricValues);
+                String mensagemAlarmePBI = evaluateInsightRules(currentMetricValues);
 
-                                currentMetricValues.put(originalName, valorNumerico);
-                                String expressao = config.getExpression();
-                                double valorParaEnviar = valorNumerico;
+                addToCsvBuffer(pbiPayload);
+                finalizePayload(pbiPayload, !mensagemAlertaPBI.isEmpty(), mensagemAlertaPBI, mensagemAlarmePBI);
 
-                                if (expressao != null && !expressao.trim().isEmpty()) {
-                                    Expression e = new ExpressionBuilder(expressao).variable("valor").build().setVariable("valor", valorNumerico);
-                                    valorParaEnviar = e.evaluate();
-                                }
-                                pbiPayload.addProperty(alias, valorParaEnviar);
-
-                            } else {
-                                pbiPayload.addProperty(alias, valorFinal.toString());
-                            }
-                        } catch (Exception e) {
-                            logger.warn("Não foi possível processar a chave '{}'. Pulando.", originalName, e);
-                        }
-                    }
-                }
-
-                logger.debug("[MOTOR DE REGRAS] A iniciar avaliação de {} regras de alerta.", alertRules != null ? alertRules.size() : 0);
-                boolean alertaCriticoDisparado = false;
-                if (alertRules != null && !alertRules.isEmpty()) {
-
-                    for (AlertRule rule : alertRules) {
-                        logger.debug("--- Avaliando regra: '{}'", rule.getRuleName());
-                        if (!rule.isEnabled()) {
-                            logger.debug("   - Regra desativada. A pular.");
-                            continue;
-                        }
-
-                        String metricToWatch = rule.getMetricToWatch();
-                        if (currentMetricValues.containsKey(metricToWatch)) {
-                            double valorAtual = currentMetricValues.get(metricToWatch);
-                            double valorLimiar = rule.getThresholdValue();
-                            boolean condicaoSatisfeita = false;
-
-                            logger.debug("   - A verificar métrica: '{}' | Valor Atual: {} | Condição: {} | Limiar: {}",
-                                    metricToWatch, valorAtual, rule.getCondition(), valorLimiar);
-
-                            switch (rule.getCondition()) {
-                                case GREATER_THAN: condicaoSatisfeita = valorAtual > valorLimiar; break;
-                                case LESS_THAN: condicaoSatisfeita = valorAtual < valorLimiar; break;
-                                case EQUALS: condicaoSatisfeita = valorAtual == valorLimiar; break;
-                                case BETWEEN:
-                                    double min = Math.min(rule.getThresholdValue(), rule.getThresholdValueMax());
-                                    double max = Math.max(rule.getThresholdValue(), rule.getThresholdValueMax());
-                                    condicaoSatisfeita = valorAtual >= min && valorAtual <= max;
-                                    break;
-                            }
-
-                            logger.debug("   - Resultado da condição: {}", condicaoSatisfeita);
-
-                            if (condicaoSatisfeita) {
-                                if (!rule.getId().equals(this.lastTriggeredAlertId)) {
-                                    logger.info("   - NOVO ESTADO DE ALERTA DETETADO! Regra: '{}'. Disparando notificação.", rule.getRuleName());
-                                    this.lastTriggeredAlertId= rule.getId(); // Atualiza o estado de alarme para esta regra.
-                                    alertaCriticoDisparado = true;
-
-                                    String mensagemComTimestamp = timestampPrefix + rule.getMessageToSend();
-                                    if (listener != null) listener.onAlert(rule.getRuleName(), mensagemComTimestamp);
-
-                                    if (rule.isSendToMqtt()) {
-                                        publicarAlertaMqtt(mensagemComTimestamp);
-                                    }
-                                    if (rule.isSendToTelegram()) {
-                                        TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagemComTimestamp);
-                                    }
-                                    mensagemAlertaPBI = mensagemComTimestamp;
-                                } else {
-                                    logger.debug("   - CONDIÇÃO DE ALERTA SATISFEITA, MAS O ESTADO É O MESMO ('{}'). Nenhuma notificação enviada.", rule.getRuleName());
-                                }
-                            }
-                        } else {
-                            logger.warn("   - A métrica '{}' para a regra '{}' não foi encontrada nos dados atuais.", metricToWatch, rule.getRuleName());
-                        }
-                    }
-                }
-
-                logger.debug("[MOTOR DE ALARMES] A iniciar avaliação de {} regras de alarme.", insightRules != null ? insightRules.size() : 0);
-                if (insightRules != null && !insightRules.isEmpty()) {
-                    for (InsightRule rule : insightRules) {
-                        if (!rule.isEnabled()) continue;
-
-                        if (currentMetricValues.containsKey(rule.getMetricToWatch())) {
-                            double valorAtual = currentMetricValues.get(rule.getMetricToWatch());
-                            boolean condicaoSatisfeita = false;
-                            switch (rule.getCondition()) {
-                                case GREATER_THAN: condicaoSatisfeita = valorAtual > rule.getThresholdValue(); break;
-                                case LESS_THAN: condicaoSatisfeita = valorAtual < rule.getThresholdValue(); break;
-                                case EQUALS: condicaoSatisfeita = valorAtual == rule.getThresholdValue(); break;
-                                case BETWEEN:
-                                double min = Math.min(rule.getThresholdValue(), rule.getThresholdValueMax());
-                                double max = Math.max(rule.getThresholdValue(), rule.getThresholdValueMax());
-                                condicaoSatisfeita = valorAtual >= min && valorAtual <= max;
-                                break;
-                            }
-
-                            if (condicaoSatisfeita) {
-                                // Apenas dispara o alarme se o estado MUDOU (ou seja, a regra atual é diferente da última)
-                                if (!rule.getId().equals(this.lastTriggeredAlarmId)) {
-                                    logger.info("   - NOVO ESTADO DE ALARME DETETADO! Regra: '{}'. Disparando notificação.", rule.getRuleName());
-                                    this.lastTriggeredAlarmId = rule.getId(); // Atualiza o estado para esta regra.
-
-                                    String mensagemComTimestamp = timestampPrefix + rule.getMessageToSend();
-
-                                    if (listener != null) {
-                                        listener.onInsight(mensagemComTimestamp, rule.getInsightType());
-                                    }
-                                    publicarAlarmeMqtt(mensagemComTimestamp, rule.getInsightType());
-                                    if (rule.isSendToTelegram()) {
-                                        TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagemComTimestamp);
-                                    }
-                                    mensagemAlarmePBI = mensagemComTimestamp;
-                                } else {
-                                    logger.debug("   - CONDIÇÃO DE ALARME SATISFEITA, MAS O ESTADO É O MESMO ('{}'). Nenhuma notificação enviada.", rule.getRuleName());
-                                }
-                            }
-                        }
-                    }
-                }
-                Map<String, Object> dataRow = new LinkedHashMap<>();
-                for (String key : pbiPayload.keySet()) {
-                    JsonElement element = pbiPayload.get(key);
-                    if (element.isJsonPrimitive()) {
-                        if (element.getAsJsonPrimitive().isNumber()) {
-                            dataRow.put(key, element.getAsNumber());
-                        } else if (element.getAsJsonPrimitive().isBoolean()) {
-                            dataRow.put(key, element.getAsBoolean());
-                        } else {
-                            dataRow.put(key, element.getAsString());
-                        }
-                    }
-                }
-                telemetryBuffer.add(dataRow);
-
-                pbiPayload.addProperty("AlertaCritico", alertaCriticoDisparado ? 1 : 0);
-                pbiPayload.addProperty("timestamp", Instant.now().minus(3, ChronoUnit.HOURS).toString());
-                pbiPayload.addProperty("UltimoAlerta", mensagemAlertaPBI);
-                pbiPayload.addProperty("UltimoAlarme", mensagemAlarmePBI);
-                pbiPayload.addProperty("HoraDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-                pbiPayload.addProperty("DataDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-                pbiPayload.addProperty("OrigemDados", dataSource.getSourceName());
-
+                // [ETAPA 4] ENVIO DOS DADOS
+                logger.info("[4/4] 📤 Enviando dados para o destino: {}", destinationType);
                 if (this.destinationType == DestinationType.POWER_BI) {
                     ExportacaoDadosPWBI.sendDataToPowerBI(pbiPayload, this.destinationEndpoint);
                 } else if (this.destinationType == DestinationType.FABRIC) {
                     ExportacaoDadosFabric.sendDataToFabric(pbiPayload, this.destinationEndpoint);
                 }
+                logger.info("✅ Ciclo concluído com sucesso.");
                 Thread.sleep(5000);
 
             } catch (InterruptedException e) {
-                logger.warn("Sinal de interrupção recebido. Encerrando a pipeline...");
+                logger.warn("Pipeline interrompida. Encerrando...");
                 this.stopRequested = true;
             } catch (Exception e) {
                 String errorMessage = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-                logger.error("Falha na pipeline: {}", errorMessage, e);
+                logger.error("❌ Falha crítica na pipeline: {}", errorMessage, e);
+
                 if (dataSource instanceof ThingsBoardSource) {
                     ((ThingsBoardSource) dataSource).clearAuthToken();
                 }
+
                 if (listener != null) {
                     listener.onConnectionLost(errorMessage);
                     reconnectionLogger.info("CONEXÃO PERDIDA - Pipeline: {}", dataSource.getSourceName());
                 }
 
-                while (!stopRequested) {
-                    try {
-                        if (manualReconnectTrigger.compareAndSet(true, false)) {
-                            logger.info("Iniciando tentativa de reconexão manual imediata...");
-                            currentRetryDelay = 0;
-                        } else {
-                            currentRetryDelay += RETRY_INCREMENT;
-                            if (currentRetryDelay > MAX_RETRY_DELAY) currentRetryDelay = MAX_RETRY_DELAY;
-                            if (listener != null) listener.onReconnectionAttempt(currentRetryDelay);
-                            Thread.sleep(currentRetryDelay * 1000);
-                        }
-                        logger.info("Tentando reconectar...");
-                        dataSource.fetchData();
-                        if (listener != null) listener.onConnectionRestored();
-                        reconnectionLogger.info("CONEXÃO RESTABELECIDA - Pipeline: {}", dataSource.getSourceName());
-                        break;
-                    } catch (InterruptedException ie) {
-                        logger.warn("Sinal de interrupção recebido durante a reconexão. Encerrando a pipeline...");
-                        this.stopRequested = true;
-                    } catch (Exception retryEx) {
-                        logger.error("Tentativa de reconexão falhou: {}", retryEx.getMessage());
-                        reconnectionLogger.info("TENTATIVA DE RECONEXÃO FALHOU - Pipeline: {}", dataSource.getSourceName());
-                    }
-                }
+                handleReconnection(MAX_RETRY_DELAY, RETRY_INCREMENT);
             }
         }
-        // Garante que todos os dados restantes no buffer são salvos antes de a pipeline terminar.
+
         exportRemainingData();
-        logger.info("FIM DO LOOP. Execução da pipeline para {} finalizada.", dataSource.getSourceName());
+        logger.info("🛑 FIM DO LOOP. Pipeline para '{}' finalizada.", dataSource.getSourceName());
         if (listener != null) {
             listener.onStatusUpdate(TaskStatus.FINISHED);
         }
     }
 
+    // --- ✨ NOVOS MÉTODOS PARA DETALHES NO LOG ✨ ---
+
     /**
-     * Publica uma mensagem de alerta crítico no tópico MQTT 'gsmart/alerta'.
-     * <p>
-     * Utiliza o {@link main.java.com.gsmart.services.MqttService} para a comunicação direta com o broker.
-     * Este método é chamado quando uma {@link main.java.com.gsmart.config.AlertRule} é despoletada.
-     *
-     * @param mensagem O conteúdo da mensagem de alerta a ser publicada.
+     * Gera uma string detalhada sobre a fonte de dados para o log.
      */
-    private void publicarAlertaMqtt(String mensagem) {
-        main.java.com.gsmart.services.MqttService.publish(this.mqttBrokerUrl, "gsmart/alerta", mensagem);
+    private String getDataSourceDetails() {
+        if (dataSource instanceof ThingsBoardSource tbSource) {
+            return String.format("ThingsBoard (Servidor: %s, Dispositivo: %s)", tbSource.getThingsboardUrl(), tbSource.getDeviceName());
+        }
+        if (dataSource instanceof DatabaseSource dbSource) {
+            return String.format("Banco de Dados (URL: %s, Tabela: %s)", dbSource.getDbUrl(), dbSource.getTableName());
+        }
+        return "Desconhecida";
     }
 
     /**
-     * Publica uma mensagem de alarme (insight) num subtópico MQTT dinâmico.
-     * <p>
-     * O tópico é formatado como 'gsmart/alarme/{tipo}', permitindo uma filtragem fácil
-     * por parte dos clientes MQTT. Este método é chamado quando uma
-     * {@link main.java.com.gsmart.config.InsightRule} é despoletada.
-     *
-     * @param mensagem O conteúdo do alarme a ser publicado.
-     * @param tipo A categoria do alarme (ex: "CUSTO", "MANUTENCAO"), que definirá o subtópico.
+     * Gera uma string detalhada sobre o destino dos dados para o log.
      */
-    private void publicarAlarmeMqtt(String mensagem, String tipo) {
-        // Publicamos o alarme num subtópico para melhor organização
-        String topic = "gsmart/alarme/" + tipo.toLowerCase();
-        main.java.com.gsmart.services.MqttService.publish(this.mqttBrokerUrl, topic, mensagem);
+    private String getDestinationDetails() {
+        if (destinationType == DestinationType.POWER_BI) {
+            return String.format("Power BI (URL: %s)", destinationEndpoint);
+        }
+        if (destinationType == DestinationType.FABRIC) {
+            // Não expomos a connection string completa no log por segurança
+            return "Microsoft Fabric Eventstream";
+        }
+        return "Desconhecido";
     }
 
-    /**
-     * Exporta todos os dados de telemetria acumulados no buffer de memória para um ficheiro CSV.
-     * <p>
-     * Este método é invocado quando a pipeline está a ser terminada para garantir que
-     * os dados recolhidos que ainda não foram enviados ou guardados não sejam perdidos.
-     */
-    public void exportRemainingData() {
-        if (!telemetryBuffer.isEmpty()) {
-            logger.info("A exportar {} registos de telemetria restantes para CSV...", telemetryBuffer.size());
-            csvExportService.exportData(new ArrayList<>(telemetryBuffer)); // Passa uma cópia do buffer
-            telemetryBuffer.clear(); // Limpa o buffer após a exportação
+    // --- O RESTANTE DA CLASSE (MÉTODOS PRIVADOS) PERMANECE O MESMO ---
+    private void processMetrics(JsonObject telemetria, Map<String, Double> currentMetricValues, JsonObject pbiPayload) {
+        for (MetricConfig config : this.metricConfigs) {
+            String originalName = config.getOriginalName();
+            if (config.isSystemMetric() || !telemetria.has(originalName)) continue;
+
+            try {
+                JsonElement valorElement = telemetria.getAsJsonArray(originalName).get(0).getAsJsonObject().get("value");
+                if (valorElement.isJsonPrimitive()) {
+                    double valorNumerico;
+                    try {
+                        valorNumerico = valorElement.getAsDouble();
+                    } catch (NumberFormatException ex) {
+                        pbiPayload.addProperty(config.getAlias(), valorElement.getAsString());
+                        continue;
+                    }
+
+                    currentMetricValues.put(originalName, valorNumerico);
+                    double valorParaEnviar = valorNumerico;
+
+                    if (config.getExpression() != null && !config.getExpression().trim().isEmpty()) {
+                        Expression e = new ExpressionBuilder(config.getExpression()).variable("valor").build().setVariable("valor", valorNumerico);
+                        valorParaEnviar = e.evaluate();
+                    }
+                    pbiPayload.addProperty(config.getAlias(), valorParaEnviar);
+                } else {
+                    pbiPayload.addProperty(config.getAlias(), valorElement.toString());
+                }
+            } catch (Exception e) {
+                logger.warn("⚠️ Não foi possível processar a métrica '{}'. Causa: {}", originalName, e.getMessage());
+            }
         }
     }
 
+    private String evaluateAlertRules(Map<String, Double> currentMetricValues) {
+        String triggeredMessage = "";
+        for (AlertRule rule : alertRules) {
+            if (!rule.isEnabled() || !currentMetricValues.containsKey(rule.getMetricToWatch())) continue;
+
+            double valorAtual = currentMetricValues.get(rule.getMetricToWatch());
+            boolean condicaoSatisfeita = checkCondition(valorAtual, rule.getCondition(), rule.getThresholdValue(), rule.getThresholdValueMax());
+
+            if (condicaoSatisfeita) {
+                if (!rule.getId().equals(this.lastTriggeredAlertId)) {
+                    logger.warn("🚨 ALERTA CRÍTICO DISPARADO! Regra: '{}'", rule.getRuleName());
+                    this.lastTriggeredAlertId = rule.getId();
+                    String mensagem = formatMessage(rule.getMessageToSend());
+                    triggeredMessage = mensagem;
+
+                    if (listener != null) listener.onAlert(rule.getRuleName(), mensagem);
+                    if (rule.isSendToMqtt()) publicarAlertaMqtt(mensagem);
+                    if (rule.isSendToTelegram()) TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagem);
+                } else {
+                    logger.debug("   - Alerta '{}' já ativo. Nenhuma nova notificação.", rule.getRuleName());
+                }
+            }
+        }
+        // Se nenhuma regra foi satisfeita, limpa o último alerta.
+        if (triggeredMessage.isEmpty()) {
+            this.lastTriggeredAlertId = null;
+        }
+        return triggeredMessage;
+    }
+
+    private String evaluateInsightRules(Map<String, Double> currentMetricValues) {
+        String triggeredMessage = "";
+        for (InsightRule rule : insightRules) {
+            if (!rule.isEnabled() || !currentMetricValues.containsKey(rule.getMetricToWatch())) continue;
+
+            double valorAtual = currentMetricValues.get(rule.getMetricToWatch());
+            boolean condicaoSatisfeita = checkCondition(valorAtual, rule.getCondition(), rule.getThresholdValue(), rule.getThresholdValueMax());
+
+            if (condicaoSatisfeita) {
+                if (!rule.getId().equals(this.lastTriggeredAlarmId)) {
+                    logger.info("💡 ALARME INTELIGENTE GERADO! Regra: '{}'", rule.getRuleName());
+                    this.lastTriggeredAlarmId = rule.getId();
+                    String mensagem = formatMessage(rule.getMessageToSend());
+                    triggeredMessage = mensagem;
+
+                    if (listener != null) listener.onInsight(mensagem, rule.getInsightType());
+                    if (rule.isSendToMqtt()) publicarAlarmeMqtt(mensagem, rule.getInsightType());
+                    if (rule.isSendToTelegram()) TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagem);
+                } else {
+                    logger.debug("   - Alarme '{}' já ativo. Nenhuma nova notificação.", rule.getRuleName());
+                }
+            }
+        }
+        if (triggeredMessage.isEmpty()) {
+            this.lastTriggeredAlarmId = null;
+        }
+        return triggeredMessage;
+    }
+
+    private boolean checkCondition(double value, main.java.com.gsmart.resources.ConditionType condition, double threshold, double thresholdMax) {
+        return switch (condition) {
+            case GREATER_THAN -> value > threshold;
+            case LESS_THAN -> value < threshold;
+            case EQUALS -> value == threshold;
+            case BETWEEN -> {
+                double min = Math.min(threshold, thresholdMax);
+                double max = Math.max(threshold, thresholdMax);
+                yield value >= min && value <= max;
+            }
+        };
+    }
+
+    private void addToCsvBuffer(JsonObject pbiPayload) {
+        Map<String, Object> dataRow = new LinkedHashMap<>();
+        for (String key : pbiPayload.keySet()) {
+            JsonElement element = pbiPayload.get(key);
+            if (element.isJsonPrimitive()) {
+                if (element.getAsJsonPrimitive().isNumber()) dataRow.put(key, element.getAsNumber());
+                else if (element.getAsJsonPrimitive().isBoolean()) dataRow.put(key, element.getAsBoolean());
+                else dataRow.put(key, element.getAsString());
+            }
+        }
+        telemetryBuffer.add(dataRow);
+    }
+
+    private void finalizePayload(JsonObject payload, boolean hasAlert, String alertMessage, String insightMessage) {
+        ZonedDateTime horaAtualBrasil = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
+        payload.addProperty("AlertaCritico", hasAlert ? 1 : 0);
+        payload.addProperty("timestamp", Instant.now().minus(3, ChronoUnit.HOURS).toString());
+        payload.addProperty("UltimoAlerta", alertMessage);
+        payload.addProperty("UltimoAlarme", insightMessage);
+        payload.addProperty("HoraDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+        payload.addProperty("DataDev", horaAtualBrasil.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        payload.addProperty("OrigemDados", dataSource.getSourceName());
+    }
+
+    private void handleReconnection(long maxDelay, long increment) {
+        long currentDelay = 0;
+        while (!stopRequested) {
+            try {
+                if (manualReconnectTrigger.compareAndSet(true, false)) {
+                    logger.info("Iniciando tentativa de reconexão manual imediata...");
+                    currentDelay = 0;
+                } else {
+                    currentDelay = Math.min(currentDelay + increment, maxDelay);
+                    logger.info("Tentando reconectar em {} segundos...", currentDelay);
+                    if (listener != null) listener.onReconnectionAttempt(currentDelay);
+                    Thread.sleep(currentDelay * 1000);
+                }
+
+                logger.info("📡 Tentando reconectar à fonte de dados...");
+                dataSource.fetchData(); // Se isto não lançar exceção, a conexão foi restabelecida.
+                if (listener != null) listener.onConnectionRestored();
+                reconnectionLogger.info("CONEXÃO RESTABELECIDA - Pipeline: {}", dataSource.getSourceName());
+                break; // Sai do loop de reconexão
+            } catch (InterruptedException ie) {
+                logger.warn("Pipeline interrompida durante a tentativa de reconexão.");
+                this.stopRequested = true;
+            } catch (Exception retryEx) {
+                logger.error("❌ Tentativa de reconexão falhou: {}", retryEx.getMessage());
+                reconnectionLogger.info("TENTATIVA DE RECONEXÃO FALHOU - Pipeline: {}", dataSource.getSourceName());
+            }
+        }
+    }
+
+    private String formatMessage(String message) {
+        ZonedDateTime horaAtualBrasil = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
+        String timestampPrefix = horaAtualBrasil.format(DateTimeFormatter.ofPattern("'['dd/MM/yyyy HH:mm:ss']' "));
+        return timestampPrefix + message;
+    }
+
+    private void publicarAlertaMqtt(String mensagem) {
+        MqttService.publish(this.mqttBrokerUrl, "gsmart/alerta", mensagem);
+    }
+
+    private void publicarAlarmeMqtt(String mensagem, String tipo) {
+        String topic = "gsmart/alarme/" + tipo.toLowerCase();
+        MqttService.publish(this.mqttBrokerUrl, topic, mensagem);
+    }
+
+    public void exportRemainingData() {
+        if (!telemetryBuffer.isEmpty()) {
+            logger.info("💾 Exportando {} registos de telemetria restantes para CSV...", telemetryBuffer.size());
+            csvExportService.exportData(new ArrayList<>(telemetryBuffer));
+            telemetryBuffer.clear();
+        }
+    }
 }

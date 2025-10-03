@@ -14,3 +14,6 @@
 # Ignora arquivos gerados pela IDE
 .idea/* linguist-generated
 *.iml linguist-generated
+
+# ignora o site de documentaçao
+Site/** linguist-documentation

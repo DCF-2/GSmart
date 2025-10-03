@@ -11,7 +11,7 @@
 The application is designed to fetch data from IoT platforms and databases, process it through a **fully configurable dual-rule engine**, and export the results to modern BI tools while sending proactive notifications throughout the process.
 
 
-![Screenshot of GSmartGui.java](Site/img/Gsmart-logo.png)
+![Screenshot of GSmartGui.java](src/main/resources/gsmart_icon.png)
 
 ---
 
@@ -142,8 +142,8 @@ java -jar target/GSmart-Processador-gui.jar
 
 For more detailed information, please consult our official documentation.
 
-* **GSmart Documentation:** `http://10.5.0.118:8080/docs/gsmart`
-* **Streaming Replication Documentation:** `http://10.5.0.118:8080/docs/streaming`
+* **GSmart Documentation:** `https://gsmart-site.netlify.app/`
+* **Streaming Replication Documentation:** `https://gsmart-site.netlify.app/`
 
 The complete project documentation, including the API reference, can also be viewed locally via MkDocs.
 

@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public class ReconnectionLogViewer extends JFrame {
 
     private final JTextPane textPane; // MUDANÇA: De JTextArea para JTextPane
-    private static final String LOG_FILE_PATH = "reconnection.log";
+    private static final String LOG_FILE_PATH = "./logs/reconnection.log";
 
     // Definindo as cores para os logs
     private static final Color COR_FALHA = new Color(200, 0, 0);

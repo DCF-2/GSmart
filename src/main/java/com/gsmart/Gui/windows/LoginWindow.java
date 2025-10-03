@@ -173,7 +173,7 @@ public class LoginWindow extends JFrame {
         SwingUtilities.invokeLater(() -> {
             try {
                 LogViewerWindow globalLogViewer = new LogViewerWindow();
-                globalLogViewer.redirectSystemStreams();
+                //globalLogViewer.redirectSystemStreams();
                 PipelineManager pipelineManager = new PipelineManager();
                 GSmartGui gui = new GSmartGui(globalLogViewer, pipelineManager, userRole);
                 gui.setVisible(true);
