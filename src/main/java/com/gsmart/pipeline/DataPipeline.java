@@ -40,7 +40,7 @@ public class DataPipeline {
     public static final Logger logger = LoggerFactory.getLogger(DataPipeline.class);
     private static final Logger reconnectionLogger = LoggerFactory.getLogger("ReconnectionLogger");
 
-    // ... (As variáveis de instância permanecem as mesmas)
+
     private final IDataSource dataSource;
     private final DestinationType destinationType;
     private final String destinationEndpoint;
@@ -76,7 +76,7 @@ public class DataPipeline {
         this.httpClient = new OkHttpClient();
     }
 
-    // ... (Os métodos triggerManualReconnect e requestStop permanecem os mesmos)
+
     public void triggerManualReconnect() {
         logger.info("Sinal de reconexão manual recebido.");
         this.manualReconnectTrigger.set(true);
@@ -92,7 +92,6 @@ public class DataPipeline {
      * Inicia e executa o ciclo de processamento contínuo da pipeline.
      */
     public void run() {
-        // --- ✨ LOG INICIAL MELHORADO ✨ ---
         logger.info("======================================================================");
         logger.info("🚀 NOVA PIPELINE INICIADA");
         logger.info("   ├─ Fonte de Dados: {}", getDataSourceDetails());
@@ -172,8 +171,6 @@ public class DataPipeline {
         }
     }
 
-    // --- ✨ NOVOS MÉTODOS PARA DETALHES NO LOG ✨ ---
-
     /**
      * Gera uma string detalhada sobre a fonte de dados para o log.
      */
@@ -201,7 +198,7 @@ public class DataPipeline {
         return "Desconhecido";
     }
 
-    // --- O RESTANTE DA CLASSE (MÉTODOS PRIVADOS) PERMANECE O MESMO ---
+
     private void processMetrics(JsonObject telemetria, Map<String, Double> currentMetricValues, JsonObject pbiPayload) {
         for (MetricConfig config : this.metricConfigs) {
             String originalName = config.getOriginalName();
@@ -237,38 +234,52 @@ public class DataPipeline {
 
     private String evaluateAlertRules(Map<String, Double> currentMetricValues) {
         String triggeredMessage = "";
+        // Percorre todas as regras de alerta
         for (AlertRule rule : alertRules) {
-            if (!rule.isEnabled() || !currentMetricValues.containsKey(rule.getMetricToWatch())) continue;
+            if (!rule.isEnabled() || !currentMetricValues.containsKey(rule.getMetricToWatch())) {
+                continue;
+            }
 
             double valorAtual = currentMetricValues.get(rule.getMetricToWatch());
             boolean condicaoSatisfeita = checkCondition(valorAtual, rule.getCondition(), rule.getThresholdValue(), rule.getThresholdValueMax());
 
             if (condicaoSatisfeita) {
+                // A condição da regra foi satisfeita.
+                // Verifica se este alerta já não é o que está ativo.
                 if (!rule.getId().equals(this.lastTriggeredAlertId)) {
+                    // É um novo alerta! Notifica e guarda o estado.
                     logger.warn("🚨 ALERTA CRÍTICO DISPARADO! Regra: '{}'", rule.getRuleName());
                     this.lastTriggeredAlertId = rule.getId();
-                    String mensagem = formatMessage(rule.getMessageToSend());
+                    // Substitui a variável {{value}} na mensagem pelo valor atual
+                    String mensagem = formatMessage(rule.getMessageToSend().replace("{{value}}", String.format("%.2f", valorAtual)));
                     triggeredMessage = mensagem;
 
                     if (listener != null) listener.onAlert(rule.getRuleName(), mensagem);
                     if (rule.isSendToMqtt()) publicarAlertaMqtt(mensagem);
                     if (rule.isSendToTelegram()) TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagem);
-                } else {
-                    logger.debug("   - Alerta '{}' já ativo. Nenhuma nova notificação.", rule.getRuleName());
+                }
+                // Se for o mesmo alerta, não faz nada (comportamento de máquina de estado).
+            } else {
+                // A condição da regra NÃO foi satisfeita.
+                // Verifica se este era o alerta que estava ativo anteriormente.
+                if (rule.getId().equals(this.lastTriggeredAlertId)) {
+                    // Se sim, o alerta foi resolvido. Reinicia o estado.
+                    logger.info("✅ CONDIÇÃO DE ALERTA RESOLVIDA. Regra: '{}'", rule.getRuleName());
+                    this.lastTriggeredAlertId = null;
                 }
             }
         }
-        // Se nenhuma regra foi satisfeita, limpa o último alerta.
-        if (triggeredMessage.isEmpty()) {
-            this.lastTriggeredAlertId = null;
-        }
-        return triggeredMessage;
+        // A mensagem de alerta para o Power BI só é preenchida se um alerta estiver ativo.
+        return lastTriggeredAlertId != null ? triggeredMessage : "";
     }
 
     private String evaluateInsightRules(Map<String, Double> currentMetricValues) {
         String triggeredMessage = "";
+        // A mesma lógica de máquina de estado é aplicada aqui.
         for (InsightRule rule : insightRules) {
-            if (!rule.isEnabled() || !currentMetricValues.containsKey(rule.getMetricToWatch())) continue;
+            if (!rule.isEnabled() || !currentMetricValues.containsKey(rule.getMetricToWatch())) {
+                continue;
+            }
 
             double valorAtual = currentMetricValues.get(rule.getMetricToWatch());
             boolean condicaoSatisfeita = checkCondition(valorAtual, rule.getCondition(), rule.getThresholdValue(), rule.getThresholdValueMax());
@@ -277,21 +288,21 @@ public class DataPipeline {
                 if (!rule.getId().equals(this.lastTriggeredAlarmId)) {
                     logger.info("💡 ALARME INTELIGENTE GERADO! Regra: '{}'", rule.getRuleName());
                     this.lastTriggeredAlarmId = rule.getId();
-                    String mensagem = formatMessage(rule.getMessageToSend());
+                    String mensagem = formatMessage(rule.getMessageToSend().replace("{{value}}", String.format("%.2f", valorAtual)));
                     triggeredMessage = mensagem;
 
                     if (listener != null) listener.onInsight(mensagem, rule.getInsightType());
                     if (rule.isSendToMqtt()) publicarAlarmeMqtt(mensagem, rule.getInsightType());
                     if (rule.isSendToTelegram()) TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagem);
-                } else {
-                    logger.debug("   - Alarme '{}' já ativo. Nenhuma nova notificação.", rule.getRuleName());
+                }
+            } else {
+                if (rule.getId().equals(this.lastTriggeredAlarmId)) {
+                    logger.info("✅ CONDIÇÃO DE ALARME RESOLVIDA. Regra: '{}'", rule.getRuleName());
+                    this.lastTriggeredAlarmId = null;
                 }
             }
         }
-        if (triggeredMessage.isEmpty()) {
-            this.lastTriggeredAlarmId = null;
-        }
-        return triggeredMessage;
+        return lastTriggeredAlarmId != null ? triggeredMessage : "";
     }
 
     private boolean checkCondition(double value, main.java.com.gsmart.resources.ConditionType condition, double threshold, double thresholdMax) {
