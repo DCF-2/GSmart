@@ -64,11 +64,11 @@ public class GSmartGui extends JFrame {
     private final DashboardPanel dashboardPanel;
     private final JComboBox<String> sourceSelector;
     private final JComboBox<String> destinationSelector;
-    private final JTextField thingsboardUrlField, dbUrlField, dbUserField, pbiUrlField, fabricConnectionStringField, mqttBrokerUrlField, telegramTokenField, telegramChatIdField;
+    private final JTextField thingsboardUrlField, tbUserField, dbUrlField, dbUserField, pbiUrlField, fabricConnectionStringField, mqttBrokerUrlField, telegramTokenField, telegramChatIdField;
     private final JButton addAlertRuleButton, editAlertRuleButton, removeAlertRuleButton, importAlertRulesButton, exportAlertRulesButton, duplicateAlertRuleButton;
     private final JButton addInsightRuleButton, editInsightRuleButton, removeInsightRuleButton, importInsightRulesButton, exportInsightRulesButton, duplicateInsightRuleButton;
-    private final JButton expressionHelpButton, telegramHelpButton;;
-    private final JPasswordField dbPasswordField;
+    private final JButton expressionHelpButton, telegramHelpButton;
+    private final JPasswordField dbPasswordField, tbPassField;
     private final JButton tbConnectButton, dbConnectButton, startButton;
     private final JLabel tbStatusLabel, dbStatusLabel;
     private final JComboBox<DeviceProfile> deviceProfileSelector;
@@ -129,6 +129,8 @@ public class GSmartGui extends JFrame {
         this.sourceSelector = new JComboBox<>(new String[]{"Thingsboard API", "Banco de Dados Espelho"});
         this.destinationSelector = new JComboBox<>(new String[]{"Power BI Push URL", "Fabric Eventstream"});
         this.thingsboardUrlField = new JTextField();
+        this.tbUserField = new JTextField();
+        this.tbPassField = new JPasswordField();
         this.dbUrlField = new JTextField();
         this.dbUserField = new JTextField();
         this.dbPasswordField = new JPasswordField();
@@ -216,6 +218,7 @@ public class GSmartGui extends JFrame {
     private void loadConfiguration() {
         Properties props = configManager.loadProperties();
         thingsboardUrlField.setText(props.getProperty("thingsboard.url", "http://10.8.0.5:8080"));
+        tbUserField.setText(props.getProperty("thingsboard.user", "tenant@thingsboard.org"));
         destinationSelector.setSelectedItem(props.getProperty("destination.last", "Power BI Push URL"));
         fabricConnectionStringField.setText(props.getProperty("fabric.connectionstring", ""));
         dbUrlField.setText(props.getProperty("db.url", "jdbc:postgresql://localhost:5432/seu_banco"));
@@ -241,6 +244,7 @@ public class GSmartGui extends JFrame {
     private void saveConfiguration() {
         Properties props = configManager.loadProperties();
         props.setProperty("thingsboard.url", thingsboardUrlField.getText());
+        props.setProperty("thingsboard.user", tbUserField.getText());
         props.setProperty("db.url", dbUrlField.getText());
         props.setProperty("db.user", dbUserField.getText());
         props.setProperty("powerbi.url", pbiUrlField.getText());
@@ -356,6 +360,8 @@ public class GSmartGui extends JFrame {
         if (config.dataSource() instanceof ThingsBoardSource tbSource) {
             dataSourceType = "ThingsBoard";
             dataSourceParams.put("url", tbSource.getThingsboardUrl());
+            dataSourceParams.put("username", tbSource.getUsername());
+            dataSourceParams.put("password", tbSource.getPassword());
             dataSourceParams.put("deviceId", tbSource.getDeviceId());
             dataSourceParams.put("deviceName", tbSource.getDeviceName());
         } else if (config.dataSource() instanceof DatabaseSource dbSource) {
@@ -380,6 +386,7 @@ public class GSmartGui extends JFrame {
         );
     }
 
+
     /**
      * Carrega as configurações das pipelines que estavam ativas na última sessão
      * e inicia-as automaticamente.
@@ -393,17 +400,25 @@ public class GSmartGui extends JFrame {
                 IDataSource dataSource = null;
                 Map<String, String> params = sConfig.getDataSourceParams();
 
-                // Reconstrói a IDataSource com base no tipo e nos parâmetros salvos
                 if ("ThingsBoard".equals(sConfig.getDataSourceType())) {
                     List<String> keys = sConfig.getMetricConfigs().stream().map(MetricConfig::getOriginalName).collect(Collectors.toList());
-                    dataSource = new ThingsBoardSource(params.get("url"), params.get("deviceId"), params.get("deviceName"), keys, sharedOkHttpClient);
+                    // --- ✨ ALTERAÇÃO AQUI: Usar o construtor correto com 7 argumentos ✨ ---
+                    dataSource = new ThingsBoardSource(
+                            params.get("url"),
+                            params.get("username"),      // Argumento 2: username
+                            params.get("password"),      // Argumento 3: password
+                            params.get("deviceId"),      // Argumento 4: deviceId
+                            params.get("deviceName"),    // Argumento 5: deviceName
+                            keys,                        // Argumento 6: keys
+                            sharedOkHttpClient           // Argumento 7: client
+                    );
+                    // --- FIM DA ALTERAÇÃO ---
                 } else if ("Database".equals(sConfig.getDataSourceType())) {
                     List<String> keys = sConfig.getMetricConfigs().stream().map(MetricConfig::getOriginalName).collect(Collectors.toList());
                     dataSource = new DatabaseSource(params.get("url"), params.get("user"), params.get("password"), params.get("tableName"), keys);
                 }
 
                 if (dataSource != null) {
-                    // Reconstrói a PipelineConfiguration completa
                     PipelineConfiguration fullConfig = new PipelineConfiguration(
                             dataSource,
                             sConfig.getDestinationType(),
@@ -416,7 +431,6 @@ public class GSmartGui extends JFrame {
                             sConfig.getTelegramChatId(),
                             sConfig.getMqttBrokerUrl()
                     );
-                    // Lança a pipeline
                     pipelineManager.launchPipeline(fullConfig);
                 }
             } catch (Exception e) {
@@ -469,12 +483,10 @@ public class GSmartGui extends JFrame {
         PopupMenu trayPopupMenu = new PopupMenu();
 
         MenuItem openItem = new MenuItem("Abrir GSmart");
-        openItem.addActionListener(e -> {
-            SwingUtilities.invokeLater(() -> {
-                setVisible(true);
-                setState(Frame.NORMAL);
-            });
-        });
+        openItem.addActionListener(e -> SwingUtilities.invokeLater(() -> {
+            setVisible(true);
+            setState(Frame.NORMAL);
+        }));
         trayPopupMenu.add(openItem);
 
         MenuItem closeItem = new MenuItem("Sair");
@@ -568,6 +580,8 @@ public class GSmartGui extends JFrame {
     public JPanel getContentPanel() {return this.contentPanel;}
     public JComboBox<String> getAlertCategoryFilter() { return alertCategoryFilter; }
     public JComboBox<String> getInsightCategoryFilter() { return insightCategoryFilter; }
+    public JTextField getTbUserField() { return tbUserField; }
+    public JPasswordField getTbPassField() { return tbPassField; }
     // --- GETTERS PARA OS BOTÕES DE REGRAS ---
     public JButton getAddAlertRuleButton() { return addAlertRuleButton; }
     public JButton getEditAlertRuleButton() { return editAlertRuleButton; }
@@ -653,8 +667,6 @@ public class GSmartGui extends JFrame {
         dispose();
 
         // Abre uma nova janela de login
-        SwingUtilities.invokeLater(() -> {
-            new LoginWindow().setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new LoginWindow().setVisible(true));
     }
 }

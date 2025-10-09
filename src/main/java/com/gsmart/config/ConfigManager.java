@@ -34,7 +34,7 @@ public class ConfigManager {
     private static final String ALERT_RULES_FILE = CONFIG_DIRECTORY + "/alerts.conf";
     private static final String INSIGHT_RULES_FILE = CONFIG_DIRECTORY + "/insights.conf";
     private static final List<String> SENSITIVE_KEYS = List.of(
-            "thingsboard.url", "db.url", "db.user", "powerbi.url",
+            "thingsboard.url", "thingsboard.user", "db.url", "db.user", "powerbi.url",
             "fabric.connectionstring", "mqtt.broker.url", "telegram.token", "telegram.chat_id"
     );
     public ConfigManager() {

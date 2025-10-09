@@ -33,7 +33,7 @@ public class UIController {
      */
     private void initializeUI() {
         // --- Configuração da Janela Principal ---
-        view.setTitle("GSmart - Configurador de Pipeline e Alertas v6.0");
+        view.setTitle("GSmart - Configurador de Pipeline e Alertas v2.3.4");
         view.setExtendedState(JFrame.MAXIMIZED_BOTH);
         view.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         view.setLocationRelativeTo(null);
@@ -151,34 +151,68 @@ public class UIController {
      * permitir a alternância entre eles.
      */
     private void createDataSourceConfigPanels() {
+        // --- PAINEL DO THINGSBOARD ---
         JPanel tbPanel = view.getThingsboardConfigPanel();
         tbPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbcTb = new GridBagConstraints();
         gbcTb.insets = new Insets(4, 5, 4, 5);
         gbcTb.anchor = GridBagConstraints.WEST;
-        gbcTb.gridx = 0; gbcTb.gridy = 0; tbPanel.add(new JLabel("URL do Servidor:"), gbcTb);
-        gbcTb.gridx = 1; gbcTb.weightx = 1.0; gbcTb.fill = GridBagConstraints.HORIZONTAL; tbPanel.add(view.getThingsboardUrlField(), gbcTb);
-        gbcTb.gridx = 2; gbcTb.weightx = 0; gbcTb.fill = GridBagConstraints.NONE; tbPanel.add(view.getTbConnectButton(), gbcTb);
-        gbcTb.gridx = 3; tbPanel.add(view.getTbStatusLabel(), gbcTb);
-        gbcTb.gridx = 0; gbcTb.gridy = 1; tbPanel.add(new JLabel("Perfil de Dispositivo (Tipo):"), gbcTb);
-        gbcTb.gridx = 1; gbcTb.gridwidth = 3; gbcTb.fill = GridBagConstraints.HORIZONTAL; tbPanel.add(view.getDeviceProfileSelector(), gbcTb);
-        gbcTb.gridx = 0; gbcTb.gridy = 2; gbcTb.gridwidth = 1; tbPanel.add(new JLabel("Dispositivo:"), gbcTb);
-        gbcTb.gridx = 1; gbcTb.gridwidth = 3; tbPanel.add(view.getDeviceSelector(), gbcTb);
 
+        // Linha 0: URL
+        gbcTb.gridx = 0; gbcTb.gridy = 0; tbPanel.add(new JLabel("URL do Servidor:"), gbcTb);
+        gbcTb.gridx = 1; gbcTb.gridwidth = 3; gbcTb.fill = GridBagConstraints.HORIZONTAL; tbPanel.add(view.getThingsboardUrlField(), gbcTb);
+
+        // Linha 1: Utilizador
+        gbcTb.gridx = 0; gbcTb.gridy = 1; gbcTb.gridwidth = 1; gbcTb.fill = GridBagConstraints.NONE; tbPanel.add(new JLabel("Utilizador:"), gbcTb);
+        gbcTb.gridx = 1; gbcTb.gridwidth = 3; gbcTb.fill = GridBagConstraints.HORIZONTAL; tbPanel.add(view.getTbUserField(), gbcTb);
+
+        // Linha 2: Senha e Botão de Conectar
+        gbcTb.gridx = 0; gbcTb.gridy = 2; gbcTb.gridwidth = 1; tbPanel.add(new JLabel("Senha:"), gbcTb);
+        gbcTb.gridx = 1; gbcTb.gridwidth = 1; gbcTb.fill = GridBagConstraints.HORIZONTAL; tbPanel.add(view.getTbPassField(), gbcTb);
+        gbcTb.gridx = 2; gbcTb.gridwidth = 1; gbcTb.fill = GridBagConstraints.NONE; tbPanel.add(view.getTbConnectButton(), gbcTb);
+        gbcTb.gridx = 3; gbcTb.gridwidth = 1; tbPanel.add(view.getTbStatusLabel(), gbcTb);
+
+        // Linha 3: Perfil de Dispositivo
+        gbcTb.gridx = 0; gbcTb.gridy = 3; tbPanel.add(new JLabel("Perfil de Dispositivo:"), gbcTb);
+        gbcTb.gridx = 1; gbcTb.gridwidth = 3; gbcTb.fill = GridBagConstraints.HORIZONTAL; tbPanel.add(view.getDeviceProfileSelector(), gbcTb);
+
+        // Linha 4: Dispositivo
+        gbcTb.gridx = 0; gbcTb.gridy = 4; gbcTb.gridwidth = 1; tbPanel.add(new JLabel("Dispositivo:"), gbcTb);
+        gbcTb.gridx = 1; gbcTb.gridwidth = 3; gbcTb.fill = GridBagConstraints.HORIZONTAL; tbPanel.add(view.getDeviceSelector(), gbcTb);
+
+        // Filler: Componente invisível que ocupa todo o espaço extra à direita
+        gbcTb.gridx = 4; gbcTb.gridy = 0; gbcTb.weightx = 1.0; gbcTb.fill = GridBagConstraints.HORIZONTAL;
+        tbPanel.add(new JPanel(), gbcTb);
+
+
+        // --- PAINEL DO BANCO DE DADOS ---
         JPanel dbPanel = view.getDatabaseConfigPanel();
         dbPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbcDb = new GridBagConstraints();
         gbcDb.insets = new Insets(2, 5, 2, 5); gbcDb.anchor = GridBagConstraints.WEST;
+
+        // Linha 0: URL
         gbcDb.gridx = 0; gbcDb.gridy = 0; gbcDb.gridwidth = 1; dbPanel.add(new JLabel("URL do Banco (JDBC):"), gbcDb);
-        gbcDb.gridx = 1; gbcDb.gridwidth = 3; gbcDb.weightx = 1.0; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbPanel.add(view.getDbUrlField(), gbcDb);
-        gbcDb.gridx = 4; gbcDb.gridwidth = 1; gbcDb.fill = GridBagConstraints.NONE; dbPanel.add(view.getDbConnectButton(), gbcDb);
-        gbcDb.gridx = 5; dbPanel.add(view.getDbStatusLabel(), gbcDb);
-        gbcDb.gridx = 0; gbcDb.gridy = 1; gbcDb.gridwidth = 1; dbPanel.add(new JLabel("Usuário:"), gbcDb);
-        gbcDb.gridx = 1; gbcDb.gridwidth = 3; gbcDb.weightx = 1.0; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbPanel.add(view.getDbUserField(), gbcDb);
+        gbcDb.gridx = 1; gbcDb.gridwidth = 3; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbPanel.add(view.getDbUrlField(), gbcDb);
+
+        // Linha 1: Utilizador
+        gbcDb.gridx = 0; gbcDb.gridy = 1; gbcDb.gridwidth = 1; gbcDb.fill = GridBagConstraints.NONE; dbPanel.add(new JLabel("Usuário:"), gbcDb);
+        gbcDb.gridx = 1; gbcDb.gridwidth = 3; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbPanel.add(view.getDbUserField(), gbcDb);
+
+        // Linha 2: Senha e Botão
         gbcDb.gridx = 0; gbcDb.gridy = 2; gbcDb.gridwidth = 1; dbPanel.add(new JLabel("Senha:"), gbcDb);
-        gbcDb.gridx = 1; gbcDb.gridwidth = 3; gbcDb.weightx = 1.0; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbPanel.add(view.getDbPasswordField(), gbcDb);
+        gbcDb.gridx = 1; gbcDb.gridwidth = 1; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbPanel.add(view.getDbPasswordField(), gbcDb);
+        gbcDb.gridx = 2; gbcDb.gridwidth = 1; gbcDb.fill = GridBagConstraints.NONE; dbPanel.add(view.getDbConnectButton(), gbcDb);
+        gbcDb.gridx = 3; gbcDb.gridwidth = 1; dbPanel.add(view.getDbStatusLabel(), gbcDb);
+
+        // Linha 3: Tabela
         gbcDb.gridx = 0; gbcDb.gridy = 3; gbcDb.gridwidth = 1; dbPanel.add(new JLabel("Tabela:"), gbcDb);
-        gbcDb.gridx = 1; gbcDb.gridwidth = 3; gbcDb.weightx = 1.0; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbPanel.add(view.getDbTableSelector(), gbcDb);
+        gbcDb.gridx = 1; gbcDb.gridwidth = 3; gbcDb.fill = GridBagConstraints.HORIZONTAL; dbPanel.add(view.getDbTableSelector(), gbcDb);
+
+        // Filler: Componente invisível para empurrar tudo para a esquerda
+        gbcDb.gridx = 4; gbcDb.gridy = 0; gbcDb.weightx = 1.0; gbcDb.fill = GridBagConstraints.HORIZONTAL;
+        dbPanel.add(new JPanel(), gbcDb);
+
 
         view.getSourceConfigCardPanel().add(tbPanel, "Thingsboard API");
         view.getSourceConfigCardPanel().add(dbPanel, "Banco de Dados Espelho");

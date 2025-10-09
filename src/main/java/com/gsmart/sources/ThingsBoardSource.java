@@ -27,6 +27,8 @@ public class ThingsBoardSource implements IDataSource {
     private static final Logger logger = LoggerFactory.getLogger(ThingsBoardSource.class);
 
     private final String thingsboardUrl;
+    private final String username;
+    private final String password;
     private final String deviceId;
     private String deviceName;
     private final List<String> keysToFetch;
@@ -43,8 +45,10 @@ public class ThingsBoardSource implements IDataSource {
      * @param keysToFetch Uma lista de chaves de telemetria a serem requisitadas na API.
      * @param client Uma instância partilhada de OkHttpClient para realizar as requisições HTTP.
      */
-    public ThingsBoardSource(String thingsboardUrl, String deviceId, String deviceName,List<String> keysToFetch, OkHttpClient client) {
+    public ThingsBoardSource(String thingsboardUrl, String username, String password, String deviceId, String deviceName,List<String> keysToFetch, OkHttpClient client) {
         this.thingsboardUrl = thingsboardUrl != null && thingsboardUrl.endsWith("/") ? thingsboardUrl.substring(0, thingsboardUrl.length() - 1) : thingsboardUrl;
+        this.username = username;
+        this.password = password;
         this.deviceId = deviceId;
         this.deviceName = deviceName;
         this.keysToFetch = keysToFetch;
@@ -91,7 +95,7 @@ public class ThingsBoardSource implements IDataSource {
         if (this.authToken != null) { return; }
         logger.info("Autenticando no ThingsBoard em {}...", this.thingsboardUrl);
         String authUrl = this.thingsboardUrl + "/api/auth/login";
-        String credentials = "{\"username\":\"tenant@thingsboard.org\", \"password\":\"tenant\"}";
+        String credentials = String.format("{\"username\":\"%s\", \"password\":\"%s\"}", this.username, this.password);
         RequestBody body = RequestBody.create(credentials, MediaType.get("application/json; charset=utf-8"));
         Request request = new Request.Builder().url(authUrl).post(body).build();
         try (Response response = client.newCall(request).execute()) {
@@ -217,4 +221,6 @@ public class ThingsBoardSource implements IDataSource {
     public String getThingsboardUrl() {return thingsboardUrl;}
     public String getDeviceId() {return deviceId;}
     public String getDeviceName() {return deviceName;}
+    public String getUsername() {return username;}
+    public String getPassword() {return password;}
 }
