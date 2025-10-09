@@ -122,13 +122,13 @@ public class AlertRuleTableModel extends AbstractTableModel {
             case 0:
                 rule.setEnabled((Boolean) aValue);
                 break;
-            case 6:
+            case 6: // Coluna MQTT
                 rule.setSendToMqtt((Boolean) aValue);
                 break;
-            case 7:
+            case 7: // Coluna Telegram
                 rule.setSendToTelegram((Boolean) aValue);
                 break;
         }
         fireTableCellUpdated(rowIndex, columnIndex);
     }
-}
+    }

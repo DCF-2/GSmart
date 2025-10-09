@@ -119,21 +119,18 @@ public class InsightRuleTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        if (columnIndex == 0) {
-            InsightRule rule = rules.get(rowIndex);
-            // --- SUBSTITUA O CONTEÚDO DO MÉTODO POR ESTE ---
-            switch (columnIndex) {
-                case 0:
-                    rule.setEnabled((Boolean) aValue);
-                    break;
-                case 6:
-                    rule.setSendToMqtt((Boolean) aValue);
-                    break;
-                case 7:
-                    rule.setSendToTelegram((Boolean) aValue);
-                    break;
-            }
-            fireTableCellUpdated(rowIndex, columnIndex);
+        InsightRule rule = rules.get(rowIndex);
+        switch (columnIndex) {
+            case 0:
+                rule.setEnabled((Boolean) aValue);
+                break;
+            case 6: // Coluna MQTT
+                rule.setSendToMqtt((Boolean) aValue);
+                break;
+            case 7: // Coluna Telegram
+                rule.setSendToTelegram((Boolean) aValue);
+                break;
         }
+        fireTableCellUpdated(rowIndex, columnIndex);
     }
 }
