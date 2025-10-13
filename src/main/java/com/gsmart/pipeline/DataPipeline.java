@@ -1,4 +1,4 @@
-// Localização: src/com/gsmart/pipeline/DataPipeline.java
+// Localização: src/main/java/com/gsmart/pipeline/DataPipeline.java
 package main.java.com.gsmart.pipeline;
 
 import com.google.gson.JsonElement;
@@ -8,10 +8,7 @@ import main.java.com.gsmart.config.InsightRule;
 import main.java.com.gsmart.config.MetricConfig;
 import main.java.com.gsmart.conection.ExportacaoDadosPWBI;
 import main.java.com.gsmart.conection.ExportacaoDadosFabric;
-import main.java.com.gsmart.resources.DestinationType;
-import main.java.com.gsmart.resources.GSmartListener;
-import main.java.com.gsmart.resources.IDataSource;
-import main.java.com.gsmart.resources.TaskStatus;
+import main.java.com.gsmart.resources.*;
 import main.java.com.gsmart.services.CsvExportService;
 import main.java.com.gsmart.services.MqttService;
 import main.java.com.gsmart.services.TelegramService;
@@ -30,16 +27,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
-/**
- * Representa o motor de uma única pipeline de processamento de dados.
- *
- * (O Javadoc permanece o mesmo)
- */
 public class DataPipeline {
     public static final Logger logger = LoggerFactory.getLogger(DataPipeline.class);
     private static final Logger reconnectionLogger = LoggerFactory.getLogger("ReconnectionLogger");
-
 
     private final IDataSource dataSource;
     private final DestinationType destinationType;
@@ -53,14 +45,15 @@ public class DataPipeline {
     private final String telegramChatId;
     private final CsvExportService csvExportService;
     private final List<Map<String, Object>> telemetryBuffer;
-    private String lastTriggeredAlertId = null;
-    private String lastTriggeredAlarmId = null;
+
+    private final Map<String, String> activeAlertRulePerMetric = new HashMap<>();
+    private final Map<String, String> activeAlarmRulePerMetric = new HashMap<>();
+
     private final OkHttpClient httpClient;
     private volatile boolean stopRequested = false;
     private final AtomicBoolean manualReconnectTrigger = new AtomicBoolean(false);
 
-
-    public DataPipeline(IDataSource dataSource,DestinationType destinationType, String destinationEndpoint,List<MetricConfig> metricConfigs, GSmartListener listener, List<AlertRule> alertRules, List<InsightRule> insightRules, String telegramToken, String telegramChatId, String mqttBrokerUrl) {
+    public DataPipeline(IDataSource dataSource, DestinationType destinationType, String destinationEndpoint, List<MetricConfig> metricConfigs, GSmartListener listener, List<AlertRule> alertRules, List<InsightRule> insightRules, String telegramToken, String telegramChatId, String mqttBrokerUrl) {
         this.dataSource = dataSource;
         this.destinationType = destinationType;
         this.destinationEndpoint = destinationEndpoint;
@@ -76,7 +69,6 @@ public class DataPipeline {
         this.httpClient = new OkHttpClient();
     }
 
-
     public void triggerManualReconnect() {
         logger.info("Sinal de reconexão manual recebido.");
         this.manualReconnectTrigger.set(true);
@@ -87,10 +79,6 @@ public class DataPipeline {
         this.stopRequested = true;
     }
 
-
-    /**
-     * Inicia e executa o ciclo de processamento contínuo da pipeline.
-     */
     public void run() {
         logger.info("======================================================================");
         logger.info("🚀 NOVA PIPELINE INICIADA");
@@ -111,7 +99,6 @@ public class DataPipeline {
 
                 logger.info("🔄 --- Novo ciclo de processamento iniciado ---");
 
-                // [ETAPA 1] BUSCA DE DADOS
                 logger.info("[1/4] 📥 Buscando dados da fonte: '{}'", dataSource.getSourceName());
                 JsonObject telemetria = dataSource.fetchData();
                 if (telemetria.keySet().isEmpty()) {
@@ -120,13 +107,11 @@ public class DataPipeline {
                     continue;
                 }
 
-                // [ETAPA 2] PROCESSAMENTO E TRANSFORMAÇÃO
                 logger.info("[2/4] ⚙️  Processando e transformando {} métricas...", metricConfigs.stream().filter(m -> !m.isSystemMetric()).count());
                 Map<String, Double> currentMetricValues = new HashMap<>();
                 JsonObject pbiPayload = new JsonObject();
                 processMetrics(telemetria, currentMetricValues, pbiPayload);
 
-                // [ETAPA 3] AVALIAÇÃO DE REGRAS
                 logger.info("[3/4] ⚖️  Avaliando {} regras de alerta e {} de alarme...", alertRules.size(), insightRules.size());
                 String mensagemAlertaPBI = evaluateAlertRules(currentMetricValues);
                 String mensagemAlarmePBI = evaluateInsightRules(currentMetricValues);
@@ -134,7 +119,6 @@ public class DataPipeline {
                 addToCsvBuffer(pbiPayload);
                 finalizePayload(pbiPayload, !mensagemAlertaPBI.isEmpty(), mensagemAlertaPBI, mensagemAlarmePBI);
 
-                // [ETAPA 4] ENVIO DOS DADOS
                 logger.info("[4/4] 📤 Enviando dados para o destino: {}", destinationType);
                 if (this.destinationType == DestinationType.POWER_BI) {
                     ExportacaoDadosPWBI.sendDataToPowerBI(pbiPayload, this.destinationEndpoint);
@@ -164,6 +148,7 @@ public class DataPipeline {
             }
         }
 
+        // --- ALTERAÇÃO: Exportação de dados movida para o final do ciclo de vida da thread ---
         exportRemainingData();
         logger.info("🛑 FIM DO LOOP. Pipeline para '{}' finalizada.", dataSource.getSourceName());
         if (listener != null) {
@@ -171,9 +156,142 @@ public class DataPipeline {
         }
     }
 
-    /**
-     * Gera uma string detalhada sobre a fonte de dados para o log.
-     */
+    // --- MÉTODOS DE AVALIAÇÃO DE REGRAS ---
+
+    private String evaluateAlertRules(Map<String, Double> currentMetricValues) {
+        // Usamos um StringBuilder para concatenar mensagens de múltiplas métricas
+        StringBuilder payloadBuilder = new StringBuilder();
+        Set<String> metricsWithActiveRuleThisCycle = new HashSet<>();
+
+        Map<String, List<AlertRule>> rulesByMetric = alertRules.stream()
+                .filter(rule -> rule.isEnabled() && rule.getMetricToWatch() != null)
+                .collect(Collectors.groupingBy(AlertRule::getMetricToWatch));
+
+        for (Map.Entry<String, List<AlertRule>> entry : rulesByMetric.entrySet()) {
+            String metricName = entry.getKey();
+            List<AlertRule> rulesForMetric = entry.getValue();
+
+            if (!currentMetricValues.containsKey(metricName)) {
+                continue;
+            }
+            double valorAtual = currentMetricValues.get(metricName);
+
+            // ---Ordenação Dinâmica  ---
+            // Define a prioridade: para ">", o maior valor é mais importante. Para "<", o menor valor é mais importante.
+            Comparator<AlertRule> comparator = Comparator.comparingDouble(AlertRule::getThresholdValue);
+            // Se alguma regra for LESS_THAN, a lógica se inverte: o menor limiar é o mais crítico/específico.
+            if (rulesForMetric.stream().anyMatch(r -> r.getCondition() == ConditionType.LESS_THAN)) {
+                comparator = comparator.reversed();
+            }
+
+            Optional<AlertRule> bestTriggeredRuleOpt = rulesForMetric.stream()
+                    .filter(rule -> checkCondition(valorAtual, rule.getCondition(), rule.getThresholdValue(), rule.getThresholdValueMax()))
+                    .max(comparator); // Encontra a regra mais específica (com maior prioridade)
+
+            if (bestTriggeredRuleOpt.isPresent()) {
+                AlertRule triggeredRule = bestTriggeredRuleOpt.get();
+                metricsWithActiveRuleThisCycle.add(metricName);
+                String previouslyActiveRuleId = activeAlertRulePerMetric.get(metricName);
+
+                if (!triggeredRule.getId().equals(previouslyActiveRuleId)) {
+                    logger.warn("🚨 MUDANÇA DE ESTADO DE ALERTA! Métrica: '{}', Nova Regra: '{}'", metricName, triggeredRule.getRuleName());
+                    activeAlertRulePerMetric.put(metricName, triggeredRule.getId());
+
+                    String mensagem = formatMessage(triggeredRule.getMessageToSend().replace("{{value}}", String.format("%.2f", valorAtual)));
+                    if (!payloadBuilder.isEmpty()) {
+                        payloadBuilder.append(" | "); // Separador para múltiplas mensagens
+                    }
+                    payloadBuilder.append(mensagem);
+
+                    if (listener != null) listener.onAlert(triggeredRule.getRuleName(), mensagem);
+                    if (triggeredRule.isSendToMqtt()) publicarAlertaMqtt(mensagem);
+                    if (triggeredRule.isSendToTelegram()) TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagem);
+                } else {
+                    // O estado não mudou, mas a regra continua ativa. Adicionamos a mensagem ao payload.
+                    String mensagem = formatMessage(triggeredRule.getMessageToSend().replace("{{value}}", String.format("%.2f", valorAtual)));
+                    if (!payloadBuilder.isEmpty()) {
+                        payloadBuilder.append(" | ");
+                    }
+                    payloadBuilder.append(mensagem);
+                }
+            }
+        }
+
+        Set<String> resolvedMetrics = new HashSet<>(activeAlertRulePerMetric.keySet());
+        resolvedMetrics.removeAll(metricsWithActiveRuleThisCycle);
+
+        for (String resolvedMetric : resolvedMetrics) {
+            logger.info("✅ CONDIÇÃO DE ALERTA RESOLVIDA. Métrica: '{}'", resolvedMetric);
+            activeAlertRulePerMetric.remove(resolvedMetric);
+        }
+
+        return payloadBuilder.toString();
+    }
+
+    private String evaluateInsightRules(Map<String, Double> currentMetricValues) {
+        StringBuilder payloadBuilder = new StringBuilder();
+        Set<String> metricsWithActiveRuleThisCycle = new HashSet<>();
+
+        Map<String, List<InsightRule>> rulesByMetric = insightRules.stream()
+                .filter(rule -> rule.isEnabled() && rule.getMetricToWatch() != null)
+                .collect(Collectors.groupingBy(InsightRule::getMetricToWatch));
+
+        for (Map.Entry<String, List<InsightRule>> entry : rulesByMetric.entrySet()) {
+            String metricName = entry.getKey();
+            List<InsightRule> rulesForMetric = entry.getValue();
+
+            if (!currentMetricValues.containsKey(metricName)) continue;
+
+            double valorAtual = currentMetricValues.get(metricName);
+
+            // --- ✨ SUA CORREÇÃO APLICADA: Ordenação Dinâmica ✨ ---
+            Comparator<InsightRule> comparator = Comparator.comparingDouble(InsightRule::getThresholdValue);
+            if (rulesForMetric.stream().anyMatch(r -> r.getCondition() == ConditionType.GREATER_THAN)) {
+                comparator = comparator.reversed();
+            }
+
+            Optional<InsightRule> bestTriggeredRuleOpt = rulesForMetric.stream()
+                    .filter(rule -> checkCondition(valorAtual, rule.getCondition(), rule.getThresholdValue(), rule.getThresholdValueMax()))
+                    .max(comparator);
+
+            if (bestTriggeredRuleOpt.isPresent()) {
+                InsightRule triggeredRule = bestTriggeredRuleOpt.get();
+                metricsWithActiveRuleThisCycle.add(metricName);
+                String previouslyActiveRuleId = activeAlarmRulePerMetric.get(metricName);
+
+                if (!triggeredRule.getId().equals(previouslyActiveRuleId)) {
+                    logger.info("💡 MUDANÇA DE ESTADO DE ALARME! Métrica: '{}', Nova Regra: '{}'", metricName, triggeredRule.getRuleName());
+                    activeAlarmRulePerMetric.put(metricName, triggeredRule.getId());
+
+                    String mensagem = formatMessage(triggeredRule.getMessageToSend().replace("{{value}}", String.format("%.2f", valorAtual)));
+                    if (!payloadBuilder.isEmpty()) {
+                        payloadBuilder.append(" | ");
+                    }
+                    payloadBuilder.append(mensagem);
+
+                    if (listener != null) listener.onInsight(mensagem, triggeredRule.getInsightType());
+                    if (triggeredRule.isSendToMqtt()) publicarAlarmeMqtt(mensagem, triggeredRule.getInsightType());
+                    if (triggeredRule.isSendToTelegram()) TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagem);
+                } else {
+                    if (!payloadBuilder.isEmpty()) {
+                        payloadBuilder.append(" | ");
+                    }
+                    payloadBuilder.append(formatMessage(triggeredRule.getMessageToSend().replace("{{value}}", String.format("%.2f", valorAtual))));
+                }
+            }
+        }
+
+        Set<String> resolvedMetrics = new HashSet<>(activeAlarmRulePerMetric.keySet());
+        resolvedMetrics.removeAll(metricsWithActiveRuleThisCycle);
+
+        for (String resolvedMetric : resolvedMetrics) {
+            logger.info("✅ CONDIÇÃO DE ALARME RESOLVIDA. Métrica: '{}'", resolvedMetric);
+            activeAlarmRulePerMetric.remove(resolvedMetric);
+        }
+
+        return payloadBuilder.toString();
+    }
+
     private String getDataSourceDetails() {
         if (dataSource instanceof ThingsBoardSource tbSource) {
             return String.format("ThingsBoard (Servidor: %s, Dispositivo: %s)", tbSource.getThingsboardUrl(), tbSource.getDeviceName());
@@ -184,20 +302,15 @@ public class DataPipeline {
         return "Desconhecida";
     }
 
-    /**
-     * Gera uma string detalhada sobre o destino dos dados para o log.
-     */
     private String getDestinationDetails() {
         if (destinationType == DestinationType.POWER_BI) {
             return String.format("Power BI (URL: %s)", destinationEndpoint);
         }
         if (destinationType == DestinationType.FABRIC) {
-            // Não expomos a connection string completa no log por segurança
             return "Microsoft Fabric Eventstream";
         }
         return "Desconhecido";
     }
-
 
     private void processMetrics(JsonObject telemetria, Map<String, Double> currentMetricValues, JsonObject pbiPayload) {
         for (MetricConfig config : this.metricConfigs) {
@@ -230,79 +343,6 @@ public class DataPipeline {
                 logger.warn("⚠️ Não foi possível processar a métrica '{}'. Causa: {}", originalName, e.getMessage());
             }
         }
-    }
-
-    private String evaluateAlertRules(Map<String, Double> currentMetricValues) {
-        String triggeredMessage = "";
-        // Percorre todas as regras de alerta
-        for (AlertRule rule : alertRules) {
-            if (!rule.isEnabled() || !currentMetricValues.containsKey(rule.getMetricToWatch())) {
-                continue;
-            }
-
-            double valorAtual = currentMetricValues.get(rule.getMetricToWatch());
-            boolean condicaoSatisfeita = checkCondition(valorAtual, rule.getCondition(), rule.getThresholdValue(), rule.getThresholdValueMax());
-
-            if (condicaoSatisfeita) {
-                // A condição da regra foi satisfeita.
-                // Verifica se este alerta já não é o que está ativo.
-                if (!rule.getId().equals(this.lastTriggeredAlertId)) {
-                    // É um novo alerta! Notifica e guarda o estado.
-                    logger.warn("🚨 ALERTA CRÍTICO DISPARADO! Regra: '{}'", rule.getRuleName());
-                    this.lastTriggeredAlertId = rule.getId();
-                    // Substitui a variável {{value}} na mensagem pelo valor atual
-                    String mensagem = formatMessage(rule.getMessageToSend().replace("{{value}}", String.format("%.2f", valorAtual)));
-                    triggeredMessage = mensagem;
-
-                    if (listener != null) listener.onAlert(rule.getRuleName(), mensagem);
-                    if (rule.isSendToMqtt()) publicarAlertaMqtt(mensagem);
-                    if (rule.isSendToTelegram()) TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagem);
-                }
-                // Se for o mesmo alerta, não faz nada (comportamento de máquina de estado).
-            } else {
-                // A condição da regra NÃO foi satisfeita.
-                // Verifica se este era o alerta que estava ativo anteriormente.
-                if (rule.getId().equals(this.lastTriggeredAlertId)) {
-                    // Se sim, o alerta foi resolvido. Reinicia o estado.
-                    logger.info("✅ CONDIÇÃO DE ALERTA RESOLVIDA. Regra: '{}'", rule.getRuleName());
-                    this.lastTriggeredAlertId = null;
-                }
-            }
-        }
-        // A mensagem de alerta para o Power BI só é preenchida se um alerta estiver ativo.
-        return lastTriggeredAlertId != null ? triggeredMessage : "";
-    }
-
-    private String evaluateInsightRules(Map<String, Double> currentMetricValues) {
-        String triggeredMessage = "";
-        // A mesma lógica de máquina de estado é aplicada aqui.
-        for (InsightRule rule : insightRules) {
-            if (!rule.isEnabled() || !currentMetricValues.containsKey(rule.getMetricToWatch())) {
-                continue;
-            }
-
-            double valorAtual = currentMetricValues.get(rule.getMetricToWatch());
-            boolean condicaoSatisfeita = checkCondition(valorAtual, rule.getCondition(), rule.getThresholdValue(), rule.getThresholdValueMax());
-
-            if (condicaoSatisfeita) {
-                if (!rule.getId().equals(this.lastTriggeredAlarmId)) {
-                    logger.info("💡 ALARME INTELIGENTE GERADO! Regra: '{}'", rule.getRuleName());
-                    this.lastTriggeredAlarmId = rule.getId();
-                    String mensagem = formatMessage(rule.getMessageToSend().replace("{{value}}", String.format("%.2f", valorAtual)));
-                    triggeredMessage = mensagem;
-
-                    if (listener != null) listener.onInsight(mensagem, rule.getInsightType());
-                    if (rule.isSendToMqtt()) publicarAlarmeMqtt(mensagem, rule.getInsightType());
-                    if (rule.isSendToTelegram()) TelegramService.enviarMensagem(this.telegramToken, this.telegramChatId, mensagem);
-                }
-            } else {
-                if (rule.getId().equals(this.lastTriggeredAlarmId)) {
-                    logger.info("✅ CONDIÇÃO DE ALARME RESOLVIDA. Regra: '{}'", rule.getRuleName());
-                    this.lastTriggeredAlarmId = null;
-                }
-            }
-        }
-        return lastTriggeredAlarmId != null ? triggeredMessage : "";
     }
 
     private boolean checkCondition(double value, main.java.com.gsmart.resources.ConditionType condition, double threshold, double thresholdMax) {

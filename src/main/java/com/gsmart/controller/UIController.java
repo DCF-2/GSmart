@@ -33,7 +33,7 @@ public class UIController {
      */
     private void initializeUI() {
         // --- Configuração da Janela Principal ---
-        view.setTitle("GSmart - Configurador de Pipeline e Alertas v2.3.4");
+        view.setTitle("GSmart - Configurador de Pipeline e Alertas v2.3.5");
         view.setExtendedState(JFrame.MAXIMIZED_BOTH);
         view.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         view.setLocationRelativeTo(null);

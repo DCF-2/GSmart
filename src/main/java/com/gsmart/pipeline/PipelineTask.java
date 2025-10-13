@@ -79,7 +79,8 @@ public class PipelineTask {
             // 1. Sinaliza para a pipeline que ela deve parar.
             if (pipeline != null) {
                 pipeline.requestStop();
-                pipeline.exportRemainingData();
+                // --- ✨ ALTERAÇÃO AQUI: A linha abaixo foi REMOVIDA para evitar o congelamento da UI ✨ ---
+                // pipeline.exportRemainingData();
             }
 
 
