@@ -142,8 +142,8 @@ java -jar target/GSmart-Processador-gui.jar
 
 For more detailed information, please consult our official documentation.
 
-* **GSmart Documentation:** `https://gsmart-site.netlify.app/`
-* **Streaming Replication Documentation:** `https://gsmart-site.netlify.app/`
+* _[**GSmart Documentation:**](https://gsmart-site.netlify.app/)_
+* _[**Streaming Replication Documentation:**](https://gsmart-site.netlify.app/)_
 
 The complete project documentation, including the API reference, can also be viewed locally via MkDocs.
 
@@ -157,5 +157,6 @@ This project is licensed under the MIT License. See the LICENSE file for more de
 
 ## 👥 Author
 
-**GPSERS** - *Intelligent Solutions*
+* **Davi Freitas** - *Desenvolvedor Principal*
+* **GPSERS** - *Intelligent Solutions*
     
